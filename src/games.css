@@ -1,0 +1,257 @@
+/* Game-specific styles: cards on landing, plus tetris/snake/2048 boards */
+
+/* ─── Landing ───────────────────────────────────────────────── */
+.landing__hero {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 20px;
+  padding: 22px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(800px 240px at 0% 0%, rgba(107,140,255,0.10), transparent 60%),
+    var(--panel-bg);
+}
+.landing__hero h1 {
+  font-size: 32px;
+  margin: 0 0 6px;
+  color: var(--text-strong);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  text-wrap: balance;
+}
+.landing__hero p { margin: 0; color: var(--text-dim); font-size: 14.5px; max-width: 56ch; }
+.landing__hero-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  align-self: end;
+}
+.stat-card {
+  background: var(--panel-bg-soft);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+}
+.stat-card dt {
+  font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--text-mute); margin-bottom: 6px;
+}
+.stat-card dd {
+  margin: 0; font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+  font-size: 20px; color: var(--text-strong);
+}
+
+.section-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.section-head h2 {
+  font-size: 15px; color: var(--text-strong); margin: 0;
+  letter-spacing: -0.005em; font-weight: 600;
+}
+.section-head span { font-size: 12px; color: var(--text-mute); }
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+@media (max-width: 1100px) { .cards { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 760px)  { .cards { grid-template-columns: 1fr; } }
+
+.game-card {
+  position: relative;
+  display: flex; flex-direction: column;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+.game-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--game-color, var(--accent));
+  box-shadow: 0 16px 40px rgba(0,0,0,0.45),
+              0 0 0 1px var(--game-color, var(--accent)) inset;
+}
+.game-card__preview {
+  aspect-ratio: 16 / 10;
+  background: var(--grid-empty);
+  border-bottom: 1px solid var(--panel-border);
+  position: relative;
+  overflow: hidden;
+  display: grid; place-items: center;
+}
+.game-card__body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 10px; }
+.game-card__title-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.game-card__title { font-size: 16px; color: var(--text-strong); font-weight: 600; letter-spacing: -0.01em; }
+.game-card__chip {
+  font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--game-color, var(--accent));
+  background: color-mix(in oklab, var(--game-color, var(--accent)) 14%, transparent);
+  border: 1px solid color-mix(in oklab, var(--game-color, var(--accent)) 30%, transparent);
+  padding: 3px 8px; border-radius: 999px;
+  font-weight: 600;
+}
+.game-card__desc { font-size: 13px; color: var(--text-dim); margin: 0; line-height: 1.45; }
+.game-card__meta {
+  display: flex; align-items: center; gap: 14px;
+  font-size: 12px; color: var(--text-mute);
+  font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+  padding-top: 6px; border-top: 1px solid var(--panel-border);
+  margin-top: 4px;
+}
+.game-card__meta span strong { color: var(--text); font-weight: 600; }
+
+/* ─── Tetris preview & in-game ──────────────────────────────── */
+.tetris-mini {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 1px;
+  width: 70%;
+  aspect-ratio: 10 / 16;
+  background: var(--grid-line);
+  border: 1px solid var(--grid-line);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.tetris-mini > div { background: var(--grid-empty); }
+.tetris-mini > div.f {
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.18), inset 0 -2px 0 rgba(0,0,0,0.28);
+}
+
+/* Full Tetris board (used on /play) */
+.tboard {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  grid-template-rows: repeat(20, 1fr);
+  gap: 1px;
+  background: var(--grid-line);
+  border: 1px solid var(--grid-line);
+  width: min(46vh, 360px);
+  aspect-ratio: 10 / 20;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.tboard > div { background: var(--grid-empty); }
+.tboard > div.f {
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.18), inset 0 -3px 0 rgba(0,0,0,0.28);
+}
+.tboard > div.g {
+  background: transparent;
+  border: 1px dashed currentColor;
+  opacity: 0.55;
+}
+
+/* ─── Snake preview & in-game ──────────────────────────────── */
+.snake-mini, .sboard {
+  display: grid;
+  background: var(--grid-empty);
+  border: 1px solid var(--panel-border);
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+}
+.snake-mini { width: 70%; aspect-ratio: 1; }
+.sboard { width: min(46vh, 460px); aspect-ratio: 1; }
+.snake-mini::before, .sboard::before {
+  content: ""; position: absolute; inset: 0;
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: calc(100% / 16) calc(100% / 16);
+  opacity: 0.7;
+}
+.snake-cell { background: var(--game-snake); border-radius: 2px; }
+.snake-head { background: #6ce4ad; box-shadow: 0 0 12px rgba(66,211,146,0.6); }
+.snake-food { background: var(--tetro-Z); border-radius: 50%; box-shadow: 0 0 12px rgba(239,32,41,0.55); }
+
+/* ─── 2048 preview & in-game ────────────────────────────────── */
+.tw-mini, .twboard {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  gap: 6px;
+  padding: 8px;
+  background: #1d1f2a;
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+}
+.tw-mini { width: 70%; aspect-ratio: 1; }
+.twboard { width: min(46vh, 420px); aspect-ratio: 1; padding: 10px; gap: 8px; }
+.tw-tile {
+  display: grid; place-items: center;
+  background: #2a2d3c;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--text-strong);
+  font-size: 11px;
+  letter-spacing: -0.01em;
+}
+.twboard .tw-tile { font-size: 22px; border-radius: 8px; }
+.tw-tile[data-v="2"]    { background: #2c3140; color: var(--text); }
+.tw-tile[data-v="4"]    { background: #353b50; color: var(--text); }
+.tw-tile[data-v="8"]    { background: #4658a0; }
+.tw-tile[data-v="16"]   { background: #6b8cff; }
+.tw-tile[data-v="32"]   { background: #ad4d9c; }
+.tw-tile[data-v="64"]   { background: #ef7921; }
+.tw-tile[data-v="128"]  { background: #f4b860; color: #1c1d24; }
+.tw-tile[data-v="256"]  { background: #f7d308; color: #1c1d24; }
+.tw-tile[data-v="512"]  { background: #42d392; color: #0f1016; }
+.tw-tile[data-v="1024"] { background: #31c7ef; color: #0f1016; }
+.tw-tile[data-v="2048"] { background: linear-gradient(135deg,#6b8cff,#ef7921); color: white; }
+.tw-tile.empty { background: transparent; box-shadow: inset 0 0 0 1px var(--panel-border); }
+
+/* ─── In-game shell (header chip strip + sidepanels) ─────── */
+.play {
+  display: grid;
+  grid-template-columns: minmax(200px, 240px) 1fr minmax(200px, 240px);
+  gap: 18px;
+  align-items: start;
+}
+@media (max-width: 1100px) { .play { grid-template-columns: 1fr; } }
+.play__center {
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+  padding: 22px;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-lg);
+}
+.play__side { display: flex; flex-direction: column; gap: 12px; }
+
+.score-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+}
+.score-grid .stat-card { padding: 10px 12px; }
+.score-grid .stat-card dd { font-size: 17px; }
+
+.next-list {
+  display: flex; flex-direction: column; gap: 6px; align-items: center;
+}
+.preview-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  width: 76px; aspect-ratio: 1; gap: 1px;
+}
+.preview-grid > div { background: transparent; border-radius: 2px; }
+.preview-grid > div.f {
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.18), inset 0 -2px 0 rgba(0,0,0,0.28);
+}
+
+.kbd {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: var(--panel-bg-soft);
+  border: 1px solid var(--panel-border);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  padding: 1px 6px;
+  color: var(--text);
+}
+.controls-list { display: grid; gap: 6px; font-size: 12.5px; color: var(--text-dim); }
+.controls-list > div { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
