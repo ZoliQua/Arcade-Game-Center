@@ -1,0 +1,19 @@
+{
+  "name": "arcade-portal",
+  "private": true,
+  "version": "0.0.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w @arcade/portal",
+    "build": "npm run build -w @arcade/portal",
+    "preview": "npm run preview -w @arcade/portal",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
