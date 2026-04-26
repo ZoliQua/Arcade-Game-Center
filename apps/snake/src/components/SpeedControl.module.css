@@ -1,0 +1,32 @@
+.wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(80vmin, 560px);
+  padding: 10px 16px;
+  background: #1e1e24;
+  border: 2px solid #2c2c36;
+  border-radius: 8px;
+}
+
+.label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #9ca3af;
+  min-width: 56px;
+}
+
+.slider {
+  flex: 1;
+  accent-color: #22c55e;
+  cursor: pointer;
+}
+
+.value {
+  font-size: 1.125rem;
+  font-weight: 700;
+  min-width: 24px;
+  text-align: right;
+  color: #e5e7eb;
+}

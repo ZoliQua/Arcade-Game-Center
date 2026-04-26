@@ -1,0 +1,34 @@
+.wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(80vmin, 560px);
+  padding: 10px 16px;
+  background: #1e1e24;
+  border: 2px solid #2c2c36;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #9ca3af;
+  flex: 1;
+}
+
+.checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: #22c55e;
+  cursor: pointer;
+}
+
+.state {
+  font-size: 0.875rem;
+  font-weight: 700;
+  min-width: 32px;
+  text-align: right;
+  color: #e5e7eb;
+}
