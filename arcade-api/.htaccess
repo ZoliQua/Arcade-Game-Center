@@ -1,0 +1,16 @@
+# Block direct access to config and helper files. Only score.php and
+# leaderboard.php should be reachable from the outside.
+<FilesMatch "^_">
+    Require all denied
+</FilesMatch>
+
+# Belt-and-suspenders: also deny *.example.php just in case.
+<FilesMatch "\.example\.php$">
+    Require all denied
+</FilesMatch>
+
+# Disable directory listing.
+Options -Indexes
+
+# Force UTF-8 for any text the scripts emit.
+AddDefaultCharset UTF-8

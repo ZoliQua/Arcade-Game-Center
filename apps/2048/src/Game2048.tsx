@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import './styles/index.css';
 import { GameBoard } from './components/GameBoard';
 import { GameControls } from './components/GameControls';
@@ -22,7 +22,11 @@ function reducer(state: GameState, action: GameAction): GameState {
   return advanceGame(state, action, defaultRng);
 }
 
-export function Game2048() {
+type Game2048Props = {
+  onGameOver?: (score: number) => void;
+};
+
+export function Game2048({ onGameOver }: Game2048Props = {}) {
   const { best, recordScore } = useHighScore();
   const [state, dispatch] = useReducer(reducer, best, init);
   const [sessionId, setSessionId] = useState(0);
@@ -30,6 +34,14 @@ export function Game2048() {
   useEffect(() => {
     recordScore(state.score);
   }, [state.score, recordScore]);
+
+  const lastReportedRef = useRef<typeof state.status>(state.status);
+  useEffect(() => {
+    if (state.status === 'gameOver' && lastReportedRef.current !== 'gameOver') {
+      onGameOver?.(state.score);
+    }
+    lastReportedRef.current = state.status;
+  }, [state.status, state.score, onGameOver]);
 
   const hasDying = useMemo(
     () => state.tiles.some((t) => t.isDying || t.isNew || t.mergedFrom),

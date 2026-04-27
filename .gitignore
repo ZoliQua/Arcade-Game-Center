@@ -5,3 +5,10 @@ dist/
 .vite/
 .env
 .env.local
+
+# Server-side secrets — never commit
+arcade-api/_config.php
+
+# Frontend env (API key baked at build time)
+apps/portal/.env
+

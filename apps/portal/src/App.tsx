@@ -7,6 +7,11 @@ import { Game2048 } from '@arcade/2048';
 import { Landing } from './Landing';
 import { Leaderboard } from './Leaderboard';
 import { Settings } from './Settings';
+import { NicknamePrompt } from './NicknamePrompt';
+import { getNickname } from './services/nickname';
+import { useScoreSubmitter } from './hooks/useScoreSubmitter';
+
+const NICK_PROMPT_DISMISSED_KEY = 'arcade.nickPromptDismissed';
 
 export default function App() {
   const [route, setRoute] = useState<Route>({ view: 'home' });
@@ -14,6 +19,18 @@ export default function App() {
   const [collapsed, setCollapsed] = useState(false);
   const [status, setStatus] = useState<GameStatus>('idle');
   const [sessionSeconds, setSessionSeconds] = useState(0);
+
+  const [nickname, setNickname] = useState<string | null>(() => getNickname());
+  const [nickPromptOpen, setNickPromptOpen] = useState(() => {
+    if (getNickname()) return false;
+    try {
+      return localStorage.getItem(NICK_PROMPT_DISMISSED_KEY) !== '1';
+    } catch {
+      return true;
+    }
+  });
+
+  const submitScore = useScoreSubmitter();
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -66,13 +83,43 @@ export default function App() {
         />
         <main className="content__body">
           {route.view === 'home' && <Landing setRoute={setRoute} totals={totals} />}
-          {route.view === 'play' && route.gameId === 'tetris' && <TetrisGame />}
-          {route.view === 'play' && route.gameId === 'snake' && <SnakeGame />}
-          {route.view === 'play' && route.gameId === '2048' && <Game2048 />}
+          {route.view === 'play' && route.gameId === 'tetris' && (
+            <TetrisGame onGameOver={(s) => submitScore('tetris', s)} />
+          )}
+          {route.view === 'play' && route.gameId === 'snake' && (
+            <SnakeGame onGameOver={(s) => submitScore('snake', s)} />
+          )}
+          {route.view === 'play' && route.gameId === '2048' && (
+            <Game2048 onGameOver={(s) => submitScore('2048', s)} />
+          )}
           {route.view === 'leaderboard' && <Leaderboard />}
-          {route.view === 'settings' && <Settings theme={theme} setTheme={setTheme} />}
+          {route.view === 'settings' && (
+            <Settings
+              theme={theme}
+              setTheme={setTheme}
+              nickname={nickname}
+              onNicknameChange={setNickname}
+            />
+          )}
         </main>
       </div>
+
+      {nickPromptOpen && (
+        <NicknamePrompt
+          onSet={(nick) => {
+            setNickname(nick);
+            setNickPromptOpen(false);
+          }}
+          onSkip={() => {
+            try {
+              localStorage.setItem(NICK_PROMPT_DISMISSED_KEY, '1');
+            } catch {
+              /* ignore */
+            }
+            setNickPromptOpen(false);
+          }}
+        />
+      )}
     </div>
   );
 }

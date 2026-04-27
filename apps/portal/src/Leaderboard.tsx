@@ -1,77 +1,167 @@
-type Row = {
-  rank: number;
-  game: string;
-  score: number;
-  lines: number | string;
-  when: string;
+import { useEffect, useState } from 'react';
+import {
+  apiConfigured,
+  fetchAllLeaderboards,
+  type GameId,
+  type LeaderboardEntry,
+} from './services/api';
+
+const GAME_LABEL: Record<GameId, string> = {
+  tetris: 'Tetris',
+  snake: 'Snake',
+  '2048': '2048',
 };
 
-const ROWS: Row[] = [
-  { rank: 1, game: 'Tetris', score: 12480, lines: 124, when: '2 days ago' },
-  { rank: 2, game: '2048', score: 4096, lines: '—', when: '4 days ago' },
-  { rank: 3, game: 'Snake', score: 87, lines: '—', when: 'Yesterday' },
-  { rank: 4, game: 'Tetris', score: 9760, lines: 92, when: 'Last week' },
-  { rank: 5, game: 'Tetris', score: 7320, lines: 71, when: 'Last week' },
-];
+const ORDER: GameId[] = ['tetris', 'snake', '2048'];
+
+type LeaderboardData = Record<GameId, LeaderboardEntry[]>;
+const EMPTY: LeaderboardData = { tetris: [], snake: [], '2048': [] };
+
+function fmtRelative(at: string): string {
+  const t = new Date(at.replace(' ', 'T') + 'Z').getTime();
+  if (Number.isNaN(t)) return at;
+  const diffSec = Math.max(1, Math.floor((Date.now() - t) / 1000));
+  if (diffSec < 60) return `${diffSec}s ago`;
+  if (diffSec < 3600) return `${Math.floor(diffSec / 60)}m ago`;
+  if (diffSec < 86400) return `${Math.floor(diffSec / 3600)}h ago`;
+  return `${Math.floor(diffSec / 86400)}d ago`;
+}
 
 export function Leaderboard() {
+  const [data, setData] = useState<LeaderboardData>(EMPTY);
+  const [status, setStatus] = useState<'idle' | 'loading' | 'ok' | 'error'>('idle');
+
+  useEffect(() => {
+    if (!apiConfigured) {
+      setStatus('error');
+      return;
+    }
+    const ctrl = new AbortController();
+    setStatus('loading');
+    fetchAllLeaderboards(ctrl.signal)
+      .then((d) => {
+        setData(d);
+        setStatus('ok');
+      })
+      .catch(() => setStatus('error'));
+    return () => ctrl.abort();
+  }, []);
+
   return (
     <div>
       <div className="section-head">
         <h2>Best runs</h2>
-        <span>Personal bests across all games</span>
+        <span>
+          {status === 'loading' && 'Loading…'}
+          {status === 'ok' && 'Top 10 per game · global'}
+          {status === 'error' && !apiConfigured && 'Leaderboard server not configured'}
+          {status === 'error' && apiConfigured && 'Could not reach leaderboard server'}
+        </span>
       </div>
-      <div className="panel" style={{ padding: 0, overflow: 'hidden' }}>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '60px 1fr 120px 100px 1fr',
-            padding: '12px 18px',
-            borderBottom: '1px solid var(--panel-border)',
-            fontSize: 11,
-            letterSpacing: '0.12em',
-            textTransform: 'uppercase',
-            color: 'var(--text-mute)',
-          }}
-        >
-          <span>#</span>
-          <span>Game</span>
-          <span>Score</span>
-          <span>Lines</span>
-          <span>When</span>
-        </div>
-        {ROWS.map((r) => (
-          <div
-            key={r.rank}
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '60px 1fr 120px 100px 1fr',
-              padding: '12px 18px',
-              borderBottom: '1px solid var(--panel-border)',
-              fontSize: 13.5,
-              alignItems: 'center',
-            }}
-          >
-            <span
-              style={{
-                color: r.rank === 1 ? 'var(--tetro-O)' : 'var(--text-mute)',
-                fontFamily: 'var(--font-mono)',
-                fontWeight: 600,
-              }}
-            >
-              {r.rank}
-            </span>
-            <span style={{ color: 'var(--text-strong)', fontWeight: 500 }}>{r.game}</span>
-            <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-strong)' }}>
-              {r.score.toLocaleString()}
-            </span>
-            <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-dim)' }}>
-              {r.lines}
-            </span>
-            <span style={{ color: 'var(--text-dim)' }}>{r.when}</span>
-          </div>
+
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: 18,
+        }}
+      >
+        {ORDER.map((g) => (
+          <GameLeaderboard key={g} game={g} entries={data[g]} status={status} />
         ))}
       </div>
+    </div>
+  );
+}
+
+type GameLeaderboardProps = {
+  game: GameId;
+  entries: LeaderboardEntry[];
+  status: 'idle' | 'loading' | 'ok' | 'error';
+};
+
+function GameLeaderboard({ game, entries, status }: GameLeaderboardProps) {
+  return (
+    <div className="panel" style={{ padding: 0, overflow: 'hidden' }}>
+      <div
+        style={{
+          padding: '12px 18px',
+          borderBottom: '1px solid var(--panel-border)',
+          fontSize: 11,
+          letterSpacing: '0.12em',
+          textTransform: 'uppercase',
+          color: 'var(--text-mute)',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
+        <span style={{ color: 'var(--text-strong)', fontWeight: 600 }}>
+          {GAME_LABEL[game]}
+        </span>
+        <span>{entries.length === 0 ? '—' : `${entries.length} entries`}</span>
+      </div>
+
+      {status === 'loading' && entries.length === 0 && (
+        <div style={{ padding: '18px', color: 'var(--text-mute)', fontSize: 13 }}>
+          Loading…
+        </div>
+      )}
+
+      {status === 'error' && (
+        <div style={{ padding: '18px', color: 'var(--text-mute)', fontSize: 13 }}>
+          Unavailable.
+        </div>
+      )}
+
+      {status === 'ok' && entries.length === 0 && (
+        <div style={{ padding: '18px', color: 'var(--text-mute)', fontSize: 13 }}>
+          No scores yet — be the first.
+        </div>
+      )}
+
+      {entries.map((row, i) => (
+        <div
+          key={`${row.name}-${row.score}-${row.at}`}
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '40px 1fr 100px 80px',
+            padding: '10px 18px',
+            borderBottom: '1px solid var(--panel-border)',
+            fontSize: 13,
+            alignItems: 'center',
+          }}
+        >
+          <span
+            style={{
+              color: i === 0 ? 'var(--tetro-O)' : 'var(--text-mute)',
+              fontFamily: 'var(--font-mono)',
+              fontWeight: 600,
+            }}
+          >
+            {i + 1}
+          </span>
+          <span style={{ color: 'var(--text-strong)' }}>{row.name}</span>
+          <span
+            style={{
+              fontFamily: 'var(--font-mono)',
+              color: 'var(--text-strong)',
+              textAlign: 'right',
+            }}
+          >
+            {row.score.toLocaleString()}
+          </span>
+          <span
+            style={{
+              color: 'var(--text-mute)',
+              fontSize: 11,
+              textAlign: 'right',
+            }}
+          >
+            {fmtRelative(row.at)}
+          </span>
+        </div>
+      ))}
     </div>
   );
 }

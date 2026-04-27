@@ -35,7 +35,11 @@ function statusLabel(status: GameState['status']): string {
   }
 }
 
-export function TetrisGame() {
+type TetrisGameProps = {
+  onGameOver?: (score: number) => void;
+};
+
+export function TetrisGame({ onGameOver }: TetrisGameProps = {}) {
   const [startLevel, setStartLevel] = useState<number>(1);
   const [state, dispatch] = useReducer(reducer, undefined, () => initialState(1));
 
@@ -52,9 +56,10 @@ export function TetrisGame() {
   useEffect(() => {
     if (state.status === 'gameOver' && lastSubmittedStatus.current !== 'gameOver') {
       submit(state.score);
+      onGameOver?.(state.score);
     }
     lastSubmittedStatus.current = state.status;
-  }, [state.status, state.score, submit]);
+  }, [state.status, state.score, submit, onGameOver]);
 
   const [runId, setRunId] = useState(0);
   const prevStatusRef = useRef<GameState['status']>(state.status);

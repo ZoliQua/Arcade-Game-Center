@@ -245,5 +245,81 @@ If a new game lands a high score in `localStorage`, use the same convention:
 
 ## Deploy
 
-One app, one build. Vercel / Netlify / Pages: build command `npm run build`,
-output directory `apps/portal/dist`. Workspaces are picked up automatically.
+One app, one build. The portal builds a static SPA into `apps/portal/dist`
+with relative asset paths (`./assets/...`), so it works under any subpath.
+
+### Production target: `https://drdul.hu/arcade/`
+
+Server is cPanel + LFTP (no SSH), same hosting as fogorvosa.hu. Two pieces
+ship together:
+
+- **Frontend** (`apps/portal/dist/`) → `public_html/arcade/`
+- **PHP API** (`arcade-api/`) → `public_html/arcade/api/`
+
+The API uses MySQL with the `fogorvosa_` prefix the host enforces.
+
+### One-time server setup
+
+1. **Create the MySQL database in cPanel** named `fogorvosa_arcade`, with a
+   user (e.g. `fogorvosa_arcade`) that has full privileges on it.
+
+2. **Generate a shared secret** locally:
+   ```bash
+   php -r "echo bin2hex(random_bytes(24));"
+   ```
+
+3. **Create `arcade-api/_config.php` locally** by copying
+   `arcade-api/_config.example.php` and filling in DB credentials + the
+   secret. Do **not** commit this file (it's in `.gitignore`).
+
+4. **Create `apps/portal/.env`** by copying `.env.example` and putting the
+   same secret in `VITE_ARCADE_API_KEY`. Set `VITE_ARCADE_API_BASE` to
+   `https://drdul.hu/arcade/api`.
+
+5. **Upload `_config.php` once** to `public_html/arcade/api/_config.php`. It
+   never needs to be uploaded again unless credentials change.
+
+The first request to `score.php` or `leaderboard.php` runs
+`CREATE TABLE IF NOT EXISTS` automatically — no manual SQL needed.
+
+### Per-deploy upload
+
+Build, then push everything via lftp (same credentials/pattern as
+DentalQuoteCreator). Frontend goes first, API second:
+
+```bash
+npm run build
+
+lftp -e "
+  set ssl:verify-certificate no
+  set ftp:ssl-allow yes
+  open -u USER,PASS ftp.drdul.hu
+  # Frontend
+  mirror -R --delete --exclude '\\.well-known/' apps/portal/dist public_html/arcade
+  # PHP API (skip _config.php so we don't overwrite the live one)
+  mirror -R --exclude '_config\\.php\$' arcade-api public_html/arcade/api
+  bye
+"
+```
+
+Notes:
+
+- The `mirror -R --delete` on the frontend is safe because `dist/` is
+  regenerated from scratch every build.
+- The API mirror **does not** use `--delete` and **excludes `_config.php`** —
+  this is what protects the live secrets file from being wiped.
+- If you ever need a clean wipe of the API (e.g. removing an old file),
+  delete it manually via FTP or cPanel File Manager rather than enabling
+  `--delete`.
+
+### Quick local smoke test of the dist
+
+```bash
+cd apps/portal/dist && python3 -m http.server 8765
+# open http://localhost:8765/
+```
+
+Leaderboard will say "server not configured" because `.env` isn't read by a
+plain static server — that's expected. To test the API integration locally,
+add `http://localhost:5173` to `allowed_origins` in `_config.php` on the
+server, then run `npm run dev`.

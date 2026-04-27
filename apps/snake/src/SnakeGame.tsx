@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { GameBoard } from './components/GameBoard';
 import { GameControls } from './components/GameControls';
 import { Overlay } from './components/Overlay';
@@ -15,17 +15,24 @@ import { isOppositeDirection } from './logic/snake';
 import type { Direction } from './logic/types';
 import styles from './App.module.css';
 
-export function SnakeGame() {
+type SnakeGameProps = {
+  onGameOver?: (score: number) => void;
+};
+
+export function SnakeGame({ onGameOver }: SnakeGameProps = {}) {
   const [state, setState] = useState(createInitialState);
   const [gameId, setGameId] = useState(0);
   const { highScore, recordScore } = useHighScore();
   const elapsedSeconds = useElapsedSeconds(state.status === 'running', gameId);
 
+  const lastReportedRef = useRef<typeof state.status>(state.status);
   useEffect(() => {
-    if (state.status === 'gameOver') {
+    if (state.status === 'gameOver' && lastReportedRef.current !== 'gameOver') {
       recordScore(state.score);
+      onGameOver?.(state.score);
     }
-  }, [state.status, state.score, recordScore]);
+    lastReportedRef.current = state.status;
+  }, [state.status, state.score, recordScore, onGameOver]);
 
   const tick = useCallback(() => {
     setState((prev) => advanceGame(prev));

@@ -4,3 +4,12 @@ declare module '*.module.css' {
 }
 
 declare module '*.css';
+
+interface ImportMetaEnv {
+  readonly VITE_ARCADE_API_BASE?: string;
+  readonly VITE_ARCADE_API_KEY?: string;
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}
