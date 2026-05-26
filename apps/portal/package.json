@@ -14,6 +14,7 @@
     "@arcade/tetris": "*",
     "@arcade/snake": "*",
     "@arcade/2048": "*",
+    "@arcade/pacman": "*",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },

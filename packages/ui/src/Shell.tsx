@@ -10,10 +10,11 @@ import {
   IconTetris,
   IconSnake,
   Icon2048,
+  IconPacman,
   IconKbd,
 } from './Icons';
 
-export type GameId = 'tetris' | 'snake' | '2048';
+export type GameId = 'tetris' | 'snake' | '2048' | 'pacman';
 
 export type Route =
   | { view: 'home' }
@@ -36,6 +37,7 @@ export const GAMES: GameMeta[] = [
   { id: 'tetris', name: 'Tetris', Icon: IconTetris, color: 'var(--game-tetris)', best: 12480 },
   { id: 'snake', name: 'Snake', Icon: IconSnake, color: 'var(--game-snake)', best: 87 },
   { id: '2048', name: '2048', Icon: Icon2048, color: 'var(--game-2048)', best: 4096 },
+  { id: 'pacman', name: 'Pac-Man', Icon: IconPacman, color: 'var(--game-pacman)', best: 10000 },
 ];
 
 export function fmtTime(s: number): string {

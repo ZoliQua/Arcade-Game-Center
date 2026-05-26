@@ -4,6 +4,7 @@ import type { Route, Theme, GameStatus } from '@arcade/ui';
 import { TetrisGame } from '@arcade/tetris';
 import { SnakeGame } from '@arcade/snake';
 import { Game2048 } from '@arcade/2048';
+import { PacmanGame } from '@arcade/pacman';
 import { Landing } from './Landing';
 import { Leaderboard } from './Leaderboard';
 import { Settings } from './Settings';
@@ -91,6 +92,9 @@ export default function App() {
           )}
           {route.view === 'play' && route.gameId === '2048' && (
             <Game2048 onGameOver={(s) => submitScore('2048', s)} />
+          )}
+          {route.view === 'play' && route.gameId === 'pacman' && (
+            <PacmanGame onGameOver={(s) => submitScore('pacman', s)} />
           )}
           {route.view === 'leaderboard' && <Leaderboard />}
           {route.view === 'settings' && (

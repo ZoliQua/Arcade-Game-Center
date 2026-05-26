@@ -10,12 +10,13 @@ const GAME_LABEL: Record<GameId, string> = {
   tetris: 'Tetris',
   snake: 'Snake',
   '2048': '2048',
+  pacman: 'Pac-Man',
 };
 
-const ORDER: GameId[] = ['tetris', 'snake', '2048'];
+const ORDER: GameId[] = ['tetris', 'snake', '2048', 'pacman'];
 
 type LeaderboardData = Record<GameId, LeaderboardEntry[]>;
-const EMPTY: LeaderboardData = { tetris: [], snake: [], '2048': [] };
+const EMPTY: LeaderboardData = { tetris: [], snake: [], '2048': [], pacman: [] };
 
 function fmtRelative(at: string): string {
   const t = new Date(at.replace(' ', 'T') + 'Z').getTime();

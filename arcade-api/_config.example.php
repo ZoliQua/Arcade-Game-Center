@@ -36,6 +36,7 @@ return [
         'tetris' => 9999999,
         'snake'  => 10000,
         '2048'   => 9999999,
+        'pacman' => 10000,
     ],
 
     // Nickname constraints.

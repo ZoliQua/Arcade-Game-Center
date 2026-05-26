@@ -1,4 +1,4 @@
-export type GameId = 'tetris' | 'snake' | '2048';
+export type GameId = 'tetris' | 'snake' | '2048' | 'pacman';
 
 export type LeaderboardEntry = {
   name: string;
@@ -72,7 +72,7 @@ export async function fetchLeaderboard(
 export async function fetchAllLeaderboards(
   signal?: AbortSignal,
 ): Promise<Record<GameId, LeaderboardEntry[]>> {
-  const empty: Record<GameId, LeaderboardEntry[]> = { tetris: [], snake: [], '2048': [] };
+  const empty: Record<GameId, LeaderboardEntry[]> = { tetris: [], snake: [], '2048': [], pacman: [] };
   if (!apiConfigured) return empty;
 
   try {

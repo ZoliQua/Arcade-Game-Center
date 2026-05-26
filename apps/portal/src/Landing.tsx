@@ -197,6 +197,61 @@ function Tw2048Mini({ active = false }: MiniProps) {
   );
 }
 
+function PacmanMini({ active = false }: MiniProps) {
+  const [open, setOpen] = useState(true);
+  useEffect(() => {
+    if (!active) return;
+    const id = setInterval(() => setOpen((o) => !o), 220);
+    return () => clearInterval(id);
+  }, [active]);
+
+  const N = 16;
+  const cellSize = 100 / N;
+  // A row of dots for Pac-Man to chase, plus a power pellet at the end.
+  const dots = useMemo(() => {
+    const d: { x: number; y: number; big: boolean }[] = [];
+    for (let x = 6; x < N - 1; x++) d.push({ x, y: 7, big: x === N - 2 });
+    return d;
+  }, []);
+  const pacX = 3;
+  const pacY = 7;
+
+  return (
+    <div className="pacman-mini" aria-hidden="true">
+      {dots.map((d, i) => (
+        <div
+          key={i}
+          style={{
+            position: 'absolute',
+            left: `${d.x * cellSize + (d.big ? cellSize * 0.18 : cellSize * 0.33)}%`,
+            top: `${d.y * cellSize + (d.big ? cellSize * 0.18 : cellSize * 0.33)}%`,
+            width: `${d.big ? cellSize * 0.64 : cellSize * 0.34}%`,
+            height: `${d.big ? cellSize * 0.64 : cellSize * 0.34}%`,
+            borderRadius: '50%',
+            background: 'var(--game-pacman)',
+            opacity: d.big ? 0.95 : 0.6,
+          }}
+        />
+      ))}
+      <div
+        style={{
+          position: 'absolute',
+          left: `${pacX * cellSize}%`,
+          top: `${pacY * cellSize}%`,
+          width: `${cellSize * 1.6}%`,
+          height: `${cellSize * 1.6}%`,
+          borderRadius: '50%',
+          background: 'var(--game-pacman)',
+          clipPath: open
+            ? 'polygon(100% 25%, 45% 50%, 100% 75%, 50% 100%, 0 50%, 50% 0)'
+            : 'circle(50% at 50% 50%)',
+          transition: 'clip-path 200ms ease',
+        }}
+      />
+    </div>
+  );
+}
+
 type GameCardProps = {
   name: string;
   color: string;
@@ -257,12 +312,17 @@ const META = {
     tag: 'Puzzle',
     desc: 'Slide tiles, merge equal numbers. Get to 2048 — and beyond.',
   },
+  pacman: {
+    tag: 'Maze',
+    desc: 'Chase ghosts, gobble dots and power pellets across a classic maze — switch normal/fog icons.',
+  },
 } as const;
 
 const PREVIEWS = {
   tetris: <TetrisMini />,
   snake: <SnakeMini />,
   '2048': <Tw2048Mini />,
+  pacman: <PacmanMini />,
 } as const;
 
 export function Landing({ setRoute, totals }: LandingProps) {
@@ -270,7 +330,7 @@ export function Landing({ setRoute, totals }: LandingProps) {
     <>
       <section className="landing__hero">
         <div>
-          <h1>Three classics, one home.</h1>
+          <h1>Four classics, one home.</h1>
           <p>
             Welcome back. Pick a game to play, or pick up where you left off — your high
             scores follow you across sessions.
@@ -294,7 +354,7 @@ export function Landing({ setRoute, totals }: LandingProps) {
 
       <div className="section-head">
         <h2>Games</h2>
-        <span>3 available · keyboard-first</span>
+        <span>4 available · keyboard-first</span>
       </div>
 
       <div className="cards">

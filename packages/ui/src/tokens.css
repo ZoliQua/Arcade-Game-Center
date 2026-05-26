@@ -29,6 +29,7 @@
   --game-tetris: #6b8cff;
   --game-snake:  #42d392;
   --game-2048:   #f4b860;
+  --game-pacman: #ffd23f;
 
   /* Tetromino palette (exact match to logic/constants.ts) */
   --tetro-I: #31c7ef;

@@ -124,6 +124,13 @@ export const Icon2048 = ({ size = 18, color = 'currentColor' }: IconProps) => (
   </svg>
 );
 
+export const IconPacman = ({ size = 18, color = 'currentColor' }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+    <path d="M12 12 L22 6 A11 11 0 1 0 22 18 Z" />
+    <circle cx="11" cy="7.5" r="1.4" fill="var(--bg, #0b0b12)" />
+  </svg>
+);
+
 export const IconLogo = () => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
     <rect x="3" y="3" width="8" height="8" rx="1.4" />
