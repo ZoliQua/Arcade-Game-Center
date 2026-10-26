@@ -1,0 +1,20 @@
+{
+  "name": "@arcade/kit",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared runtime for every Zoltan's Arcade game: stats & scoring, session save/restore, theme, standalone shell and common UI.",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./arcade.css": "./src/arcade.css"
+  },
+  "peerDependencies": {
+    "react": "^18",
+    "react-dom": "^18"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p ."
+  }
+}

@@ -1,4 +1,6 @@
-export type GameId = 'tetris' | 'snake' | '2048' | 'pacman';
+import { ARCADE_GAMES, type ArcadeGameId } from '@arcade/kit';
+
+export type GameId = ArcadeGameId;
 
 export type LeaderboardEntry = {
   name: string;
@@ -72,7 +74,10 @@ export async function fetchLeaderboard(
 export async function fetchAllLeaderboards(
   signal?: AbortSignal,
 ): Promise<Record<GameId, LeaderboardEntry[]>> {
-  const empty: Record<GameId, LeaderboardEntry[]> = { tetris: [], snake: [], '2048': [], pacman: [] };
+  const empty = Object.fromEntries(ARCADE_GAMES.map((g) => [g.id, []])) as unknown as Record<
+    GameId,
+    LeaderboardEntry[]
+  >;
   if (!apiConfigured) return empty;
 
   try {

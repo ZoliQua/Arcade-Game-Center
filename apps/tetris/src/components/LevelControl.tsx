@@ -8,10 +8,9 @@ type Props = {
 
 export function LevelControl({ value, disabled, onChange }: Props) {
   return (
-    <div className="level-control">
-      <label htmlFor="start-level">Starting level</label>
+    <label className="arc-field">
+      <span>Start level</span>
       <input
-        id="start-level"
         type="range"
         min={1}
         max={MAX_START_LEVEL}
@@ -19,8 +18,11 @@ export function LevelControl({ value, disabled, onChange }: Props) {
         value={value}
         disabled={disabled}
         onChange={(e) => onChange(Number.parseInt(e.target.value, 10))}
+        aria-valuemin={1}
+        aria-valuemax={MAX_START_LEVEL}
+        aria-valuenow={value}
       />
-      <span className="level-value">{value}</span>
-    </div>
+      <strong aria-live="polite">{value}</strong>
+    </label>
   );
 }

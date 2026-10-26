@@ -1,26 +1,24 @@
 {
   "name": "@arcade/ui",
-  "version": "0.0.0",
+  "version": "2.0.0",
   "private": true,
   "type": "module",
+  "description": "Portal shell for Zoltan's Arcade: sidebar, header, icons and portal/landing styles.",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./tokens.css": "./src/tokens.css",
     "./portal.css": "./src/portal.css",
     "./games.css": "./src/games.css"
+  },
+  "dependencies": {
+    "@arcade/kit": "*"
   },
   "peerDependencies": {
     "react": "^18",
     "react-dom": "^18"
   },
   "scripts": {
-    "typecheck": "tsc --noEmit"
-  },
-  "devDependencies": {
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1",
-    "typescript": "^5.6.3"
+    "typecheck": "tsc --noEmit -p ."
   }
 }

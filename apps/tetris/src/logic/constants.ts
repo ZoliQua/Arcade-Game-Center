@@ -110,16 +110,6 @@ export const SPAWN_POS: Readonly<Record<PieceKind, { x: number; y: number }>> = 
 
 export const ALL_KINDS: readonly PieceKind[] = ['I', 'O', 'T', 'S', 'Z', 'J', 'L'];
 
-export const COLORS: Readonly<Record<PieceKind, string>> = {
-  I: '#31c7ef',
-  O: '#f7d308',
-  T: '#ad4d9c',
-  S: '#42b642',
-  Z: '#ef2029',
-  J: '#5a65ad',
-  L: '#ef7921',
-};
-
 export type KickTable = Readonly<Record<`${RotationState}->${RotationState}`, readonly Offset[]>>;
 
 export const JLSTZ_KICKS: KickTable = {
@@ -166,5 +156,3 @@ export const POINTS_PER_LINES: Readonly<Record<1 | 2 | 3 | 4, number>> = {
   3: 500,
   4: 800,
 };
-
-export const HIGH_SCORE_KEY = 'tetris.highScore';

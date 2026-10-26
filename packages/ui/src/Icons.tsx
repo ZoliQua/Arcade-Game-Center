@@ -131,6 +131,32 @@ export const IconPacman = ({ size = 18, color = 'currentColor' }: IconProps) => 
   </svg>
 );
 
+export const IconGomoku = ({ size = 18, color = 'currentColor' }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.4">
+    <path d="M4 8h16M4 12h16M4 16h16M8 4v16M12 4v16M16 4v16" opacity="0.45" />
+    <circle cx="8" cy="8" r="2.4" fill={color} />
+    <circle cx="12" cy="12" r="2.4" fill={color} />
+    <circle cx="16" cy="16" r="2.4" fill={color} />
+    <circle cx="16" cy="8" r="2.2" fill="none" />
+  </svg>
+);
+
+export const IconTicTacToe = ({ size = 18, color = 'currentColor' }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round">
+    <path d="M9 3v18M15 3v18M3 9h18M3 15h18" opacity="0.5" />
+    <path d="M4.5 4.5l3 3M7.5 4.5l-3 3" />
+    <circle cx="12" cy="12" r="1.7" />
+    <path d="M16.5 16.5l3 3M19.5 16.5l-3 3" />
+  </svg>
+);
+
+export const IconSave = ({ size = 18 }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" {...stroke}>
+    <path d="M5 3h11l3 3v15H5z" />
+    <path d="M8 3v5h7V3M8 21v-7h8v7" />
+  </svg>
+);
+
 export const IconLogo = () => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
     <rect x="3" y="3" width="8" height="8" rx="1.4" />

@@ -1,377 +1,165 @@
+import { useState, type CSSProperties } from 'react';
 import {
-  cloneElement,
-  isValidElement,
-  useEffect,
-  useMemo,
-  useState,
-  type CSSProperties,
-  type Dispatch,
-  type ReactElement,
-  type SetStateAction,
-} from 'react';
-import { GAMES, fmtTime, type Route } from '@arcade/ui';
-
-const TETRO: Record<string, string> = {
-  I: '#31c7ef',
-  O: '#f7d308',
-  T: '#ad4d9c',
-  S: '#42b642',
-  Z: '#ef2029',
-  J: '#5a65ad',
-  L: '#ef7921',
-};
-
-type MiniProps = { active?: boolean };
-
-function useTetrisPreview(active: boolean) {
-  const [piece, setPiece] = useState<{ k: string; x: number; y: number }>({
-    k: 'T',
-    x: 4,
-    y: 0,
-  });
-
-  useEffect(() => {
-    if (!active) return;
-    const id = setInterval(() => {
-      setPiece((p) => {
-        const next = { ...p, y: p.y + 1 };
-        if (next.y > 14) {
-          const kinds = ['I', 'O', 'T', 'S', 'Z', 'J', 'L'];
-          return {
-            k: kinds[Math.floor(Math.random() * kinds.length)],
-            x: Math.floor(Math.random() * 8) + 1,
-            y: 0,
-          };
-        }
-        return next;
-      });
-    }, 220);
-    return () => clearInterval(id);
-  }, [active]);
-
-  const stack = useMemo(() => {
-    const rows = 16;
-    const cols = 10;
-    const grid: (string | null)[][] = Array.from({ length: rows }, () =>
-      Array(cols).fill(null),
-    );
-    const fillRows = [
-      { r: 15, fill: 0.85 },
-      { r: 14, fill: 0.7 },
-      { r: 13, fill: 0.5 },
-      { r: 12, fill: 0.3 },
-    ];
-    const kinds = ['I', 'O', 'T', 'S', 'Z', 'J', 'L'];
-    fillRows.forEach(({ r, fill }) => {
-      for (let c = 0; c < cols; c++) {
-        if (Math.random() < fill) grid[r][c] = kinds[(r * 7 + c * 3) % kinds.length];
-      }
-    });
-    return grid;
-  }, []);
-
-  return { piece, stack };
-}
-
-function TetrisMini({ active = false }: MiniProps) {
-  const { piece, stack } = useTetrisPreview(active);
-  const cells: ReactElement[] = [];
-  for (let r = 0; r < 16; r++) {
-    for (let c = 0; c < 10; c++) {
-      const stk = stack[r][c];
-      const isPiece =
-        (r === piece.y && c === piece.x) ||
-        (piece.k === 'I' && r === piece.y && c >= piece.x && c < piece.x + 4);
-      const k = isPiece ? piece.k : stk;
-      cells.push(
-        <div
-          key={`${r}-${c}`}
-          className={k ? 'f' : ''}
-          style={k ? { backgroundColor: TETRO[k] } : undefined}
-        />,
-      );
-    }
-  }
-  return <div className="tetris-mini">{cells}</div>;
-}
-
-function SnakeMini({ active = false }: MiniProps) {
-  const N = 16;
-  const [tick, setTick] = useState(0);
-  useEffect(() => {
-    if (!active) return;
-    const id = setInterval(() => setTick((t) => t + 1), 160);
-    return () => clearInterval(id);
-  }, [active]);
-
-  const path = useMemo(() => {
-    const p: [number, number][] = [];
-    for (let x = 2; x < N - 2; x++) p.push([x, 4]);
-    for (let y = 4; y < 9; y++) p.push([N - 3, y]);
-    for (let x = N - 3; x >= 3; x--) p.push([x, 9]);
-    for (let y = 9; y < 13; y++) p.push([3, y]);
-    for (let x = 3; x < N - 2; x++) p.push([x, 13]);
-    return p;
-  }, []);
-
-  const len = 8;
-  const body = Array.from(
-    { length: len },
-    (_, i) => path[(tick - i + path.length * 100) % path.length],
-  );
-  const food: [number, number] = [11, 7];
-  const cellSize = 100 / N;
-
-  return (
-    <div className="snake-mini" aria-hidden="true">
-      {body.map(([x, y], i) => (
-        <div
-          key={i}
-          className={i === 0 ? 'snake-head' : 'snake-cell'}
-          style={{
-            position: 'absolute',
-            left: `${x * cellSize}%`,
-            top: `${y * cellSize}%`,
-            width: `${cellSize}%`,
-            height: `${cellSize}%`,
-            opacity: 1 - i * 0.07,
-            transition: 'left 130ms linear, top 130ms linear',
-          }}
-        />
-      ))}
-      <div
-        className="snake-food"
-        style={{
-          position: 'absolute',
-          left: `${food[0] * cellSize + 1}%`,
-          top: `${food[1] * cellSize + 1}%`,
-          width: `${cellSize - 2}%`,
-          height: `${cellSize - 2}%`,
-        }}
-      />
-    </div>
-  );
-}
-
-function Tw2048Mini({ active = false }: MiniProps) {
-  const [pulse, setPulse] = useState(0);
-  useEffect(() => {
-    if (!active) return;
-    const id = setInterval(() => setPulse((p) => p + 1), 900);
-    return () => clearInterval(id);
-  }, [active]);
-
-  const layouts = useMemo(
-    () => [
-      [
-        [2, 4, 8, 2],
-        [4, 16, 2, 8],
-        [2, 8, 32, 4],
-        [8, 2, 16, 128],
-      ],
-      [
-        [4, 2, 16, 4],
-        [8, 32, 4, 2],
-        [2, 16, 64, 8],
-        [4, 8, 2, 256],
-      ],
-      [
-        [2, 8, 4, 2],
-        [16, 4, 32, 8],
-        [4, 64, 128, 16],
-        [2, 4, 8, 512],
-      ],
-    ],
-    [],
-  );
-  const grid = layouts[pulse % layouts.length];
-
-  return (
-    <div className="tw-mini">
-      {grid.flat().map((v, i) => (
-        <div key={i} className={`tw-tile ${v ? '' : 'empty'}`} data-v={v || ''}>
-          {v || ''}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function PacmanMini({ active = false }: MiniProps) {
-  const [open, setOpen] = useState(true);
-  useEffect(() => {
-    if (!active) return;
-    const id = setInterval(() => setOpen((o) => !o), 220);
-    return () => clearInterval(id);
-  }, [active]);
-
-  const N = 16;
-  const cellSize = 100 / N;
-  // A row of dots for Pac-Man to chase, plus a power pellet at the end.
-  const dots = useMemo(() => {
-    const d: { x: number; y: number; big: boolean }[] = [];
-    for (let x = 6; x < N - 1; x++) d.push({ x, y: 7, big: x === N - 2 });
-    return d;
-  }, []);
-  const pacX = 3;
-  const pacY = 7;
-
-  return (
-    <div className="pacman-mini" aria-hidden="true">
-      {dots.map((d, i) => (
-        <div
-          key={i}
-          style={{
-            position: 'absolute',
-            left: `${d.x * cellSize + (d.big ? cellSize * 0.18 : cellSize * 0.33)}%`,
-            top: `${d.y * cellSize + (d.big ? cellSize * 0.18 : cellSize * 0.33)}%`,
-            width: `${d.big ? cellSize * 0.64 : cellSize * 0.34}%`,
-            height: `${d.big ? cellSize * 0.64 : cellSize * 0.34}%`,
-            borderRadius: '50%',
-            background: 'var(--game-pacman)',
-            opacity: d.big ? 0.95 : 0.6,
-          }}
-        />
-      ))}
-      <div
-        style={{
-          position: 'absolute',
-          left: `${pacX * cellSize}%`,
-          top: `${pacY * cellSize}%`,
-          width: `${cellSize * 1.6}%`,
-          height: `${cellSize * 1.6}%`,
-          borderRadius: '50%',
-          background: 'var(--game-pacman)',
-          clipPath: open
-            ? 'polygon(100% 25%, 45% 50%, 100% 75%, 50% 100%, 0 50%, 50% 0)'
-            : 'circle(50% at 50% 50%)',
-          transition: 'clip-path 200ms ease',
-        }}
-      />
-    </div>
-  );
-}
-
-type GameCardProps = {
-  name: string;
-  color: string;
-  best: number;
-  desc: string;
-  tag: string;
-  onPlay: () => void;
-  children: ReactElement<MiniProps>;
-};
-
-function GameCard({ name, color, best, desc, tag, onPlay, children }: GameCardProps) {
-  const [hover, setHover] = useState(false);
-  const preview = isValidElement(children)
-    ? cloneElement(children, { active: hover })
-    : children;
-  return (
-    <article
-      className="game-card"
-      style={{ ['--game-color' as string]: color } as CSSProperties}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      onClick={onPlay}
-    >
-      <div className="game-card__preview">{preview}</div>
-      <div className="game-card__body">
-        <div className="game-card__title-row">
-          <span className="game-card__title">{name}</span>
-          <span className="game-card__chip">{tag}</span>
-        </div>
-        <p className="game-card__desc">{desc}</p>
-        <div className="game-card__meta">
-          <span>
-            Best <strong>{best.toLocaleString()}</strong>
-          </span>
-          <span style={{ flex: 1 }} />
-          <span>Press to play →</span>
-        </div>
-      </div>
-    </article>
-  );
-}
+  formatClock,
+  formatSavedAt,
+  prefersReducedMotion,
+  summarize,
+  useInView,
+  type ArcadeGameId,
+  type GameStats,
+  type SessionMeta,
+} from '@arcade/kit';
+import { GAMES, type PortalGame, type Route } from '@arcade/ui';
+import { GAME_MODULES } from './games';
 
 type LandingProps = {
-  setRoute: Dispatch<SetStateAction<Route>>;
-  totals: { played: number; score: number; seconds: number };
+  navigate: (route: Route) => void;
+  stats: Record<ArcadeGameId, GameStats>;
+  sessions: Partial<Record<ArcadeGameId, SessionMeta>>;
 };
 
-const META = {
-  tetris: {
-    tag: 'Arcade',
-    desc: 'Stack falling blocks, clear lines, chase a Tetris. SRS rotation, 7-bag, hold.',
-  },
-  snake: {
-    tag: 'Reflex',
-    desc: "Eat, grow, don't bite yourself. Classic grid. Wraparound off by default.",
-  },
-  '2048': {
-    tag: 'Puzzle',
-    desc: 'Slide tiles, merge equal numbers. Get to 2048 — and beyond.',
-  },
-  pacman: {
-    tag: 'Maze',
-    desc: 'Chase ghosts, gobble dots and power pellets across a classic maze — switch normal/fog icons.',
-  },
-} as const;
+export function Landing({ navigate, stats, sessions }: LandingProps) {
+  const totals = summarize(stats);
+  const saved = GAMES.filter((g) => sessions[g.id]);
+  const play = (id: ArcadeGameId) => navigate({ view: 'play', gameId: id });
 
-const PREVIEWS = {
-  tetris: <TetrisMini />,
-  snake: <SnakeMini />,
-  '2048': <Tw2048Mini />,
-  pacman: <PacmanMini />,
-} as const;
-
-export function Landing({ setRoute, totals }: LandingProps) {
   return (
     <>
       <section className="landing__hero">
         <div>
-          <h1>Four classics, one home.</h1>
+          <h1>Six classics, one home.</h1>
           <p>
-            Welcome back. Pick a game to play, or pick up where you left off — your high
-            scores follow you across sessions.
+            Pick a game — every card below is the real game playing itself. Runs autosave, so you can
+            leave mid-game and continue later; best scores and play time follow you across sessions.
           </p>
         </div>
         <dl className="landing__hero-stats">
           <div className="stat-card">
             <dt>Games played</dt>
-            <dd>{totals.played}</dd>
+            <dd>{totals.plays.toLocaleString()}</dd>
           </div>
           <div className="stat-card">
             <dt>Total score</dt>
-            <dd>{totals.score.toLocaleString()}</dd>
+            <dd>{totals.totalScore.toLocaleString()}</dd>
           </div>
           <div className="stat-card">
-            <dt>Time on arcade</dt>
-            <dd>{fmtTime(totals.seconds)}</dd>
+            <dt>Time played</dt>
+            <dd>{formatClock(totals.totalSeconds)}</dd>
           </div>
         </dl>
       </section>
 
-      <div className="section-head">
-        <h2>Games</h2>
-        <span>4 available · keyboard-first</span>
-      </div>
+      {saved.length > 0 && (
+        <section aria-labelledby="continue-head">
+          <div className="section-head">
+            <h2 id="continue-head">Continue where you left off</h2>
+            <span>{saved.length} saved {saved.length === 1 ? 'run' : 'runs'}</span>
+          </div>
+          <div className="continue">
+            {saved.map((g) => {
+              const s = sessions[g.id]!;
+              return (
+                <button
+                  key={g.id}
+                  type="button"
+                  className="continue__item"
+                  style={{ '--game-color': g.color } as CSSProperties}
+                  onClick={() => play(g.id)}
+                >
+                  <span className="game-card__icon">
+                    <g.Icon size={16} />
+                  </span>
+                  <span>
+                    <strong>{g.name}</strong>
+                    <small>
+                      {s.score.toLocaleString()} pts · {formatClock(s.seconds)} · {formatSavedAt(s.savedAt)}
+                    </small>
+                  </span>
+                  <span className="arc-btn arc-btn--primary">Continue</span>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
-      <div className="cards">
-        {GAMES.map((g) => (
-          <GameCard
-            key={g.id}
-            name={g.name}
-            color={g.color}
-            best={g.best}
-            desc={META[g.id].desc}
-            tag={META[g.id].tag}
-            onPlay={() => setRoute({ view: 'play', gameId: g.id })}
-          >
-            {PREVIEWS[g.id]}
-          </GameCard>
-        ))}
-      </div>
+      <section aria-labelledby="games-head">
+        <div className="section-head">
+          <h2 id="games-head">Games</h2>
+          <span>{GAMES.length} available · keyboard-first</span>
+        </div>
+        <div className="cards">
+          {GAMES.map((g) => (
+            <GameCard key={g.id} game={g} stats={stats[g.id]} saved={sessions[g.id]} onPlay={() => play(g.id)} />
+          ))}
+        </div>
+      </section>
     </>
+  );
+}
+
+function GameCard({
+  game,
+  stats,
+  saved,
+  onPlay,
+}: {
+  game: PortalGame;
+  stats: GameStats;
+  saved?: SessionMeta;
+  onPlay: () => void;
+}) {
+  const [hover, setHover] = useState(false);
+  const [previewRef, inView] = useInView<HTMLDivElement>();
+  // Demos run whenever the card is on screen; with reduced motion only on hover/focus.
+  const active = inView && (hover || !prefersReducedMotion());
+  const { Demo } = GAME_MODULES[game.id];
+
+  return (
+    <article
+      className="game-card"
+      style={{ '--game-color': game.color } as CSSProperties}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      onFocus={() => setHover(true)}
+      onBlur={() => setHover(false)}
+      onClick={onPlay}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onPlay();
+        }
+      }}
+      tabIndex={0}
+      role="link"
+      aria-label={`Play ${game.name}${saved ? ' — continue saved run' : ''}`}
+    >
+      <div className="game-card__preview" ref={previewRef}>
+        {saved && <span className="game-card__saved">Saved run</span>}
+        <Demo active={active} />
+      </div>
+      <div className="game-card__body">
+        <div className="game-card__title-row">
+          <div>
+            <span className="game-card__icon">
+              <game.Icon size={16} />
+            </span>
+            <span className="game-card__title">{game.name}</span>
+          </div>
+          <span className="game-card__chip">{game.tag}</span>
+        </div>
+        <p className="game-card__desc">{game.tagline}</p>
+        <div className="game-card__meta">
+          <span>
+            Best <strong>{stats.best.toLocaleString()}</strong>
+          </span>
+          <span>
+            Plays <strong>{stats.plays.toLocaleString()}</strong>
+          </span>
+          <span style={{ flex: 1 }} />
+          <span>{saved ? 'Continue →' : 'Play →'}</span>
+        </div>
+      </div>
+    </article>
   );
 }

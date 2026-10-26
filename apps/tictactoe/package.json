@@ -1,0 +1,24 @@
+{
+  "name": "@arcade/tictactoe",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Type-safe Tic-Tac-Toe in React + Vite + TypeScript — tooth or classic X/O marks, PvP and three AI levels (the hard minimax AI never loses), autosave & resume, shared Zoltan’s Arcade stats. Part of Arcade-Game-Center.",
+  "license": "MIT",
+  "homepage": "https://github.com/ZoliQua/Tic-Tac-Toe-Game#readme",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit -p ."
+  },
+  "peerDependencies": {
+    "react": "^18",
+    "react-dom": "^18"
+  }
+}

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { ARCADE_GAMES } from '@arcade/kit';
 import {
   apiConfigured,
   fetchAllLeaderboards,
@@ -6,20 +7,15 @@ import {
   type LeaderboardEntry,
 } from './services/api';
 
-const GAME_LABEL: Record<GameId, string> = {
-  tetris: 'Tetris',
-  snake: 'Snake',
-  '2048': '2048',
-  pacman: 'Pac-Man',
-};
-
-const ORDER: GameId[] = ['tetris', 'snake', '2048', 'pacman'];
+const ORDER: GameId[] = ARCADE_GAMES.map((g) => g.id);
+const GAME_LABEL = Object.fromEntries(ARCADE_GAMES.map((g) => [g.id, g.name])) as Record<GameId, string>;
 
 type LeaderboardData = Record<GameId, LeaderboardEntry[]>;
-const EMPTY: LeaderboardData = { tetris: [], snake: [], '2048': [], pacman: [] };
+const EMPTY = Object.fromEntries(ORDER.map((id) => [id, []])) as unknown as LeaderboardData;
 
 function fmtRelative(at: string): string {
-  const t = new Date(at.replace(' ', 'T') + 'Z').getTime();
+  // API v2 sends ISO-8601 UTC; v1 sent 'YYYY-MM-DD HH:MM:SS' (UTC).
+  const t = new Date(at.includes('T') ? at : at.replace(' ', 'T') + 'Z').getTime();
   if (Number.isNaN(t)) return at;
   const diffSec = Math.max(1, Math.floor((Date.now() - t) / 1000));
   if (diffSec < 60) return `${diffSec}s ago`;
@@ -83,7 +79,7 @@ type GameLeaderboardProps = {
 
 function GameLeaderboard({ game, entries, status }: GameLeaderboardProps) {
   return (
-    <div className="panel" style={{ padding: 0, overflow: 'hidden' }}>
+    <div className="arc-panel" style={{ padding: 0, overflow: 'hidden' }}>
       <div
         style={{
           padding: '12px 18px',
@@ -100,7 +96,7 @@ function GameLeaderboard({ game, entries, status }: GameLeaderboardProps) {
         <span style={{ color: 'var(--text-strong)', fontWeight: 600 }}>
           {GAME_LABEL[game]}
         </span>
-        <span>{entries.length === 0 ? '—' : `${entries.length} entries`}</span>
+        <span>{entries.length === 0 ? '—' : `${entries.length} ${entries.length === 1 ? 'entry' : 'entries'}`}</span>
       </div>
 
       {status === 'loading' && entries.length === 0 && (

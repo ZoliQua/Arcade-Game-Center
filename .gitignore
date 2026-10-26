@@ -12,3 +12,5 @@ arcade-api/_config.php
 # Frontend env (API key baked at build time)
 apps/portal/.env
 
+*.tsbuildinfo
+coverage/

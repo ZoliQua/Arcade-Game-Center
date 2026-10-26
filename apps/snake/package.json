@@ -1,26 +1,24 @@
 {
   "name": "@arcade/snake",
-  "version": "0.0.0",
+  "version": "2.0.0",
   "private": true,
   "type": "module",
+  "description": "Minimal, type-safe Snake in React + Vite + TypeScript — adjustable speed, wall wrap, autosave & resume, shared Zoltan’s Arcade stats. Part of Arcade-Game-Center.",
+  "license": "MIT",
+  "homepage": "https://github.com/ZoliQua/Snake-Game#readme",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts"
   },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit -p ."
+  },
   "peerDependencies": {
     "react": "^18",
     "react-dom": "^18"
-  },
-  "dependencies": {
-    "@arcade/ui": "*"
-  },
-  "scripts": {
-    "typecheck": "tsc --noEmit"
-  },
-  "devDependencies": {
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1",
-    "typescript": "^5.6.3"
   }
 }

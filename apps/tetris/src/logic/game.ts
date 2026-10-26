@@ -103,13 +103,17 @@ function startRunningFromIdle(state: GameState, startLevel: number, rng: Rng): G
 function lockAndSpawn(state: GameState, rng: Rng): GameState {
   if (!state.active) return state;
   const merged = mergePiece(state.board, state.active);
-  if (hasCellsAboveVisibleTop(merged)) {
+  const { board: cleared, cleared: linesCleared } = clearFullRows(merged);
+  // Lock out: only blocks still above the visible field after the clear end
+  // the run (a piece poking into the hidden rows while completing a line is fine).
+  if (hasCellsAboveVisibleTop(cleared)) {
     return { ...state, board: merged, active: null, status: 'gameOver' };
   }
-  const { board: cleared, cleared: linesCleared } = clearFullRows(merged);
   const lines = state.lines + linesCleared;
+  // Guideline scoring: the clear is paid at the level it was made on; the
+  // level-up (every 10 lines) applies from the next piece onwards.
+  const score = state.score + linePoints(linesCleared, state.level);
   const level = levelFromLines(lines, state.startLevel);
-  const score = state.score + linePoints(linesCleared, level);
 
   const spawned = bootstrapPieces(
     { ...state, board: cleared, next: state.next, bag: state.bag },

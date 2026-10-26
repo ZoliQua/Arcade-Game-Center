@@ -1,87 +1,71 @@
-import type { ReactNode } from 'react';
-import type { Board, ActivePiece, Cell } from '../logic/types';
-import { COLS, COLORS, HIDDEN_ROWS, ROWS, SHAPES, VISIBLE_ROWS } from '../logic/constants';
+import { memo, type ReactNode } from 'react';
+import { COLS, HIDDEN_ROWS, ROWS, SHAPES, VISIBLE_ROWS } from '../logic/constants';
+import type { ActivePiece, Board, Cell } from '../logic/types';
+import { pieceColor } from './pieceColor';
+import styles from './GameBoard.module.css';
 
 type Props = {
   board: Board;
   active: ActivePiece | null;
   ghostY: number | null;
+  /** `mini` renders the compact landing-page variant without ARIA grid roles. */
+  variant?: 'full' | 'mini';
 };
 
-function overlayPiece(board: Cell[][], piece: ActivePiece): Cell[][] {
-  const offsets = SHAPES[piece.kind][piece.rotation];
+function overlayPiece(board: Board, piece: ActivePiece): Cell[][] {
   const copy = board.map((row) => [...row]);
-  for (const [dx, dy] of offsets) {
+  for (const [dx, dy] of SHAPES[piece.kind][piece.rotation]) {
     const x = piece.x + dx;
     const y = piece.y + dy;
-    if (y >= 0 && y < ROWS && x >= 0 && x < COLS) {
-      copy[y][x] = piece.kind;
-    }
+    if (y >= 0 && y < ROWS && x >= 0 && x < COLS) copy[y][x] = piece.kind;
   }
   return copy;
 }
 
-function ghostMask(piece: ActivePiece, ghostY: number): boolean[][] {
-  const mask: boolean[][] = Array.from({ length: ROWS }, () =>
-    new Array<boolean>(COLS).fill(false),
-  );
-  const offsets = SHAPES[piece.kind][piece.rotation];
-  for (const [dx, dy] of offsets) {
-    const x = piece.x + dx;
-    const y = ghostY + dy;
-    if (y >= 0 && y < ROWS && x >= 0 && x < COLS) {
-      mask[y][x] = true;
-    }
+function ghostCells(piece: ActivePiece, ghostY: number): Set<string> {
+  const cells = new Set<string>();
+  for (const [dx, dy] of SHAPES[piece.kind][piece.rotation]) {
+    cells.add(`${piece.x + dx}:${ghostY + dy}`);
   }
-  return mask;
+  return cells;
 }
 
-export function GameBoard({ board, active, ghostY }: Props) {
+export const GameBoard = memo(function GameBoard({ board, active, ghostY, variant = 'full' }: Props) {
+  const mini = variant === 'mini';
   const rendered = active ? overlayPiece(board, active) : board;
-  const ghost =
-    active && ghostY !== null && ghostY !== active.y
-      ? ghostMask(active, ghostY)
-      : null;
+  const ghost = active && ghostY !== null && ghostY !== active.y ? ghostCells(active, ghostY) : null;
 
   const cells: ReactNode[] = [];
   for (let y = HIDDEN_ROWS; y < ROWS; y++) {
     for (let x = 0; x < COLS; x++) {
       const cell = rendered[y][x];
-      const isGhost = ghost?.[y][x] && cell === 0;
-      const key = `${y}-${x}`;
+      const role = mini ? undefined : 'gridcell';
       if (cell !== 0) {
         cells.push(
-          <div
-            key={key}
-            className="board-cell filled"
-            style={{ backgroundColor: COLORS[cell] }}
-          />,
+          <div key={`${y}-${x}`} role={role} className={`${styles.cell} ${styles.filled}`} style={pieceColor(cell)} />,
         );
-      } else if (isGhost && active) {
+      } else if (ghost?.has(`${x}:${y}`) && active) {
         cells.push(
-          <div
-            key={key}
-            className="board-cell ghost"
-            style={{ borderColor: COLORS[active.kind] }}
-          />,
+          <div key={`${y}-${x}`} role={role} className={`${styles.cell} ${styles.ghost}`} style={pieceColor(active.kind)} />,
         );
       } else {
-        cells.push(<div key={key} className="board-cell empty" />);
+        cells.push(<div key={`${y}-${x}`} role={role} className={styles.cell} />);
       }
     }
   }
 
   return (
     <div
-      className="board"
+      className={`${styles.board} ${mini ? styles.mini : ''}`}
       style={{
         gridTemplateColumns: `repeat(${COLS}, 1fr)`,
         gridTemplateRows: `repeat(${VISIBLE_ROWS}, 1fr)`,
       }}
-      role="grid"
-      aria-label="Tetris playfield"
+      role={mini ? undefined : 'grid'}
+      aria-label={mini ? undefined : 'Tetris playfield'}
+      aria-hidden={mini ? true : undefined}
     >
       {cells}
     </div>
   );
-}
+});

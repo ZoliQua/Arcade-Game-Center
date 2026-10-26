@@ -1,112 +1,119 @@
-import { useEffect, useState } from 'react';
-import { Sidebar, Header } from '@arcade/ui';
-import type { Route, Theme, GameStatus } from '@arcade/ui';
-import { TetrisGame } from '@arcade/tetris';
-import { SnakeGame } from '@arcade/snake';
-import { Game2048 } from '@arcade/2048';
-import { PacmanGame } from '@arcade/pacman';
+import { useCallback, useEffect, useState, type CSSProperties } from 'react';
+import {
+  ARCADE_KEYS,
+  gameInfo,
+  isKey,
+  readString,
+  shouldIgnoreKey,
+  useArcadeTheme,
+  writeString,
+  type ArcadeStatusInfo,
+} from '@arcade/kit';
+import { Header, Sidebar, type LiveStatus } from '@arcade/ui';
+import { GAME_MODULES } from './games';
+import { useAllStats, useSavedSessions } from './hooks/usePortalData';
+import { useScoreSubmitter } from './hooks/useScoreSubmitter';
 import { Landing } from './Landing';
 import { Leaderboard } from './Leaderboard';
-import { Settings } from './Settings';
 import { NicknamePrompt } from './NicknamePrompt';
+import { useHashRoute } from './routes';
 import { getNickname } from './services/nickname';
-import { useScoreSubmitter } from './hooks/useScoreSubmitter';
+import { Settings } from './Settings';
+import { ShortcutsDialog } from './ShortcutsDialog';
 
 const NICK_PROMPT_DISMISSED_KEY = 'arcade.nickPromptDismissed';
+const SIDEBAR_COLLAPSED_KEY = 'arcade.sidebarCollapsed';
 
 export default function App() {
-  const [route, setRoute] = useState<Route>({ view: 'home' });
-  const [theme, setTheme] = useState<Theme>('dark');
-  const [collapsed, setCollapsed] = useState(false);
-  const [status, setStatus] = useState<GameStatus>('idle');
-  const [sessionSeconds, setSessionSeconds] = useState(0);
+  const [route, navigate] = useHashRoute();
+  const [theme, setTheme, toggleTheme] = useArcadeTheme();
+  const [collapsed, setCollapsed] = useState(() => readString(SIDEBAR_COLLAPSED_KEY) === '1');
+  const [live, setLive] = useState<LiveStatus>(null);
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
 
-  const [nickname, setNickname] = useState<string | null>(() => getNickname());
-  const [nickPromptOpen, setNickPromptOpen] = useState(() => {
-    if (getNickname()) return false;
-    try {
-      return localStorage.getItem(NICK_PROMPT_DISMISSED_KEY) !== '1';
-    } catch {
-      return true;
-    }
-  });
-
+  const stats = useAllStats();
+  const sessions = useSavedSessions();
   const submitScore = useScoreSubmitter();
 
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-  }, [theme]);
+  const [nickname, setNickname] = useState<string | null>(() => getNickname());
+  const [nickPromptOpen, setNickPromptOpen] = useState(
+    () => !getNickname() && readString(NICK_PROMPT_DISMISSED_KEY) !== '1',
+  );
+
+  const playingId = route.view === 'play' ? route.gameId : null;
+
+  // The header chip mirrors whatever game is mounted; reset it on game switch.
+  useEffect(() => setLive(null), [playingId]);
 
   useEffect(() => {
-    const id = setInterval(() => setSessionSeconds((s) => s + 1), 1000);
-    return () => clearInterval(id);
+    document.title = playingId ? `${gameInfo(playingId).name} · Zoltan's Arcade` : "Zoltan's Arcade";
+  }, [playingId]);
+
+  const toggleCollapsed = useCallback(() => {
+    setCollapsed((c) => {
+      writeString(SIDEBAR_COLLAPSED_KEY, c ? '0' : '1');
+      return !c;
+    });
   }, []);
 
   useEffect(() => {
-    if (route.view === 'play') setStatus('running');
-    else setStatus('idle');
-  }, [route.view, route.view === 'play' ? route.gameId : null]);
-
-  useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      const target = e.target as HTMLElement | null;
-      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) return;
-      if (e.key === 't' || e.key === 'T') {
-        setTheme((t) => (t === 'dark' ? 'light' : 'dark'));
-      }
-      if (e.key === 'p' || e.key === 'P') {
-        if (route.view === 'play') {
-          setStatus((s) => (s === 'running' ? 'paused' : s === 'paused' ? 'running' : s));
-        }
-      }
+      if (shouldIgnoreKey(e)) return;
+      if (isKey(e, ARCADE_KEYS.theme)) toggleTheme();
+      else if (e.key === '?') setShortcutsOpen((o) => !o);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [route.view]);
+  }, [toggleTheme]);
 
-  const totals = { played: 47, score: 21895, seconds: sessionSeconds + 3742 };
+  const onStatusChange = useCallback((info: ArcadeStatusInfo) => setLive(info), []);
+  const onGameOver = useCallback(
+    (score: number) => {
+      if (playingId) submitScore(playingId, score);
+    },
+    [playingId, submitScore],
+  );
+
+  const Game = playingId ? GAME_MODULES[playingId].Game : null;
 
   return (
     <div className="arcade" data-collapsed={collapsed ? 'true' : 'false'}>
       <Sidebar
         route={route}
-        setRoute={setRoute}
+        navigate={navigate}
         collapsed={collapsed}
-        setCollapsed={setCollapsed}
+        onToggleCollapsed={toggleCollapsed}
+        stats={stats}
+        sessions={sessions}
       />
       <div className="content">
         <Header
           route={route}
           theme={theme}
-          setTheme={setTheme}
-          sessionSeconds={sessionSeconds}
-          status={status}
+          onToggleTheme={toggleTheme}
+          onOpenShortcuts={() => setShortcutsOpen(true)}
+          onOpenSettings={() => navigate({ view: 'settings' })}
+          live={live}
         />
         <main className="content__body">
-          {route.view === 'home' && <Landing setRoute={setRoute} totals={totals} />}
-          {route.view === 'play' && route.gameId === 'tetris' && (
-            <TetrisGame onGameOver={(s) => submitScore('tetris', s)} />
-          )}
-          {route.view === 'play' && route.gameId === 'snake' && (
-            <SnakeGame onGameOver={(s) => submitScore('snake', s)} />
-          )}
-          {route.view === 'play' && route.gameId === '2048' && (
-            <Game2048 onGameOver={(s) => submitScore('2048', s)} />
-          )}
-          {route.view === 'play' && route.gameId === 'pacman' && (
-            <PacmanGame onGameOver={(s) => submitScore('pacman', s)} />
+          {route.view === 'home' && <Landing navigate={navigate} stats={stats} sessions={sessions} />}
+          {Game && playingId && (
+            <div
+              className="play-view"
+              style={{ '--game-color': `var(${gameInfo(playingId).colorVar})` } as CSSProperties}
+            >
+              {/* key: a fresh instance per game, so each restores its own saved run */}
+              <Game key={playingId} embedded onGameOver={onGameOver} onStatusChange={onStatusChange} />
+            </div>
           )}
           {route.view === 'leaderboard' && <Leaderboard />}
           {route.view === 'settings' && (
-            <Settings
-              theme={theme}
-              setTheme={setTheme}
-              nickname={nickname}
-              onNicknameChange={setNickname}
-            />
+            <Settings theme={theme} setTheme={setTheme} nickname={nickname} onNicknameChange={setNickname} />
           )}
         </main>
       </div>
+
+      {shortcutsOpen && <ShortcutsDialog gameId={playingId} onClose={() => setShortcutsOpen(false)} />}
 
       {nickPromptOpen && (
         <NicknamePrompt
@@ -115,11 +122,7 @@ export default function App() {
             setNickPromptOpen(false);
           }}
           onSkip={() => {
-            try {
-              localStorage.setItem(NICK_PROMPT_DISMISSED_KEY, '1');
-            } catch {
-              /* ignore */
-            }
+            writeString(NICK_PROMPT_DISMISSED_KEY, '1');
             setNickPromptOpen(false);
           }}
         />

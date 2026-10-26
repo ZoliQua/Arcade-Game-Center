@@ -1,56 +1,45 @@
 import type { ReactNode } from 'react';
+import { BBOX_SIZE, SHAPES } from '../logic/constants';
 import type { PieceKind } from '../logic/types';
-import { BBOX_SIZE, COLORS, SHAPES } from '../logic/constants';
+import { pieceColor } from './pieceColor';
+import styles from './PiecePreview.module.css';
 
 type Props = {
   kind: PieceKind | null;
-  label: string;
   dimmed?: boolean;
+  small?: boolean;
 };
 
-export function PiecePreview({ kind, label, dimmed }: Props) {
-  const size = 4;
-  const filled: boolean[][] = Array.from({ length: size }, () =>
-    new Array<boolean>(size).fill(false),
-  );
+const SIZE = 4;
+
+export function PiecePreview({ kind, dimmed = false, small = false }: Props) {
+  const filled = new Set<string>();
   if (kind) {
-    const offsets = SHAPES[kind][0];
-    const bbox = BBOX_SIZE[kind];
-    const padX = Math.floor((size - bbox) / 2);
-    const padY = Math.floor((size - bbox) / 2);
-    for (const [dx, dy] of offsets) {
-      const x = dx + padX;
-      const y = dy + padY;
-      if (x >= 0 && x < size && y >= 0 && y < size) {
-        filled[y][x] = true;
-      }
-    }
+    const pad = Math.floor((SIZE - BBOX_SIZE[kind]) / 2);
+    for (const [dx, dy] of SHAPES[kind][0]) filled.add(`${dx + pad}:${dy + pad}`);
   }
 
   const cells: ReactNode[] = [];
-  for (let y = 0; y < size; y++) {
-    for (let x = 0; x < size; x++) {
-      const on = filled[y][x];
+  for (let y = 0; y < SIZE; y++) {
+    for (let x = 0; x < SIZE; x++) {
+      const on = kind !== null && filled.has(`${x}:${y}`);
       cells.push(
         <div
           key={`${y}-${x}`}
-          className={`preview-cell${on ? ' filled' : ''}`}
-          style={on && kind ? { backgroundColor: COLORS[kind] } : undefined}
+          className={`${styles.cell}${on ? ` ${styles.filled}` : ''}`}
+          style={on && kind ? pieceColor(kind) : undefined}
         />,
       );
     }
   }
 
   return (
-    <div className={`preview${dimmed ? ' dimmed' : ''}`}>
-      <div className="preview-label">{label}</div>
-      <div
-        className="preview-grid"
-        style={{ gridTemplateColumns: `repeat(${size}, 1fr)` }}
-        aria-hidden="true"
-      >
-        {cells}
-      </div>
+    <div
+      className={`${styles.grid}${small ? ` ${styles.small}` : ''}${dimmed ? ` ${styles.dimmed}` : ''}`}
+      role="img"
+      aria-label={kind ? `${kind} piece` : 'empty'}
+    >
+      {cells}
     </div>
   );
 }

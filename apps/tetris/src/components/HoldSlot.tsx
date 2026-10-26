@@ -1,5 +1,6 @@
 import type { PieceKind } from '../logic/types';
 import { PiecePreview } from './PiecePreview';
+import styles from './PiecePreview.module.css';
 
 type Props = {
   hold: PieceKind | null;
@@ -8,9 +9,11 @@ type Props = {
 
 export function HoldSlot({ hold, canHold }: Props) {
   return (
-    <section className="panel hold">
-      <h2 className="panel-title">Hold</h2>
-      <PiecePreview kind={hold} label="" dimmed={!canHold} />
+    <section className="arc-panel" aria-label="Hold">
+      <h2 className="arc-panel__title">Hold</h2>
+      <div className={styles.slot}>
+        <PiecePreview kind={hold} dimmed={!canHold} />
+      </div>
     </section>
   );
 }

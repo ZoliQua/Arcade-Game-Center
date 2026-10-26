@@ -1,144 +1,154 @@
-import type { CSSProperties, ComponentType, Dispatch, SetStateAction } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import {
-  IconHome,
-  IconTrophy,
-  IconSettings,
-  IconSun,
-  IconMoon,
-  IconChevron,
-  IconLogo,
-  IconTetris,
-  IconSnake,
-  Icon2048,
-  IconPacman,
-  IconKbd,
-} from './Icons';
-
-export type GameId = 'tetris' | 'snake' | '2048' | 'pacman';
+  formatClock,
+  type ArcadeGameId,
+  type ArcadeStatus,
+  type ArcadeTheme,
+  type GameStats,
+  type SessionMeta,
+} from '@arcade/kit';
+import { APP_VERSION, GAMES } from './games';
+import { IconChevron, IconHome, IconKbd, IconLogo, IconMoon, IconSettings, IconSun, IconTrophy } from './Icons';
 
 export type Route =
   | { view: 'home' }
-  | { view: 'play'; gameId: GameId }
+  | { view: 'play'; gameId: ArcadeGameId }
   | { view: 'leaderboard' }
   | { view: 'settings' };
 
-export type Theme = 'dark' | 'light';
-export type GameStatus = 'idle' | 'running' | 'paused' | 'gameOver';
-
-export type GameMeta = {
-  id: GameId;
-  name: string;
-  Icon: ComponentType<{ size?: number; color?: string }>;
-  color: string;
-  best: number;
-};
-
-export const GAMES: GameMeta[] = [
-  { id: 'tetris', name: 'Tetris', Icon: IconTetris, color: 'var(--game-tetris)', best: 12480 },
-  { id: 'snake', name: 'Snake', Icon: IconSnake, color: 'var(--game-snake)', best: 87 },
-  { id: '2048', name: '2048', Icon: Icon2048, color: 'var(--game-2048)', best: 4096 },
-  { id: 'pacman', name: 'Pac-Man', Icon: IconPacman, color: 'var(--game-pacman)', best: 10000 },
-];
-
-export function fmtTime(s: number): string {
-  const m = Math.floor(s / 60);
-  const r = s % 60;
-  return `${String(m).padStart(2, '0')}:${String(r).padStart(2, '0')}`;
-}
-
 type SidebarProps = {
   route: Route;
-  setRoute: Dispatch<SetStateAction<Route>>;
+  navigate: (route: Route) => void;
   collapsed: boolean;
-  setCollapsed: Dispatch<SetStateAction<boolean>>;
+  onToggleCollapsed: () => void;
+  stats: Record<ArcadeGameId, GameStats>;
+  sessions: Partial<Record<ArcadeGameId, SessionMeta>>;
 };
 
-export function Sidebar({ route, setRoute, collapsed, setCollapsed }: SidebarProps) {
+export function Sidebar({ route, navigate, collapsed, onToggleCollapsed, stats, sessions }: SidebarProps) {
   return (
-    <aside className="sidebar">
-      <div
-        className="sidebar__brand"
-        onClick={() => setRoute({ view: 'home' })}
-        style={{ cursor: 'pointer' }}
-      >
-        <div className="sidebar__logo">
+    <aside className="sidebar" aria-label="Main navigation">
+      <button type="button" className="sidebar__brand" onClick={() => navigate({ view: 'home' })}>
+        <span className="sidebar__logo">
           <IconLogo />
-        </div>
-        <div className="sidebar__title">
-          <strong>Zoltan's Arcade</strong>
-          <span>Portal · v1.0</span>
-        </div>
-      </div>
+        </span>
+        <span className="sidebar__title">
+          <strong>Zoltan&apos;s Arcade</strong>
+          <span>Portal · v{APP_VERSION}</span>
+        </span>
+      </button>
 
       <div className="sidebar__section-label">Browse</div>
-      <button
-        className={`nav-item ${route.view === 'home' ? 'nav-item--active' : ''}`}
-        onClick={() => setRoute({ view: 'home' })}
-      >
-        <span className="nav-item__icon">
-          <IconHome />
-        </span>
-        <span className="nav-item__label">Home</span>
-      </button>
+      <NavItem
+        label="Home"
+        icon={<IconHome />}
+        active={route.view === 'home'}
+        onClick={() => navigate({ view: 'home' })}
+      />
 
       <div className="sidebar__section-label">Games</div>
       {GAMES.map((g) => {
         const isActive = route.view === 'play' && route.gameId === g.id;
+        const best = stats[g.id]?.best ?? 0;
         return (
-          <button
+          <NavItem
             key={g.id}
-            className={`nav-item ${isActive ? 'nav-item--active' : ''}`}
-            onClick={() => setRoute({ view: 'play', gameId: g.id })}
-            style={{ ['--game-color' as string]: g.color } as CSSProperties}
-          >
-            <span className="nav-item__icon" style={{ color: isActive ? g.color : undefined }}>
-              <g.Icon />
-            </span>
-            <span className="nav-item__label">{g.name}</span>
-            <span className="nav-item__badge">{g.best.toLocaleString()}</span>
-          </button>
+            label={g.name}
+            color={g.color}
+            icon={<g.Icon />}
+            active={isActive}
+            onClick={() => navigate({ view: 'play', gameId: g.id })}
+            badge={best > 0 ? best.toLocaleString() : undefined}
+            saved={Boolean(sessions[g.id]) && !isActive}
+          />
         );
       })}
 
       <div className="sidebar__section-label">More</div>
-      <button className="nav-item" onClick={() => setRoute({ view: 'leaderboard' })}>
-        <span className="nav-item__icon">
-          <IconTrophy />
-        </span>
-        <span className="nav-item__label">Leaderboard</span>
-      </button>
-      <button className="nav-item" onClick={() => setRoute({ view: 'settings' })}>
-        <span className="nav-item__icon">
-          <IconSettings />
-        </span>
-        <span className="nav-item__label">Settings</span>
-      </button>
+      <NavItem
+        label="Leaderboard"
+        icon={<IconTrophy />}
+        active={route.view === 'leaderboard'}
+        onClick={() => navigate({ view: 'leaderboard' })}
+      />
+      <NavItem
+        label="Settings"
+        icon={<IconSettings />}
+        active={route.view === 'settings'}
+        onClick={() => navigate({ view: 'settings' })}
+      />
 
       <div className="sidebar__spacer" />
       <div className="sidebar__footer">
-        <button className="nav-item" onClick={() => setCollapsed(!collapsed)}>
-          <span
-            className="nav-item__icon"
-            style={{ transform: collapsed ? 'rotate(0deg)' : 'rotate(180deg)' }}
-          >
-            <IconChevron />
-          </span>
-          <span className="nav-item__label">{collapsed ? 'Expand' : 'Collapse'}</span>
-        </button>
+        <NavItem
+          label={collapsed ? 'Expand' : 'Collapse'}
+          icon={
+            <span style={{ display: 'grid', transform: collapsed ? 'none' : 'rotate(180deg)' }}>
+              <IconChevron />
+            </span>
+          }
+          onClick={onToggleCollapsed}
+        />
       </div>
     </aside>
   );
 }
 
-type HeaderProps = {
-  route: Route;
-  theme: Theme;
-  setTheme: Dispatch<SetStateAction<Theme>>;
-  sessionSeconds: number;
-  status: GameStatus;
+function NavItem({
+  label,
+  icon,
+  active = false,
+  onClick,
+  color,
+  badge,
+  saved = false,
+}: {
+  label: string;
+  icon: ReactNode;
+  active?: boolean;
+  onClick: () => void;
+  color?: string;
+  badge?: string;
+  saved?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      className={`nav-item ${active ? 'nav-item--active' : ''}`}
+      onClick={onClick}
+      aria-current={active ? 'page' : undefined}
+      title={label}
+      style={color ? ({ '--game-color': color } as CSSProperties) : undefined}
+    >
+      <span className="nav-item__icon" style={{ color: active && color ? color : undefined }}>
+        {icon}
+      </span>
+      <span className="nav-item__label">{label}</span>
+      {saved && <span className="nav-item__saved" title="Saved run — continue where you left off" />}
+      {badge && <span className="nav-item__badge">{badge}</span>}
+    </button>
+  );
+}
+
+export type LiveStatus = { status: ArcadeStatus; seconds: number; score: number } | null;
+
+const STATUS_TEXT: Record<ArcadeStatus, string> = {
+  idle: 'Ready',
+  running: 'Playing',
+  paused: 'Paused',
+  gameOver: 'Game over',
 };
 
-export function Header({ route, theme, setTheme, sessionSeconds, status }: HeaderProps) {
+type HeaderProps = {
+  route: Route;
+  theme: ArcadeTheme;
+  onToggleTheme: () => void;
+  onOpenShortcuts: () => void;
+  onOpenSettings: () => void;
+  live: LiveStatus;
+};
+
+export function Header({ route, theme, onToggleTheme, onOpenShortcuts, onOpenSettings, live }: HeaderProps) {
   const game = route.view === 'play' ? GAMES.find((g) => g.id === route.gameId) : undefined;
 
   let crumb = '';
@@ -149,7 +159,7 @@ export function Header({ route, theme, setTheme, sessionSeconds, status }: Heade
   return (
     <header className="header">
       <div className="header__crumbs">
-        <strong>Zoltan's Arcade</strong>
+        <strong>Zoltan&apos;s Arcade</strong>
         {route.view !== 'home' && (
           <>
             <span className="sep">/</span>
@@ -158,40 +168,44 @@ export function Header({ route, theme, setTheme, sessionSeconds, status }: Heade
         )}
       </div>
 
-      {route.view === 'play' && (
-        <span className="header__chip" title="Status & elapsed time">
-          <span
-            className="header__chip-dot"
-            style={{
-              background:
-                status === 'paused' ? 'var(--text-mute)' : 'var(--game-snake)',
-            }}
-          />
-          <strong style={{ color: 'var(--text)' }}>
-            {status === 'paused'
-              ? 'Paused'
-              : status === 'gameOver'
-                ? 'Game over'
-                : 'Playing'}
-          </strong>
-          <span style={{ color: 'var(--text-mute)' }}>·</span>
-          <span>{fmtTime(sessionSeconds)}</span>
+      {route.view === 'play' && live && (
+        <span className={`header__chip header__chip--${live.status}`} title="Status · score · run time" role="status">
+          <span className="header__chip-dot" />
+          <strong>{STATUS_TEXT[live.status]}</strong>
+          <span className="sep">·</span>
+          <span>{live.score.toLocaleString()} pts</span>
+          <span className="sep">·</span>
+          <span>{formatClock(live.seconds)}</span>
         </span>
       )}
 
       <div className="header__actions">
         <button
+          type="button"
           className="icon-btn"
-          aria-label="Toggle theme"
-          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+          aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
+          onClick={onToggleTheme}
           title="Toggle theme (T)"
         >
           {theme === 'dark' ? <IconSun /> : <IconMoon />}
         </button>
-        <button className="icon-btn" aria-label="Keyboard shortcuts" title="Shortcuts (?)">
+        <button
+          type="button"
+          className="icon-btn"
+          aria-label="Keyboard shortcuts"
+          title="Keyboard shortcuts (?)"
+          onClick={onOpenShortcuts}
+        >
           <IconKbd />
         </button>
-        <button className="icon-btn" aria-label="Settings" title="Settings">
+        <button
+          type="button"
+          className="icon-btn"
+          aria-label="Settings"
+          title="Settings"
+          onClick={onOpenSettings}
+          aria-pressed={route.view === 'settings'}
+        >
           <IconSettings />
         </button>
       </div>

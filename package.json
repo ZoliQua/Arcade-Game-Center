@@ -1,7 +1,16 @@
 {
-  "name": "arcade-portal",
+  "name": "arcade-game-center",
   "private": true,
-  "version": "0.0.0",
+  "version": "2.0.0",
+  "type": "module",
+  "description": "Zoltan’s Arcade — one portal for six classic browser games (Tetris, Snake, 2048, Pac-Man, Gomoku, Tic-Tac-Toe) with a shared design system, stats, autosave, live demos and a global leaderboard.",
+  "license": "MIT",
+  "author": "Zoltán Dul",
+  "homepage": "https://github.com/ZoliQua/Arcade-Game-Center#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ZoliQua/Arcade-Game-Center.git"
+  },
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -11,7 +20,33 @@
     "build": "npm run build -w @arcade/portal",
     "preview": "npm run preview -w @arcade/portal",
     "typecheck": "npm run typecheck --workspaces --if-present",
-    "lint": "npm run lint --workspaces --if-present"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint .",
+    "check": "npm run lint && npm run typecheck && npm test && npm run sync:check && npm run build",
+    "sync:kit": "node scripts/sync-games.mjs kit",
+    "sync:pull": "node scripts/sync-games.mjs pull",
+    "sync:push": "node scripts/sync-games.mjs push",
+    "sync:check": "node scripts/sync-games.mjs check",
+    "dev:game": "npm run dev -w"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/react": "^16.3.3",
+    "@types/node": "^22.20.5",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "eslint": "^9.15.0",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-react-refresh": "^0.4.14",
+    "globals": "^15.12.0",
+    "jsdom": "^25.0.1",
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.15.0",
+    "vite": "^5.4.11",
+    "vitest": "^2.1.9"
   },
   "engines": {
     "node": ">=20"

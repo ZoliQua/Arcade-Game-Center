@@ -1,7 +1,5 @@
 /* Portal layout — sidebar + content shell */
 
-* { box-sizing: border-box; }
-
 .arcade {
   --sidebar-w: 232px;
   --sidebar-w-collapsed: 72px;
@@ -30,11 +28,18 @@
   z-index: 5;
 }
 .sidebar__brand {
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--panel-border);
+  cursor: pointer;
+  width: 100%;
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 4px 6px 14px;
-  border-bottom: 1px solid var(--panel-border);
   margin-bottom: 8px;
 }
 .sidebar__logo {
@@ -120,8 +125,15 @@
   color: var(--text-mute);
   font-family: var(--font-mono);
 }
+.nav-item__saved {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--ok);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--ok) 20%, transparent);
+  flex-shrink: 0;
+}
 [data-collapsed="true"] .nav-item__label,
 [data-collapsed="true"] .nav-item__badge { display: none; }
+[data-collapsed="true"] .nav-item__saved { position: absolute; top: 6px; right: 6px; }
 
 .sidebar__spacer { flex: 1; }
 
@@ -165,10 +177,13 @@
 }
 .header__chip-dot {
   width: 6px; height: 6px; border-radius: 50%;
-  background: var(--game-snake);
-  box-shadow: 0 0 0 3px rgba(66,211,146,0.18);
+  background: var(--text-mute);
 }
+.header__chip--running .header__chip-dot { background: var(--ok); box-shadow: 0 0 0 3px color-mix(in oklab, var(--ok) 22%, transparent); }
+.header__chip--paused .header__chip-dot { background: var(--warn); }
+.header__chip--gameOver .header__chip-dot { background: var(--danger); }
 .header__chip strong { color: var(--text-strong); font-weight: 600; }
+.header__chip .sep { color: var(--text-mute); }
 
 .header__actions { display: flex; align-items: center; gap: 6px; }
 
@@ -197,45 +212,56 @@
   gap: 24px;
 }
 
-/* ─── BUTTONS ─────────────────────────────────────────────── */
-.btn {
-  display: inline-flex; align-items: center; justify-content: center;
-  gap: 8px;
-  padding: 8px 14px;
+/* ─── PLAY VIEW ───────────────────────────────────────────── */
+.play-view {
+  width: 100%;
+}
+
+/* ─── DIALOG ──────────────────────────────────────────────── */
+.portal-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: var(--overlay-bg);
+  backdrop-filter: blur(4px);
+}
+.portal-dialog__card {
+  width: 100%;
+  max-width: 460px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px;
+}
+.portal-dialog__card h2 { margin: 0; font-size: 20px; color: var(--text-strong); }
+.portal-dialog__card p { margin: 0; color: var(--text-dim); font-size: 13px; }
+
+.portal-input {
+  flex: 1;
+  min-width: 0;
+  padding: 9px 12px;
   border-radius: 8px;
   border: 1px solid var(--panel-border);
-  background: var(--panel-bg);
+  background: var(--panel-bg-soft);
   color: var(--text-strong);
   font: inherit;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: border-color 120ms, background 120ms, transform 80ms;
+  font-size: 13.5px;
 }
-.btn:hover { border-color: var(--accent); }
-.btn:active { transform: translateY(1px); }
-.btn--primary {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: white;
-  box-shadow: 0 4px 14px rgba(107,140,255,0.32);
-}
-.btn--primary:hover { background: var(--accent-strong); border-color: var(--accent-strong); }
-.btn--ghost { background: transparent; }
+.portal-input:focus-visible { outline: 2px solid var(--accent-ring); outline-offset: 1px; }
 
-/* ─── PANEL ───────────────────────────────────────────────── */
-.panel {
-  background: var(--panel-bg);
-  border: 1px solid var(--panel-border);
-  border-radius: var(--radius-md);
-  padding: 14px;
-  box-shadow: var(--shadow-sm);
-}
-.panel-title {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--text-mute);
-  margin-bottom: 10px;
+/* ─── SMALL SCREENS ───────────────────────────────────────── */
+@media (max-width: 760px) {
+  .arcade,
+  .arcade[data-collapsed="false"] { grid-template-columns: var(--sidebar-w-collapsed) 1fr; }
+  .arcade .sidebar__title,
+  .arcade .nav-item__label,
+  .arcade .nav-item__badge { display: none; }
+  .arcade .sidebar__section-label { opacity: 0; height: 8px; padding: 6px 0 0; }
+  .content__body { padding: 18px 14px 28px; }
+  .header { padding: 0 14px; }
+  .header__crumbs strong,
+  .header__crumbs strong + .sep { display: none; }
 }

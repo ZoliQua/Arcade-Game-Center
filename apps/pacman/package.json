@@ -1,26 +1,24 @@
 {
   "name": "@arcade/pacman",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
+  "description": "Type-safe Pac-Man in React + Vite + TypeScript — four ghost AIs, frightened chains, lives & levels, normal/fog icon themes, autosave & resume, shared Zoltan’s Arcade stats. Part of Arcade-Game-Center.",
+  "license": "MIT",
+  "homepage": "https://github.com/ZoliQua/Pac-Man-Game#readme",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts"
   },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit -p ."
+  },
   "peerDependencies": {
     "react": "^18",
     "react-dom": "^18"
-  },
-  "dependencies": {
-    "@arcade/ui": "*"
-  },
-  "scripts": {
-    "typecheck": "tsc --noEmit"
-  },
-  "devDependencies": {
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1",
-    "typescript": "^5.6.3"
   }
 }

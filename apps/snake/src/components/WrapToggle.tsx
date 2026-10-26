@@ -1,5 +1,3 @@
-import styles from './WrapToggle.module.css';
-
 type Props = {
   wrapWalls: boolean;
   onChange: (wrapWalls: boolean) => void;
@@ -7,15 +5,14 @@ type Props = {
 
 export function WrapToggle({ wrapWalls, onChange }: Props) {
   return (
-    <label className={styles.wrap}>
-      <span className={styles.label}>Wrap walls</span>
+    <label className="arc-field">
       <input
         type="checkbox"
-        className={styles.checkbox}
         checked={wrapWalls}
         onChange={(event) => onChange(event.target.checked)}
       />
-      <span className={styles.state} aria-live="polite">{wrapWalls ? 'On' : 'Off'}</span>
+      <span>Wrap walls</span>
+      <strong aria-live="polite">{wrapWalls ? 'On' : 'Off'}</strong>
     </label>
   );
 }

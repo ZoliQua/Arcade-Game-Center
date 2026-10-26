@@ -1,26 +1,24 @@
 {
   "name": "@arcade/2048",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
+  "description": "Type-safe 2048 in React + Vite + TypeScript — slide & merge with animations, swipe input, undo, autosave & resume, shared Zoltan’s Arcade stats. Part of Arcade-Game-Center.",
+  "license": "MIT",
+  "homepage": "https://github.com/ZoliQua/2048-Game#readme",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts"
   },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit -p ."
+  },
   "peerDependencies": {
     "react": "^18",
     "react-dom": "^18"
-  },
-  "dependencies": {
-    "@arcade/ui": "*"
-  },
-  "scripts": {
-    "typecheck": "tsc --noEmit"
-  },
-  "devDependencies": {
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1",
-    "typescript": "^5.6.3"
   }
 }

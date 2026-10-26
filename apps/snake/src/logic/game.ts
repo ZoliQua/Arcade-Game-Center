@@ -29,10 +29,20 @@ export function advanceGame(state: GameState, rng: () => number = Math.random): 
   }
 
   const snake = moveSnake(state.snake, head, willEat);
-  const food = willEat ? spawnFood(snake, state.gridSize, rng) : state.food;
   const score = willEat ? state.score + state.speed : state.score;
 
+  // Snake fills the whole board: nothing left to eat, the run is won.
+  if (isBoardFull(snake, state.gridSize)) {
+    return { ...state, snake, direction, score, status: 'gameOver' };
+  }
+
+  const food = willEat ? spawnFood(snake, state.gridSize, rng) : state.food;
+
   return { ...state, snake, food, direction, score };
+}
+
+export function isBoardFull(snake: GameState['snake'], gridSize: number): boolean {
+  return snake.length >= gridSize * gridSize;
 }
 
 export function createInitialState(overrides: Partial<GameState> = {}): GameState {

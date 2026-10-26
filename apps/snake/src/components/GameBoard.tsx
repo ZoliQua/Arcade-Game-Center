@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import type { Position } from '../logic/types';
 import styles from './GameBoard.module.css';
 
@@ -6,11 +6,13 @@ type Props = {
   gridSize: number;
   snake: Position[];
   food: Position;
+  /** `mini` renders the compact landing-page variant without ARIA grid roles. */
+  variant?: 'full' | 'mini';
 };
 
 type CellKind = 'empty' | 'head' | 'body' | 'food';
 
-export function GameBoard({ gridSize, snake, food }: Props) {
+export const GameBoard = memo(function GameBoard({ gridSize, snake, food, variant = 'full' }: Props) {
   const cells = useMemo(() => {
     const grid: CellKind[][] = Array.from({ length: gridSize }, () =>
       Array.from({ length: gridSize }, () => 'empty' as CellKind),
@@ -31,25 +33,28 @@ export function GameBoard({ gridSize, snake, food }: Props) {
     return grid;
   }, [gridSize, snake, food]);
 
+  const mini = variant === 'mini';
+
   return (
     <div
-      className={styles.board}
+      className={`${styles.board} ${mini ? styles.mini : ''}`}
       style={{
         gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
         gridTemplateRows: `repeat(${gridSize}, 1fr)`,
       }}
-      role="grid"
-      aria-label="Snake game board"
+      role={mini ? undefined : 'grid'}
+      aria-label={mini ? undefined : 'Snake game board'}
+      aria-hidden={mini ? true : undefined}
     >
       {cells.flatMap((row, y) =>
         row.map((kind, x) => (
           <div
             key={`${x}-${y}`}
             className={`${styles.cell} ${styles[kind]}`}
-            role="gridcell"
+            role={mini ? undefined : 'gridcell'}
           />
         )),
       )}
     </div>
   );
-}
+});
