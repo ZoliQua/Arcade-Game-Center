@@ -1,6 +1,17 @@
 <?php
 declare(strict_types=1);
 
+// Never leak stack traces or SQL to clients: log the details, answer with JSON.
+ini_set('display_errors', '0');
+set_exception_handler(static function (Throwable $e): void {
+    error_log('[arcade-api] ' . $e::class . ': ' . $e->getMessage() . ' @ ' . $e->getFile() . ':' . $e->getLine());
+    if (!headers_sent()) {
+        http_response_code(500);
+        header('Content-Type: application/json; charset=utf-8');
+    }
+    echo '{"error":"server_error"}';
+});
+
 /**
  * CORS handling: respond to preflight, set headers on real requests.
  * Returns true if the request should continue, false if we already responded
@@ -56,14 +67,17 @@ function arcade_require_api_key(array $cfg): void
  * SHA-256 of the client IP. Stored as a hash so we can rate-limit without
  * keeping raw IPs around.
  */
-function arcade_ip_hash(): string
+function arcade_ip_hash(array $cfg = []): string
 {
-    $ip = $_SERVER['HTTP_X_FORWARDED_FOR']
-        ?? $_SERVER['HTTP_X_REAL_IP']
-        ?? $_SERVER['REMOTE_ADDR']
-        ?? '0.0.0.0';
-    // X-Forwarded-For may be a comma-separated list; take the first.
-    $ip = trim(explode(',', $ip)[0]);
+    // Forwarding headers are client-controlled; trusting them unconditionally
+    // lets anyone bypass the rate limit by sending a fresh X-Forwarded-For.
+    // Only honour them when the API sits behind a known reverse proxy.
+    $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+    if (!empty($cfg['trust_proxy'])) {
+        $ip = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['HTTP_X_REAL_IP'] ?? $ip;
+        // X-Forwarded-For may be a comma-separated list; take the first.
+        $ip = trim(explode(',', $ip)[0]);
+    }
     return hash('sha256', $ip);
 }
 

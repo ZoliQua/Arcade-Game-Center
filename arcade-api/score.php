@@ -46,7 +46,7 @@ if (!arcade_is_score_sane($game, $scoreInt, $cfg)) {
 }
 
 $pdo = arcade_db($cfg);
-$ipHash = arcade_ip_hash();
+$ipHash = arcade_ip_hash($cfg);
 
 if (!arcade_check_rate_limit($pdo, $cfg, $ipHash)) {
     arcade_json(['error' => 'rate_limited'], 429);
@@ -62,19 +62,22 @@ $stmt->execute([
     ':score' => $scoreInt,
     ':ip'    => $ipHash,
 ]);
+$insertId = (int) $pdo->lastInsertId();
 
-// Look up the player's rank for this game (1-based, ties broken by created_at).
+// Rank among players (the leaderboard lists each player once, with their best):
+// 1 + number of other players whose best is strictly higher. `rank` is a
+// reserved word since MySQL 8.0.2, hence the alias.
 $rankStmt = $pdo->prepare(
-    'SELECT 1 + COUNT(*) AS rank FROM `' . $cfg['table_scores'] . '`
-     WHERE game = :game AND score > :score'
+    'SELECT 1 + COUNT(DISTINCT player_name) AS player_rank FROM `' . $cfg['table_scores'] . '`
+     WHERE game = :game AND score > :score AND player_name <> :nick'
 );
-$rankStmt->execute([':game' => $game, ':score' => $scoreInt]);
+$rankStmt->execute([':game' => $game, ':score' => $scoreInt, ':nick' => $cleanNick]);
 $rankRow = $rankStmt->fetch();
 
 arcade_json([
     'ok'    => true,
-    'id'    => (int) $pdo->lastInsertId(),
-    'rank'  => (int) ($rankRow['rank'] ?? 0),
+    'id'    => $insertId,
+    'rank'  => (int) ($rankRow['player_rank'] ?? 0),
     'game'  => $game,
     'name'  => $cleanNick,
     'score' => $scoreInt,

@@ -30,13 +30,20 @@ return [
     // Max submissions per IP per hour. Naive bots get bounced; humans never hit it.
     'rate_limit_per_hour' => 30,
 
+    // Set to true ONLY if the API runs behind a reverse proxy/CDN that sets
+    // X-Forwarded-For. Otherwise the header is ignored (it can be spoofed).
+    'trust_proxy' => false,
+
     // Per-game maximum reasonable score. Anything above is rejected as spam.
     // Tune these if a real player ever gets close.
     'max_score' => [
         'tetris' => 9999999,
         'snake'  => 10000,
         '2048'   => 9999999,
-        'pacman' => 10000,
+        'pacman' => 999999, // several levels × ~2,600 dots + ghost chains easily exceed 10k
+        // Duel games score one round with duelRoundScore(): max 2 × 500.
+        'gomoku'    => 1000,
+        'tictactoe' => 1000,
     ],
 
     // Nickname constraints.
