@@ -57,7 +57,8 @@ lftp -e "
 "
 ```
 
-- `--delete` is safe for the frontend because `dist/` is rebuilt from scratch.
+- `--delete` is safe for the frontend because `dist/` is rebuilt from scratch. `dist/.htaccess` (from
+  `apps/portal/public/`) keeps browsers from caching a stale `index.html` after a deploy.
 - The API mirror never uses `--delete` and excludes `_config.php`, so the live secrets survive.
 
 ## Local smoke test

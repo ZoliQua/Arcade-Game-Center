@@ -3,6 +3,17 @@
 All notable changes to Arcade-Game-Center. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 versioning: [SemVer](https://semver.org/).
 
+## [2.1.1] — 2026-11-15
+
+### Fixed
+- Leaderboard showed "No scores yet — be the first." when the API failed; `fetchLeaderboard` /
+  `fetchAllLeaderboards` now throw on HTTP or payload errors and the page shows "Could not reach leaderboard
+  server" / "Unavailable." instead.
+
+### Added
+- `apps/portal/public/.htaccess`: `index.html` is always revalidated so a new deploy shows up immediately; hashed
+  `assets/` are cached for a year (immutable).
+
 ## [2.1.0] — 2026-11-14
 
 ### Added

@@ -40,7 +40,9 @@ export function Leaderboard() {
         setData(d);
         setStatus('ok');
       })
-      .catch(() => setStatus('error'));
+      .catch(() => {
+        if (!ctrl.signal.aborted) setStatus('error');
+      });
     return () => ctrl.abort();
   }, []);
 

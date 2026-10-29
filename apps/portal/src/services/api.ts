@@ -52,6 +52,10 @@ export async function submitScore(
   }
 }
 
+/**
+ * Top scores of one game. Throws when the server answers with an error or an
+ * unexpected payload, so callers can tell "no scores yet" from "server down".
+ */
 export async function fetchLeaderboard(
   game: GameId,
   limit = 10,
@@ -59,18 +63,15 @@ export async function fetchLeaderboard(
 ): Promise<LeaderboardEntry[]> {
   if (!apiConfigured) return [];
 
-  try {
-    const url = `${BASE}/leaderboard.php?game=${encodeURIComponent(game)}&limit=${limit}`;
-    const res = await fetch(url, { signal });
-    if (!res.ok) return [];
-    const data = (await res.json()) as { ok?: boolean; top?: LeaderboardEntry[] };
-    if (!data.ok || !Array.isArray(data.top)) return [];
-    return data.top;
-  } catch {
-    return [];
-  }
+  const url = `${BASE}/leaderboard.php?game=${encodeURIComponent(game)}&limit=${limit}`;
+  const res = await fetch(url, { signal });
+  if (!res.ok) throw new Error(`http_${res.status}`);
+  const data = (await res.json()) as { ok?: boolean; top?: LeaderboardEntry[] };
+  if (!data.ok || !Array.isArray(data.top)) throw new Error('bad_payload');
+  return data.top;
 }
 
+/** Top scores of every game in one request. Throws like {@link fetchLeaderboard}. */
 export async function fetchAllLeaderboards(
   signal?: AbortSignal,
 ): Promise<Record<GameId, LeaderboardEntry[]>> {
@@ -80,16 +81,12 @@ export async function fetchAllLeaderboards(
   >;
   if (!apiConfigured) return empty;
 
-  try {
-    const res = await fetch(`${BASE}/leaderboard.php`, { signal });
-    if (!res.ok) return empty;
-    const data = (await res.json()) as {
-      ok?: boolean;
-      leaderboards?: Record<GameId, LeaderboardEntry[]>;
-    };
-    if (!data.ok || !data.leaderboards) return empty;
-    return { ...empty, ...data.leaderboards };
-  } catch {
-    return empty;
-  }
+  const res = await fetch(`${BASE}/leaderboard.php`, { signal });
+  if (!res.ok) throw new Error(`http_${res.status}`);
+  const data = (await res.json()) as {
+    ok?: boolean;
+    leaderboards?: Record<GameId, LeaderboardEntry[]>;
+  };
+  if (!data.ok || !data.leaderboards) throw new Error('bad_payload');
+  return { ...empty, ...data.leaderboards };
 }
