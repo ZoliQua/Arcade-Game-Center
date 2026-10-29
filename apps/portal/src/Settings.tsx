@@ -74,7 +74,7 @@ export function Settings({ theme, setTheme, nickname, onNicknameChange }: Settin
           />
         </Row>
 
-        <Row label="Statistics" hint="Reset best scores, plays and play time for all six games.">
+        <Row label="Statistics" hint="Reset best scores, plays and play time for every game.">
           <ConfirmButton label="Reset stats" confirmLabel="Reset all stats?" onConfirm={() => resetStats()} />
         </Row>
       </div>

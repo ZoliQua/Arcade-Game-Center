@@ -1,6 +1,16 @@
 import type { ComponentType } from 'react';
 import { ARCADE_GAMES, type ArcadeGameId, type ArcadeGameInfo } from '@arcade/kit';
-import { Icon2048, IconGomoku, IconPacman, IconSnake, IconTetris, IconTicTacToe } from './Icons';
+import {
+  Icon2048,
+  IconBreakout,
+  IconConnectFour,
+  IconGomoku,
+  IconInvaders,
+  IconPacman,
+  IconSnake,
+  IconTetris,
+  IconTicTacToe,
+} from './Icons';
 
 type IconCmp = ComponentType<{ size?: number; color?: string }>;
 
@@ -11,6 +21,9 @@ export const GAME_ICONS: Record<ArcadeGameId, IconCmp> = {
   pacman: IconPacman,
   gomoku: IconGomoku,
   tictactoe: IconTicTacToe,
+  breakout: IconBreakout,
+  invaders: IconInvaders,
+  connect4: IconConnectFour,
 };
 
 export type PortalGame = ArcadeGameInfo & { Icon: IconCmp; color: string };
@@ -22,5 +35,5 @@ export const GAMES: PortalGame[] = ARCADE_GAMES.map((g) => ({
   color: `var(${g.colorVar})`,
 }));
 
-export const APP_VERSION = '2.0';
+export const APP_VERSION = '2.1';
 

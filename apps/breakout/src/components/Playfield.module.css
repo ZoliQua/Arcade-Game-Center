@@ -1,0 +1,123 @@
+.field {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  height: auto;
+  border: 1px solid var(--panel-border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.playing {
+  cursor: none;
+}
+
+.mini {
+  width: auto;
+  min-width: 0;
+  height: 90%;
+  max-width: 96%;
+  border-radius: var(--radius-sm);
+  box-shadow: none;
+  cursor: default;
+}
+
+.bg {
+  fill: var(--grid-empty);
+}
+
+.shine {
+  fill: rgba(255, 255, 255, 0.28);
+}
+
+.steel {
+  fill: var(--text-mute);
+  stroke: var(--panel-border-strong);
+  stroke-width: 1;
+}
+
+.armor2 {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.55);
+  stroke-width: 1;
+}
+
+.armor3 {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.85);
+  stroke-width: 1.6;
+  stroke-dasharray: 3 2;
+}
+
+.crack {
+  fill: none;
+  stroke: rgba(0, 0, 0, 0.45);
+  stroke-width: 1.2;
+  stroke-linejoin: round;
+}
+
+.paddle {
+  fill: var(--game-color, var(--game-breakout));
+  filter: drop-shadow(0 0 4px color-mix(in oklab, var(--game-color, var(--game-breakout)) 60%, transparent));
+}
+
+.paddleCatch {
+  stroke: var(--ok);
+  stroke-width: 2;
+}
+
+.blink {
+  animation: blink 0.35s steps(2, start) infinite;
+}
+
+.ball {
+  fill: var(--text-strong);
+  filter: drop-shadow(0 0 3px color-mix(in oklab, var(--text-strong) 55%, transparent));
+}
+
+.ballSlow {
+  fill: var(--ok);
+}
+
+.drop {
+  stroke: rgba(255, 255, 255, 0.6);
+  stroke-width: 1;
+}
+
+.dropText {
+  fill: #fff;
+  font: 700 8px var(--font-sans);
+  text-anchor: middle;
+  dominant-baseline: middle;
+  pointer-events: none;
+}
+
+.banner {
+  fill: var(--text-strong);
+  font: 800 22px var(--font-sans);
+  letter-spacing: 0.04em;
+  text-anchor: middle;
+  pointer-events: none;
+}
+
+.hint {
+  fill: var(--text-dim);
+  font: 600 12px var(--font-sans);
+  text-anchor: middle;
+  pointer-events: none;
+}
+
+@keyframes blink {
+  to {
+    opacity: 0.45;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blink {
+    animation: none;
+  }
+}

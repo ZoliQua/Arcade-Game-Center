@@ -1,9 +1,9 @@
 {
   "name": "@arcade/portal",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "private": true,
   "type": "module",
-  "description": "The Zoltan's Arcade portal app: landing page with live demos, all six games, stats, saves, leaderboard and settings.",
+  "description": "The Zoltan's Arcade portal app: landing page with live demos, all nine games, stats, saves, leaderboard and settings.",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit -p . && vite build",
@@ -12,7 +12,10 @@
   },
   "dependencies": {
     "@arcade/2048": "*",
+    "@arcade/breakout": "*",
+    "@arcade/connect4": "*",
     "@arcade/gomoku": "*",
+    "@arcade/invaders": "*",
     "@arcade/kit": "*",
     "@arcade/pacman": "*",
     "@arcade/snake": "*",

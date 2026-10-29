@@ -150,6 +150,36 @@ export const IconTicTacToe = ({ size = 18, color = 'currentColor' }: IconProps) 
   </svg>
 );
 
+export const IconBreakout = ({ size = 18, color = 'currentColor' }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+    <rect x="2" y="3" width="6" height="3.2" rx="0.8" />
+    <rect x="9" y="3" width="6" height="3.2" rx="0.8" />
+    <rect x="16" y="3" width="6" height="3.2" rx="0.8" />
+    <rect x="2" y="7.4" width="6" height="3.2" rx="0.8" />
+    <rect x="16" y="7.4" width="6" height="3.2" rx="0.8" />
+    <circle cx="14" cy="14.5" r="1.9" />
+    <rect x="6" y="19" width="10" height="2.6" rx="1.3" />
+  </svg>
+);
+
+export const IconInvaders = ({ size = 18, color = 'currentColor' }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+    <path d="M5 4h2v2h-2zM17 4h2v2h-2zM7 6h2v2h-2zM15 6h2v2h-2zM5 8h14v2h-14zM3 10h4v2h-4zM9 10h6v2h-6zM17 10h4v2h-4zM1 12h22v2h-22zM1 14h2v2h-2zM5 14h14v2h-14zM21 14h2v2h-2zM1 16h2v2h-2zM5 16h2v2h-2zM17 16h2v2h-2zM21 16h2v2h-2zM7 18h4v2h-4zM13 18h4v2h-4z" />
+  </svg>
+);
+
+export const IconConnectFour = ({ size = 18, color = 'currentColor' }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.4">
+    <rect x="2.5" y="4" width="19" height="16" rx="2.5" />
+    <circle cx="7" cy="9" r="1.9" />
+    <circle cx="12" cy="9" r="1.9" />
+    <circle cx="17" cy="9" r="1.9" fill={color} />
+    <circle cx="7" cy="15" r="1.9" fill={color} />
+    <circle cx="12" cy="15" r="1.9" fill={color} />
+    <circle cx="17" cy="15" r="1.9" />
+  </svg>
+);
+
 export const IconSave = ({ size = 18 }: IconProps) => (
   <svg width={size} height={size} viewBox="0 0 24 24" {...stroke}>
     <path d="M5 3h11l3 3v15H5z" />

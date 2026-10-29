@@ -6,6 +6,9 @@ import { Game2048, Game2048Demo } from '@arcade/2048';
 import { PacmanDemo, PacmanGame } from '@arcade/pacman';
 import { GomokuDemo, GomokuGame } from '@arcade/gomoku';
 import { TicTacToeDemo, TicTacToeGame } from '@arcade/tictactoe';
+import { BreakoutDemo, BreakoutGame } from '@arcade/breakout';
+import { SpaceInvadersDemo, SpaceInvadersGame } from '@arcade/invaders';
+import { ConnectFourDemo, ConnectFourGame } from '@arcade/connect4';
 
 export type GameModule = {
   Game: ComponentType<ArcadeGameProps>;
@@ -20,4 +23,7 @@ export const GAME_MODULES: Record<ArcadeGameId, GameModule> = {
   pacman: { Game: PacmanGame, Demo: PacmanDemo },
   gomoku: { Game: GomokuGame, Demo: GomokuDemo },
   tictactoe: { Game: TicTacToeGame, Demo: TicTacToeDemo },
+  breakout: { Game: BreakoutGame, Demo: BreakoutDemo },
+  invaders: { Game: SpaceInvadersGame, Demo: SpaceInvadersDemo },
+  connect4: { Game: ConnectFourGame, Demo: ConnectFourDemo },
 };

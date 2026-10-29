@@ -1,0 +1,61 @@
+.game {
+  max-width: 1000px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 260px);
+  gap: 18px;
+  align-items: start;
+  justify-content: center;
+}
+
+.boardWrap {
+  /* Sized here (against the grid column) so the overlay covers exactly the playfield. */
+  justify-self: center;
+  width: min(100%, 720px, calc((100vh - 220px) * 4 / 3));
+  min-width: 0;
+}
+
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.buttons > * {
+  flex: 1;
+}
+
+.level {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.level strong {
+  color: var(--text-strong);
+}
+
+.save {
+  margin-top: 10px;
+  min-height: 16px;
+}
+
+.note {
+  margin: 10px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--text-dim);
+}
+
+@media (max-width: 820px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -1,6 +1,6 @@
 {
   "name": "@arcade/2048",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "type": "module",
   "description": "Type-safe 2048 in React + Vite + TypeScript — slide & merge with animations, swipe input, undo, autosave & resume, shared Zoltan’s Arcade stats. Part of Arcade-Game-Center.",

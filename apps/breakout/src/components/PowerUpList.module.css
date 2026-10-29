@@ -1,0 +1,41 @@
+.list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.active {
+  color: var(--text-strong);
+}
+
+.capsule {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 14px;
+  border-radius: 7px;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.label {
+  flex: 1;
+}
+
+.timer {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--game-color, var(--accent));
+}

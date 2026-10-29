@@ -1,9 +1,9 @@
 {
   "name": "arcade-game-center",
   "private": true,
-  "version": "2.0.0",
+  "version": "2.1.0",
   "type": "module",
-  "description": "Zoltan’s Arcade — one portal for six classic browser games (Tetris, Snake, 2048, Pac-Man, Gomoku, Tic-Tac-Toe) with a shared design system, stats, autosave, live demos and a global leaderboard.",
+  "description": "Zoltan’s Arcade — one portal for nine classic browser games (Tetris, Snake, 2048, Pac-Man, Gomoku, Tic-Tac-Toe, Breakout, Space Invaders, Connect Four) with a shared design system, stats, autosave, live demos and a global leaderboard.",
   "license": "MIT",
   "author": "Zoltán Dul",
   "homepage": "https://github.com/ZoliQua/Arcade-Game-Center#readme",
