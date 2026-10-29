@@ -3,6 +3,22 @@
 All notable changes to Arcade-Game-Center. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 versioning: [SemVer](https://semver.org/).
 
+## [2.1.0] — 2026-11-14
+
+### Added
+- **Breakout**, **Space Invaders** and **Connect Four** join the arcade (nine games), each from its own standalone repo
+  ([Breakout-Game](https://github.com/ZoliQua/Breakout-Game), [Space-Invaders-Game](https://github.com/ZoliQua/Space-Invaders-Game),
+  [Connect-Four-Game](https://github.com/ZoliQua/Connect-Four-Game)) mirrored into `apps/breakout`, `apps/invaders`,
+  `apps/connect4` — with live landing-page demos, autosave & resume and the shared stats.
+- Kit registry entries and `--game-breakout` / `--game-invaders` / `--game-connect4` accent tokens (dark & light);
+  Connect Four scores rounds with `duelRoundScore`.
+- Sidebar / card icons for the three games.
+- `arcade-api`: `max_score` caps for `breakout`, `invaders` (999,999) and `connect4` (1,000).
+
+### Changed
+- Landing hero, settings copy and page description no longer hard-code the number of games.
+- `scripts/sync-games.mjs` and `scripts/repo-docs.mjs` know the new repos; all game repos list the nine games.
+
 ## [2.0.0] — 2026-10-24
 
 ### Added

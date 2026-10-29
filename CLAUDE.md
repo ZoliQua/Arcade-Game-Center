@@ -3,7 +3,8 @@
 ## Project facts
 
 - **Repository**: https://github.com/ZoliQua/Arcade-Game-Center — npm workspaces monorepo, React 18 + Vite 5 + TypeScript 5.
-- **Games** (each also a standalone sibling repo in `../`): tetris, snake, 2048, pacman, gomoku, tictactoe.
+- **Games** (each also a standalone sibling repo in `../`): tetris, snake, 2048, pacman, gomoku, tictactoe,
+  breakout, invaders, connect4.
 - **Communication**: answer the user in **Hungarian**; code, comments and docs are in English.
 - **Scripts**: `npm run dev` · `dev:game @arcade/<id>` · `build` · `lint` · `typecheck` · `test` · `check` ·
   `sync:kit` · `sync:pull -- <id>` · `sync:push -- <id>` · `sync:check`.

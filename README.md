@@ -1,6 +1,7 @@
 # 🕹️ Zoltan's Arcade — Arcade-Game-Center
 
-One portal for six classic browser games — **Tetris, Snake, 2048, Pac-Man, Gomoku and Tic-Tac-Toe** — with one design
+One portal for nine classic browser games — **Tetris, Snake, 2048, Pac-Man, Gomoku, Tic-Tac-Toe, Breakout, Space Invaders
+and Connect Four** — with one design
 system, one scoring model, autosave & resume, live attract-mode demos on the home page and a global leaderboard.
 Every game is also its **own repository** that builds and runs standalone.
 
@@ -40,6 +41,9 @@ Live: **https://drdul.hu/arcade/**
 | 🟡 Pac-Man | [Pac-Man-Game](https://github.com/ZoliQua/Pac-Man-Game) | Maze — four ghost AIs, power pellets, levels | `apps/pacman` |
 | ⚫ Gomoku | [Gomoku-Game](https://github.com/ZoliQua/Gomoku-Game) | Strategy — 15×15, α-β minimax AI | `apps/gomoku` |
 | 🦷 Tic-Tac-Toe | [Tic-Tac-Toe-Game](https://github.com/ZoliQua/Tic-Tac-Toe-Game) | Duel — tooth or X/O marks, unbeatable AI | `apps/tictactoe` |
+| 🏓 Breakout | [Breakout-Game](https://github.com/ZoliQua/Breakout-Game) | Paddle — swept-collision ball, power-ups, multiball, level loop | `apps/breakout` |
+| 👾 Space Invaders | [Space-Invaders-Game](https://github.com/ZoliQua/Space-Invaders-Game) | Shooter — marching waves, eroding bunkers, mystery UFO | `apps/invaders` |
+| 🔴 Connect Four | [Connect-Four-Game](https://github.com/ZoliQua/Connect-Four-Game) | Duel — 7×6, bitboard negamax AI | `apps/connect4` |
 
 ## ✨ Features
 
@@ -68,7 +72,7 @@ npm run dev:game @arcade/gomoku   # any game on its own, straight from apps/
 ```
 apps/
   portal/        @arcade/portal    the user-facing Vite app (landing, play, leaderboard, settings)
-  tetris/ snake/ 2048/ pacman/ gomoku/ tictactoe/
+  tetris/ snake/ 2048/ pacman/ gomoku/ tictactoe/ breakout/ invaders/ connect4/
                  @arcade/<id>      mirror of each standalone repo: src/, index.html, public/, vite.config.ts
 packages/
   kit/           @arcade/kit       shared runtime: stats, sessions, theme, hooks, StatPanel, GameOverlay, ArcadeShell, arcade.css
@@ -95,7 +99,7 @@ edited there. Inside the portal a small Vite plugin points all copies back at `p
 | `stats.ts` | `recordRun`, `readStats`, `summarize`, `resetStats` — the one scoring model, migrates legacy `<id>.highScore` keys |
 | `session.ts` | `saveSession`, `loadSession` (schema-versioned, validated, 30-day expiry), `peekSession`, `clearSession` |
 | `hooks.ts` | `useArcadeRun`, `useSessionAutosave`, `useRestoredSession`, `useRunTimer`, `useGameStats`, `useArcadeTheme`, `useInView` |
-| `scoring.ts` | `duelRoundScore` for Gomoku & Tic-Tac-Toe |
+| `scoring.ts` | `duelRoundScore` for Gomoku, Tic-Tac-Toe & Connect Four |
 | `components/` | `StatPanel`, `GameOverlay`, `SaveBadge`, `KeyHelp`, `StatusPill`, `ArcadeShell` (standalone page chrome) |
 | `arcade.css` | design tokens (dark/light), `arc-*` components, standalone page layout |
 | `registry.ts` | names, repos, tags, accent colours of all games |
@@ -151,7 +155,7 @@ Configuration: copy `arcade-api/_config.example.php` → `_config.php` and `apps
 ## 🚢 Deploy
 
 One static build (`apps/portal/dist`, relative asset paths) plus the PHP API. Step-by-step: [docs/DEPLOY.md](./docs/DEPLOY.md).
-Adding a seventh game: [docs/ADDING-A-GAME.md](./docs/ADDING-A-GAME.md).
+Adding a tenth game: [docs/ADDING-A-GAME.md](./docs/ADDING-A-GAME.md).
 
 ## 🤝 Contributing
 

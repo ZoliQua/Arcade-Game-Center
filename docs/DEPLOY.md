@@ -25,15 +25,18 @@ server rewrites.
 
 The first request creates the table automatically.
 
-### Upgrading an existing server to v2 (six games)
+### Upgrading an existing server to v2.1 (nine games)
 
 The live `_config.php` is not in git — add the new games to its `max_score` map, otherwise their scores are rejected
 with `unknown_game`, and raise the Pac-Man cap:
 
 ```php
 'pacman'    => 999999,
+'breakout'  => 999999,
+'invaders'  => 999999,
 'gomoku'    => 1000,
 'tictactoe' => 1000,
+'connect4'  => 1000,
 ```
 
 Optionally add `'trust_proxy' => false,`.
