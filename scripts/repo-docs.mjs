@@ -26,6 +26,9 @@ const REPOS = {
   pacman: { dir: 'Pac-Man-Game', name: 'Pac-Man' },
   gomoku: { dir: 'Gomoku-Game', name: 'Gomoku' },
   tictactoe: { dir: 'Tic-Tac-Toe-Game', name: 'Tic-Tac-Toe' },
+  breakout: { dir: 'Breakout-Game', name: 'Breakout' },
+  invaders: { dir: 'Space-Invaders-Game', name: 'Space Invaders' },
+  connect4: { dir: 'Connect-Four-Game', name: 'Connect Four' },
   center: { dir: 'Arcade-Game-Center', name: 'Arcade-Game-Center', monorepo: true },
 };
 

@@ -30,6 +30,9 @@ export const GAMES = {
   pacman: 'Pac-Man-Game',
   gomoku: 'Gomoku-Game',
   tictactoe: 'Tic-Tac-Toe-Game',
+  breakout: 'Breakout-Game',
+  invaders: 'Space-Invaders-Game',
+  connect4: 'Connect-Four-Game',
 };
 
 const SYNCED = ['src', 'index.html', 'public', 'vite.config.ts'];
