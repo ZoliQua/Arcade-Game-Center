@@ -29,6 +29,7 @@ const REPOS = {
   breakout: { dir: 'Breakout-Game', name: 'Breakout' },
   invaders: { dir: 'Space-Invaders-Game', name: 'Space Invaders' },
   connect4: { dir: 'Connect-Four-Game', name: 'Connect Four' },
+  nutsort: { dir: 'Nut-Sort-Game', name: 'Nut Sort' },
   center: { dir: 'Arcade-Game-Center', name: 'Arcade-Game-Center', monorepo: true },
 };
 
