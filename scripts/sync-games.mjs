@@ -33,6 +33,7 @@ export const GAMES = {
   breakout: 'Breakout-Game',
   invaders: 'Space-Invaders-Game',
   connect4: 'Connect-Four-Game',
+  nutsort: 'Nut-Sort-Game',
 };
 
 const SYNCED = ['src', 'index.html', 'public', 'vite.config.ts'];

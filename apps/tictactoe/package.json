@@ -1,6 +1,6 @@
 {
   "name": "@arcade/tictactoe",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "private": true,
   "type": "module",
   "description": "Type-safe Tic-Tac-Toe in React + Vite + TypeScript — tooth or classic X/O marks, PvP and three AI levels (the hard minimax AI never loses), autosave & resume, shared Zoltan’s Arcade stats. Part of Arcade-Game-Center.",

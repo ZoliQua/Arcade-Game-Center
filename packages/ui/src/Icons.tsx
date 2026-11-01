@@ -180,6 +180,16 @@ export const IconConnectFour = ({ size = 18, color = 'currentColor' }: IconProps
   </svg>
 );
 
+export const IconNutSort = ({ size = 18, color = 'currentColor' }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.4">
+    <path d="M12 2.5v9" />
+    <path d="M10.5 4.5l3 1M10.5 7l3 1M10.5 9.5l3 1" />
+    <path d="M5.5 13h13l1.5 3-1.5 3h-13L4 16z" fill={color} fillOpacity="0.25" />
+    <path d="M9.5 13v6M14.5 13v6" />
+    <path d="M3 21.5h18" />
+  </svg>
+);
+
 export const IconSave = ({ size = 18 }: IconProps) => (
   <svg width={size} height={size} viewBox="0 0 24 24" {...stroke}>
     <path d="M5 3h11l3 3v15H5z" />

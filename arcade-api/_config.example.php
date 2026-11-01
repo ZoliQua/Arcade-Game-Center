@@ -43,6 +43,7 @@ return [
         'pacman' => 999999, // several levels × ~2,600 dots + ghost chains easily exceed 10k
         'breakout' => 999999, // endless level loop with a growing multiplier
         'invaders' => 999999, // endless waves; the 1978 cabinet rolled over at 9,999
+        'nutsort'  => 10800,  // 20 fixed levels, 100 × nut types each, solved at par
         // Duel games score one round with duelRoundScore(): max 2 × 500.
         'gomoku'    => 1000,
         'tictactoe' => 1000,
