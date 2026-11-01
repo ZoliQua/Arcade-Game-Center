@@ -1,7 +1,7 @@
 # 🕹️ Zoltan's Arcade — Arcade-Game-Center
 
-One portal for nine classic browser games — **Tetris, Snake, 2048, Pac-Man, Gomoku, Tic-Tac-Toe, Breakout, Space Invaders
-and Connect Four** — with one design
+One portal for ten browser games — **Tetris, Snake, 2048, Pac-Man, Gomoku, Tic-Tac-Toe, Breakout, Space Invaders,
+Connect Four and Nut Sort** — with one design
 system, one scoring model, autosave & resume, live attract-mode demos on the home page and a global leaderboard.
 Every game is also its **own repository** that builds and runs standalone.
 
@@ -44,6 +44,7 @@ Live: **https://drdul.hu/arcade/**
 | 🏓 Breakout | [Breakout-Game](https://github.com/ZoliQua/Breakout-Game) | Paddle — swept-collision ball, power-ups, multiball, level loop | `apps/breakout` |
 | 👾 Space Invaders | [Space-Invaders-Game](https://github.com/ZoliQua/Space-Invaders-Game) | Shooter — marching waves, eroding bunkers, mystery UFO | `apps/invaders` |
 | 🔴 Connect Four | [Connect-Four-Game](https://github.com/ZoliQua/Connect-Four-Game) | Duel — 7×6, bitboard negamax AI | `apps/connect4` |
+| 🔩 Nut Sort | [Nut-Sort-Game](https://github.com/ZoliQua/Nut-Sort-Game) | Sorting — 20 fixed levels with proven par, colour-blind shape coding | `apps/nutsort` |
 
 ## ✨ Features
 
@@ -72,7 +73,7 @@ npm run dev:game @arcade/gomoku   # any game on its own, straight from apps/
 ```
 apps/
   portal/        @arcade/portal    the user-facing Vite app (landing, play, leaderboard, settings)
-  tetris/ snake/ 2048/ pacman/ gomoku/ tictactoe/ breakout/ invaders/ connect4/
+  tetris/ snake/ 2048/ pacman/ gomoku/ tictactoe/ breakout/ invaders/ connect4/ nutsort/
                  @arcade/<id>      mirror of each standalone repo: src/, index.html, public/, vite.config.ts
 packages/
   kit/           @arcade/kit       shared runtime: stats, sessions, theme, hooks, StatPanel, GameOverlay, ArcadeShell, arcade.css

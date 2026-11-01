@@ -25,6 +25,14 @@ server rewrites.
 
 The first request creates the table automatically.
 
+### Upgrading an existing server to v2.2 (ten games)
+
+Add Nut Sort to the live `_config.php` `max_score` map (20 levels × 100 × nut types, solved at par):
+
+```php
+'nutsort'   => 10800,
+```
+
 ### Upgrading an existing server to v2.1 (nine games)
 
 The live `_config.php` is not in git — add the new games to its `max_score` map, otherwise their scores are rejected

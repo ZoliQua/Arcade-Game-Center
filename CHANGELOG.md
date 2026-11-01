@@ -3,6 +3,18 @@
 All notable changes to Arcade-Game-Center. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 versioning: [SemVer](https://semver.org/).
 
+## [2.2.0] — 2026-11-22
+
+### Added
+- **Nut Sort** joins the arcade (ten games), from its own standalone repo
+  ([Nut-Sort-Game](https://github.com/ZoliQua/Nut-Sort-Game)) mirrored into `apps/nutsort`: 20 fixed levels with a
+  proven minimum number of moves, scoring by moves against par, undo and restart that cost points, neon and glass looks,
+  colour-blind shape coding (every nut type has its own width and notch count), a live demo replaying optimal solutions,
+  autosave & resume and the shared stats.
+- Kit registry entry and `--game-nutsort` accent token (dark & light); sidebar / card icon.
+- `arcade-api`: `max_score` cap for `nutsort` (10,800).
+- Design specs and implementation plans under `docs/superpowers/` (Nut Sort, and the upcoming Texas Hold'em).
+
 ## [2.1.1] — 2026-11-15
 
 ### Fixed
