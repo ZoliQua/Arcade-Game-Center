@@ -34,6 +34,7 @@ export const GAMES = {
   invaders: 'Space-Invaders-Game',
   connect4: 'Connect-Four-Game',
   nutsort: 'Nut-Sort-Game',
+  holdem: 'Texas-Holdem-Game',
 };
 
 const SYNCED = ['src', 'index.html', 'public', 'vite.config.ts'];

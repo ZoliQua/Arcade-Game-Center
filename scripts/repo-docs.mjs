@@ -30,6 +30,7 @@ const REPOS = {
   invaders: { dir: 'Space-Invaders-Game', name: 'Space Invaders' },
   connect4: { dir: 'Connect-Four-Game', name: 'Connect Four' },
   nutsort: { dir: 'Nut-Sort-Game', name: 'Nut Sort' },
+  holdem: { dir: 'Texas-Holdem-Game', name: "Texas Hold'em", logicDir: 'src/engine' },
   center: { dir: 'Arcade-Game-Center', name: 'Arcade-Game-Center', monorepo: true },
 };
 
@@ -214,7 +215,7 @@ Run the full check — the same one CI runs:
 npm run check   # lint → typecheck → tests → production build
 \`\`\`
 
-- Keep game rules in pure functions under \`src/logic/\` and cover them with tests.
+- Keep game rules in pure functions under \`${r.logicDir ?? 'src/logic'}/\` and cover them with tests.
 - Keep pull requests small and focused: one fix or one feature.
 - Update the README and CHANGELOG when behaviour changes.
 ${r.monorepo ? `- Game code under \`apps/<id>/\` mirrors the standalone repos. Change it in either place, then run

@@ -44,6 +44,7 @@ return [
         'breakout' => 999999, // endless level loop with a growing multiplier
         'invaders' => 999999, // endless waves; the 1978 cabinet rolled over at 9,999
         'nutsort'  => 10800,  // 20 fixed levels, 100 × nut types each, solved at par
+        'holdem'   => 5000,   // tournament: base by difficulty (max 5000) × finishing-place share
         // Duel games score one round with duelRoundScore(): max 2 × 500.
         'gomoku'    => 1000,
         'tictactoe' => 1000,

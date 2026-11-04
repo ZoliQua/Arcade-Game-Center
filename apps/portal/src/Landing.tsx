@@ -27,7 +27,7 @@ export function Landing({ navigate, stats, sessions }: LandingProps) {
     <>
       <section className="landing__hero">
         <div>
-          <h1>Ten classics, one home.</h1>
+          <h1>Eleven classics, one home.</h1>
           <p>
             Pick a game — every card below is the real game playing itself. Runs autosave, so you can
             leave mid-game and continue later; best scores and play time follow you across sessions.

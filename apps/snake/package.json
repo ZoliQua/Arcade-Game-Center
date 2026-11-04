@@ -1,6 +1,6 @@
 {
   "name": "@arcade/snake",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "private": true,
   "type": "module",
   "description": "Minimal, type-safe Snake in React + Vite + TypeScript — adjustable speed, wall wrap, autosave & resume, shared Zoltan’s Arcade stats. Part of Arcade-Game-Center.",

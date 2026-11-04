@@ -10,6 +10,7 @@ import { BreakoutDemo, BreakoutGame } from '@arcade/breakout';
 import { SpaceInvadersDemo, SpaceInvadersGame } from '@arcade/invaders';
 import { ConnectFourDemo, ConnectFourGame } from '@arcade/connect4';
 import { NutSortDemo, NutSortGame } from '@arcade/nutsort';
+import { HoldemDemo, HoldemGame } from '@arcade/holdem';
 
 export type GameModule = {
   Game: ComponentType<ArcadeGameProps>;
@@ -28,4 +29,5 @@ export const GAME_MODULES: Record<ArcadeGameId, GameModule> = {
   invaders: { Game: SpaceInvadersGame, Demo: SpaceInvadersDemo },
   connect4: { Game: ConnectFourGame, Demo: ConnectFourDemo },
   nutsort: { Game: NutSortGame, Demo: NutSortDemo },
+  holdem: { Game: HoldemGame, Demo: HoldemDemo },
 };

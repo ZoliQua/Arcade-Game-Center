@@ -6,6 +6,7 @@ import {
   IconConnectFour,
   IconGomoku,
   IconInvaders,
+  IconHoldem,
   IconNutSort,
   IconPacman,
   IconSnake,
@@ -26,6 +27,7 @@ export const GAME_ICONS: Record<ArcadeGameId, IconCmp> = {
   invaders: IconInvaders,
   connect4: IconConnectFour,
   nutsort: IconNutSort,
+  holdem: IconHoldem,
 };
 
 export type PortalGame = ArcadeGameInfo & { Icon: IconCmp; color: string };
@@ -37,5 +39,5 @@ export const GAMES: PortalGame[] = ARCADE_GAMES.map((g) => ({
   color: `var(${g.colorVar})`,
 }));
 
-export const APP_VERSION = '2.2';
+export const APP_VERSION = '2.3';
 

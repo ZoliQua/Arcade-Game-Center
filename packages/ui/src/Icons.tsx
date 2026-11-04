@@ -190,6 +190,16 @@ export const IconNutSort = ({ size = 18, color = 'currentColor' }: IconProps) =>
   </svg>
 );
 
+export const IconHoldem = ({ size = 18, color = 'currentColor' }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.4">
+    <rect x="3.5" y="4" width="8" height="12" rx="1.3" transform="rotate(-14 7.5 10)" />
+    <rect x="8" y="3" width="8" height="12" rx="1.3" fill={color} fillOpacity="0.25" transform="rotate(10 12 9)" />
+    <path d="M12 7.2l1.2 1.6-1.2 1.6-1.2-1.6z" transform="rotate(10 12 9)" />
+    <circle cx="17" cy="17.5" r="4" />
+    <circle cx="17" cy="17.5" r="2" strokeDasharray="1.6 1.6" />
+  </svg>
+);
+
 export const IconSave = ({ size = 18 }: IconProps) => (
   <svg width={size} height={size} viewBox="0 0 24 24" {...stroke}>
     <path d="M5 3h11l3 3v15H5z" />
