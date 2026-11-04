@@ -25,6 +25,14 @@ server rewrites.
 
 The first request creates the table automatically.
 
+### Upgrading an existing server to v2.3 (eleven games)
+
+Add Texas Hold'em to the live `_config.php` `max_score` map (hard-table base 5,000 × first-place share 1.0):
+
+```php
+'holdem'    => 5000,
+```
+
 ### Upgrading an existing server to v2.2 (ten games)
 
 Add Nut Sort to the live `_config.php` `max_score` map (20 levels × 100 × nut types, solved at par):

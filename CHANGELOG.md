@@ -3,6 +3,18 @@
 All notable changes to Arcade-Game-Center. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 versioning: [SemVer](https://semver.org/).
 
+## [2.3.0] — 2026-12-06
+
+### Added
+- **Texas Hold'em** joins the arcade (eleven games), from its own standalone repo
+  ([Texas-Holdem-Game](https://github.com/ZoliQua/Texas-Holdem-Game)) mirrored into `apps/holdem`: no-limit sit & go
+  heads-up or 6-max, 20/30/45/60-minute blind structures calibrated by simulation, three difficulty pools of five
+  characters each with their own style, figure and readable tells, scoring by table difficulty × finishing place,
+  neon / classic / luxe tables, a four-colour or grey deck, a hand log, a bots-only demo table, autosave & resume.
+- Kit registry entry and `--game-holdem` accent token (dark & light); sidebar / card icon.
+- `arcade-api`: `max_score` cap for `holdem` (5,000).
+- `scripts/repo-docs.mjs`: per-repo `logicDir` for the CONTRIBUTING guide (Hold'em keeps its rules in `src/engine/`).
+
 ## [2.2.0] — 2026-11-22
 
 ### Added
