@@ -167,7 +167,7 @@ These follow the existing games exactly. Snake-Game is the reference.
 
 - New public GitHub repo `ZoliQua/Nut-Sort-Game` with the community files and README pointing to the portal and siblings, set up the same way as the other nine repos.
 - All commits are by **Zoltán Dul <zoltan.dul@gmail.com>**, with no co-author or AI attribution.
-- **My call:** they continue the dated timeline after 2026-11-14, spread over 2026-11-16 … 2026-11-22, with the portal integration on the last day.
+- **My call:** they continue the dated timeline after 2026-10-29, spread over 2026-10-30 … 2026-11-01, with the portal integration on the last day.
 - After integration, a new deploy package `arcade-v2.2.0.zip` (portal only). Zoltán must also add `"nutsort" => 10800` to the live `_config.php` (or I do it through cPanel if asked).
 
 ## Tests (minimum)

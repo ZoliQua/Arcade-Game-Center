@@ -3,7 +3,7 @@
 All notable changes to Arcade-Game-Center. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 versioning: [SemVer](https://semver.org/).
 
-## [2.3.0] — 2026-12-06
+## [2.3.0] — 2026-11-04
 
 ### Added
 - **Texas Hold'em** joins the arcade (eleven games), from its own standalone repo
@@ -15,7 +15,7 @@ versioning: [SemVer](https://semver.org/).
 - `arcade-api`: `max_score` cap for `holdem` (5,000).
 - `scripts/repo-docs.mjs`: per-repo `logicDir` for the CONTRIBUTING guide (Hold'em keeps its rules in `src/engine/`).
 
-## [2.2.0] — 2026-11-22
+## [2.2.0] — 2026-11-01
 
 ### Added
 - **Nut Sort** joins the arcade (ten games), from its own standalone repo
@@ -27,7 +27,7 @@ versioning: [SemVer](https://semver.org/).
 - `arcade-api`: `max_score` cap for `nutsort` (10,800).
 - Design specs and implementation plans under `docs/superpowers/` (Nut Sort, and the upcoming Texas Hold'em).
 
-## [2.1.1] — 2026-11-15
+## [2.1.1] — 2026-10-29
 
 ### Fixed
 - Leaderboard showed "No scores yet — be the first." when the API failed; `fetchLeaderboard` /
@@ -38,7 +38,7 @@ versioning: [SemVer](https://semver.org/).
 - `apps/portal/public/.htaccess`: `index.html` is always revalidated so a new deploy shows up immediately; hashed
   `assets/` are cached for a year (immutable).
 
-## [2.1.0] — 2026-11-14
+## [2.1.0] — 2026-10-29
 
 ### Added
 - **Breakout**, **Space Invaders** and **Connect Four** join the arcade (nine games), each from its own standalone repo
@@ -54,7 +54,7 @@ versioning: [SemVer](https://semver.org/).
 - Landing hero, settings copy and page description no longer hard-code the number of games.
 - `scripts/sync-games.mjs` and `scripts/repo-docs.mjs` know the new repos; all game repos list the nine games.
 
-## [2.0.0] — 2026-10-24
+## [2.0.0] — 2026-10-26
 
 ### Added
 - **Gomoku** and **Tic-Tac-Toe** join the arcade (six games).

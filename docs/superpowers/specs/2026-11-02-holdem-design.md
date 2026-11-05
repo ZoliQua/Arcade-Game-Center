@@ -2,7 +2,7 @@
 
 The eleventh arcade game: a No-Limit Texas Hold'em tournament against computer opponents. It ships as its own repo (`Texas-Holdem-Game`, id `holdem`) and is then integrated into the portal (`docs/ADDING-A-GAME.md`).
 
-It is built **after** Nut Sort (`2026-11-16-nut-sort-design.md`).
+It is built **after** Nut Sort (`2026-10-30-nut-sort-design.md`).
 
 ## Why
 
@@ -254,7 +254,7 @@ These follow the existing games exactly.
 
 - New public GitHub repo `ZoliQua/Texas-Holdem-Game` with the community files, a README pointing to the portal and the sibling repos, and topics. Set up the same way as the other repos.
 - All commits are by **Zoltán Dul <zoltan.dul@gmail.com>**, with no co-author or AI attribution.
-- **My call:** they continue the dated timeline after Nut Sort, spread over 2026-11-23 … 2026-12-06, with the portal integration on the last day.
+- **My call:** they continue the dated timeline after Nut Sort, spread over 2026-11-02 … 2026-11-04, with the portal integration on the last day.
 - After integration, a new deploy package `arcade-v2.3.0.zip` (portal only). The live `_config.php` needs `"holdem" => 5000`.
 
 ## Left to the builder
