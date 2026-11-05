@@ -40,18 +40,33 @@ function browserLang(): Lang | null {
   return null;
 }
 
-/** Saved choice → browser language → English. (URL prefs are saved at boot by `applyUrlPrefs`.) */
+/**
+ * Last language `applyLang` could not persist (storage blocked or full).
+ * Consulted only when storage has no value, so a page without storage still
+ * remembers the switch for components that mount later. A successful write clears it.
+ */
+let unsavedLang: Lang | null = null;
+
+/** Saved choice → in-memory fallback → browser language → English. (URL prefs are applied at boot by `applyUrlPrefs`.) */
 export function readLang(): Lang {
   const stored = readString(LANG_KEY);
   if (isLang(stored)) return stored;
-  return browserLang() ?? 'en';
+  return unsavedLang ?? browserLang() ?? 'en';
 }
 
+export type ApplyOptions = {
+  /**
+   * Persist and update `<html>` but emit no event. Only for boot-time
+   * application before any listener renders (see `applyUrlPrefs`).
+   */
+  silent?: boolean;
+};
+
 /** Persist the language, set `<html lang>` and notify every listener on the page. */
-export function applyLang(lang: Lang): void {
-  writeString(LANG_KEY, lang);
+export function applyLang(lang: Lang, opts: ApplyOptions = {}): void {
+  unsavedLang = writeString(LANG_KEY, lang) ? null : lang;
   if (typeof document !== 'undefined') document.documentElement.lang = lang;
-  emit(LANG_EVENT, lang);
+  if (!opts.silent) emit(LANG_EVENT, lang);
 }
 
 /** Replace `{name}` placeholders; unknown placeholders are left as they are. */

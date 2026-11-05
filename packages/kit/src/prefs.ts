@@ -1,5 +1,5 @@
 import { applyDental } from './dental';
-import { applyLang, isLang, type Lang } from './i18n';
+import { applyLang, isLang, type ApplyOptions, type Lang } from './i18n';
 
 /**
  * URL hand-off of the shared preferences: `?lang=en|hu|de` and `?dental=1|0`,
@@ -43,16 +43,25 @@ export function readUrlPrefs(loc: Loc = currentLocation()): UrlPrefs {
   return out;
 }
 
-/** Apply (and persist) whatever the URL asks for. */
-export function applyUrlPrefs(loc?: Loc): void {
+/**
+ * Apply (and persist) whatever the URL asks for. Call once at boot.
+ * `{ silent: true }` skips the change events: use it when applying during the
+ * first render (as `ArcadeShell` does), where no listener exists yet and an
+ * event could trigger React's "update while rendering" warning; components
+ * then read the new values on mount.
+ */
+export function applyUrlPrefs(loc?: Loc, opts: ApplyOptions = {}): void {
   const prefs = readUrlPrefs(loc);
-  if (prefs.lang) applyLang(prefs.lang);
-  if (prefs.dental !== undefined) applyDental(prefs.dental);
+  if (prefs.lang) applyLang(prefs.lang, opts);
+  if (prefs.dental !== undefined) applyDental(prefs.dental, opts);
 }
 
-/** Append the hand-off params to a link to another arcade origin (`dental` only when on). */
+/**
+ * Append the hand-off params to a link to another arcade origin. Both are
+ * always sent (`dental=1|0`), so turning dental mode off carries over too.
+ */
 export function withPrefs(url: string, prefs: { lang: Lang; dental: boolean }): string {
-  const params = `lang=${prefs.lang}${prefs.dental ? '&dental=1' : ''}`;
+  const params = `lang=${prefs.lang}&dental=${prefs.dental ? 1 : 0}`;
   const hashAt = url.indexOf('#');
   const base = hashAt >= 0 ? url.slice(0, hashAt) : url;
   const hash = hashAt >= 0 ? url.slice(hashAt) : '';

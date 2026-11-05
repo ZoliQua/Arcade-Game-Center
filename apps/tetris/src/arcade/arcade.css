@@ -645,6 +645,7 @@ body {
   /* Off: hollow outline tooth. On: filled tooth + check badge (shape, not just colour). */
   --arc-tooth-fill: transparent;
   --arc-tooth-stroke: currentColor;
+  --arc-tooth-shine: transparent;
 }
 .arc-dental-toggle--on {
   border-color: var(--game-color, var(--accent));
@@ -653,6 +654,7 @@ body {
 .arc-dental-toggle--on .arc-dental-toggle__icon {
   --arc-tooth-fill: #f7f8fb;
   --arc-tooth-stroke: #6b7080;
+  --arc-tooth-shine: #fff;
 }
 .arc-dental-toggle__check {
   position: absolute;

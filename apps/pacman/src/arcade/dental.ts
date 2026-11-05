@@ -1,4 +1,5 @@
 import { emit, readString, writeString } from './storage';
+import type { ApplyOptions } from './i18n';
 
 /**
  * Dental mode: one shared, presentation-only preference (`arcade.dental`,
@@ -9,8 +10,14 @@ import { emit, readString, writeString } from './storage';
 export const DENTAL_KEY = 'arcade.dental';
 export const DENTAL_EVENT = 'arcade:dental';
 
+/** Last value `applyDental` could not persist; used only when storage has no value. */
+let unsavedDental: boolean | null = null;
+
+/** Saved value → in-memory fallback (storage blocked) → off. */
 export function readDental(): boolean {
-  return readString(DENTAL_KEY) === '1';
+  const stored = readString(DENTAL_KEY);
+  if (stored === '1' || stored === '0') return stored === '1';
+  return unsavedDental ?? false;
 }
 
 /** Mirror the preference on `<html data-dental>` so CSS can react to it. */
@@ -19,8 +26,8 @@ export function markDental(on: boolean): void {
 }
 
 /** Persist dental mode and notify every listener on the page. */
-export function applyDental(on: boolean): void {
-  writeString(DENTAL_KEY, on ? '1' : '0');
+export function applyDental(on: boolean, opts: ApplyOptions = {}): void {
+  unsavedDental = writeString(DENTAL_KEY, on ? '1' : '0') ? null : on;
   markDental(on);
-  emit(DENTAL_EVENT, on);
+  if (!opts.silent) emit(DENTAL_EVENT, on);
 }

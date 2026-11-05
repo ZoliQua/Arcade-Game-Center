@@ -79,9 +79,11 @@ function LangMenu({ lang, onPick, label }: { lang: Lang; onPick: (l: Lang) => vo
  * Zoltan's Arcade, plus links to the sibling games and the portal.
  */
 export function ArcadeShell({ gameId, children }: { gameId: ArcadeGameId; children: ReactNode }) {
-  // `?lang=` / `?dental=` hand-off: applied (and saved) once, before any hook reads the prefs.
+  // `?lang=` / `?dental=` hand-off, applied once before any hook below reads the prefs.
+  // Silent: it persists the values (or keeps them in memory) and updates <html>, but
+  // emits no event, so nothing can re-render another component during this render.
   useState(() => {
-    applyUrlPrefs();
+    applyUrlPrefs(undefined, { silent: true });
     return true;
   });
   const game = gameInfo(gameId);

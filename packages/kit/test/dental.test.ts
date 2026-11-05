@@ -53,4 +53,17 @@ describe('dental mode', () => {
     expect(b.result.current[0]).toBe(true);
     expect(document.documentElement.getAttribute('data-dental')).toBe('on');
   });
+
+  it('a hook mounted after a switch sees it when storage is blocked', () => {
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      throw new Error('blocked');
+    });
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('blocked');
+    });
+    applyDental(true);
+    expect(renderHook(() => useDental()).result.current[0]).toBe(true);
+    applyDental(false);
+    expect(renderHook(() => useDental()).result.current[0]).toBe(false);
+  });
 });

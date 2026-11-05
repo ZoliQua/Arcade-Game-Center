@@ -2,9 +2,13 @@ import type { CSSProperties, ReactNode } from 'react';
 
 /**
  * The shared dental icon family (dental mode in every game). All icons use a
- * 100×100 viewBox and differ in silhouette, never in colour alone. Colours come
- * from optional props, then CSS custom properties, then built-in defaults:
+ * 100×100 viewBox and are told apart by shape, never by colour alone:
+ * Molar, GoldCrown, Toothbrush, PasteDrop, Probe and Germ each have their own
+ * silhouette; DecayedTooth has a chipped (notched) crown edge; Tooth and
+ * SmileTooth share the incisor outline and differ by interior marks (the face).
+ * Colours come from optional props, then CSS custom properties, then defaults:
  *   --arc-tooth-fill / --arc-tooth-stroke   enamel (Tooth, Molar, SmileTooth, DecayedTooth)
+ *   --arc-tooth-shine                       enamel highlight streak (transparent hides it)
  *   --arc-dental-ink                        faces, cavities, bristle lines
  *   --arc-dental-accent                     brush handle, paste stripe
  *   --arc-germ                              germ body
@@ -27,6 +31,10 @@ const TOOTH =
 // Wide, flat-topped molar.
 const MOLAR =
   'M18 22c0-8 6-12 14-12 6 0 10 3 18 3s12-3 18-3c8 0 14 4 14 12 0 10-4 18-6 26-2 10-2 22-6 30-3 6-8 6-10 0-2-8-3-16-10-16s-8 8-10 16c-2 6-7 6-10 0-4-8-4-20-6-30-2-8-6-16-6-26z';
+
+// Same incisor with a chipped, zig-zag notch in the upper-right crown edge.
+const TOOTH_CHIPPED =
+  'M30 14c-9 0-16 7-16 17 0 7 2 12 4 18 2 5 4 13 5 22 1 8 4 13 8 13 4 0 6-3 7-10 1-7 2-11 5-11 3 0 4 4 5 11 1 7 3 10 7 10 4 0 7-5 8-13 1-9 3-17 5-22 2-6 4-11 4-18l-13-2 7-6-9-4-1-5c-5 0-9 2-12 5-3-3-7-5-12-5z';
 
 const ENAMEL = 'var(--arc-tooth-fill, #f7f8fb)';
 const OUTLINE = 'var(--arc-tooth-stroke, #9aa3b5)';
@@ -55,7 +63,7 @@ function Enamel({ d, fill, stroke }: { d: string; fill?: string; stroke?: string
   return (
     <>
       <path d={d} fill={fill ?? ENAMEL} stroke={stroke ?? OUTLINE} strokeWidth="4" strokeLinejoin="round" />
-      <path d="M34 24q-8 4-8 14" fill="none" stroke="#fff" strokeWidth="5" strokeLinecap="round" opacity="0.7" />
+      <path d="M34 24q-8 4-8 14" fill="none" stroke="var(--arc-tooth-shine, #fff)" strokeWidth="5" strokeLinecap="round" opacity="0.7" />
     </>
   );
 }
@@ -188,15 +196,15 @@ export function Germ(props: DentalIconProps) {
   );
 }
 
-/** Tooth with dark cavities and a crack (caries; eroded Space Invaders bunkers). */
+/** Chipped tooth with dark cavities and a crack (caries; eroded Space Invaders bunkers). */
 export function DecayedTooth(props: DentalIconProps) {
   const cavity = 'var(--arc-caries, #4a3a2a)';
   return (
     <Svg {...props}>
-      <Enamel d={TOOTH} fill={props.fill} stroke={props.stroke} />
-      <circle cx="58" cy="32" r="9" fill={cavity} />
-      <circle cx="42" cy="50" r="6" fill={cavity} />
-      <path d="M60 46l-6 10 6 6-4 10" fill="none" stroke={cavity} strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
+      <Enamel d={TOOTH_CHIPPED} fill={props.fill} stroke={props.stroke} />
+      <circle cx="38" cy="36" r="8" fill={cavity} />
+      <circle cx="54" cy="54" r="5" fill={cavity} />
+      <path d="M59 30l-4 9 5 5-3 8" fill="none" stroke={cavity} strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
     </Svg>
   );
 }

@@ -2,6 +2,7 @@ import { act, fireEvent, render, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { applyLang, LANG_EVENT, LANG_KEY, LANGS, readLang, type Messages } from '../src/i18n';
 import { useLang, useMessages } from '../src/hooks';
+import { applyDental } from '../src/dental';
 import { formatNumber } from '../src/format';
 import { ARCADE_GAMES, ARCADE_PORTAL_URL, gameName, gameTagline } from '../src/registry';
 import { ArcadeShell } from '../src/components/ArcadeShell';
@@ -61,6 +62,47 @@ describe('applyLang', () => {
     expect(localStorage.getItem('arcade.lang')).toBe('hu');
     expect(seen).toEqual(['hu']);
     expect(LANGS).toEqual(['en', 'hu', 'de']);
+  });
+});
+
+describe('blocked storage', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+    applyLang('en'); // a successful write clears the in-memory fallback
+  });
+  function blockStorage() {
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      throw new Error('blocked');
+    });
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('blocked');
+    });
+  }
+
+  it('a useLang mounted after applyLang reads the applied language', () => {
+    browserLanguages(['en-US']);
+    blockStorage();
+    applyLang('de');
+    const { result } = renderHook(() => useLang());
+    expect(result.current[0]).toBe('de');
+  });
+
+  it('ArcadeShell honours ?lang= without emitting during render', () => {
+    browserLanguages(['en-US']);
+    blockStorage();
+    const errors = vi.spyOn(console, 'error');
+    window.history.replaceState(null, '', '/?lang=de&dental=1');
+    const { getByRole } = render(
+      <ArcadeShell gameId="connect4">
+        <StatusPill status="paused" />
+      </ArcadeShell>,
+    );
+    window.history.replaceState(null, '', '/');
+    expect(document.title).toBe("Vier gewinnt · Zoltan's Arcade");
+    expect(getByRole('status').textContent).toContain('Pausiert');
+    expect(getByRole('button', { name: /Zahnmodus/ }).getAttribute('aria-pressed')).toBe('true');
+    expect(errors).not.toHaveBeenCalled();
+    act(() => applyDental(false));
   });
 });
 
