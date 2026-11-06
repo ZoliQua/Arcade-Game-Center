@@ -22,6 +22,9 @@ return [
     // CORS — list every origin that should be able to POST/GET.
     // Add http://localhost:5173 only while testing locally.
     'allowed_origins' => [
+        'https://dulzoltan.hu',
+        'https://www.dulzoltan.hu',
+        // Previous host, kept while old links and caches still point there.
         'https://drdul.hu',
         'https://www.drdul.hu',
     ],

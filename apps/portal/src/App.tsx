@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type CSSProperties } from 'react';
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
 import {
   ARCADE_KEYS,
   gameInfo,
@@ -11,6 +11,7 @@ import {
   type ArcadeStatusInfo,
 } from '@arcade/kit';
 import { Header, Sidebar, type LiveStatus } from '@arcade/ui';
+import { trackRoute } from './analytics';
 import { GAME_MODULES } from './games';
 import { routeTitle } from './i18n';
 import { useAllStats, useSavedSessions } from './hooks/usePortalData';
@@ -18,7 +19,7 @@ import { useScoreSubmitter } from './hooks/useScoreSubmitter';
 import { Landing } from './Landing';
 import { Leaderboard } from './Leaderboard';
 import { NicknamePrompt } from './NicknamePrompt';
-import { useHashRoute } from './routes';
+import { formatHash, useHashRoute } from './routes';
 import { getNickname } from './services/nickname';
 import { Settings } from './Settings';
 import { ShortcutsDialog } from './ShortcutsDialog';
@@ -51,6 +52,18 @@ export default function App() {
   useEffect(() => {
     document.title = routeTitle(route, lang);
   }, [route, lang]);
+
+  // One `arcade_page_view` per route change (not per language switch or re-render).
+  const routeKey = formatHash(route);
+  const langRef = useRef(lang);
+  langRef.current = lang;
+  const trackedRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (trackedRef.current === routeKey) return;
+    trackedRef.current = routeKey;
+    trackRoute(route, langRef.current);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed by the route's hash
+  }, [routeKey]);
 
   const toggleCollapsed = useCallback(() => {
     setCollapsed((c) => {
