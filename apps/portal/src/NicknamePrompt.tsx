@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useMessages } from '@arcade/kit';
+import { PORTAL_MESSAGES } from './i18n';
 import { nicknameLimits, setNickname } from './services/nickname';
 
 type Props = {
@@ -7,6 +9,7 @@ type Props = {
 };
 
 export function NicknamePrompt({ onSet, onSkip }: Props) {
+  const t = useMessages(PORTAL_MESSAGES);
   const [draft, setDraft] = useState('');
   const valid = draft.trim().length >= nicknameLimits.min && draft.trim().length <= nicknameLimits.max;
 
@@ -26,8 +29,8 @@ export function NicknamePrompt({ onSet, onSkip }: Props) {
         }}
       >
         <div>
-          <h2 id="nick-title">Pick a nickname</h2>
-          <p>Shown on the global leaderboard. You can change it later in Settings.</p>
+          <h2 id="nick-title">{t('nickTitle')}</h2>
+          <p>{t('nickBody')}</p>
         </div>
 
         <input
@@ -37,16 +40,16 @@ export function NicknamePrompt({ onSet, onSkip }: Props) {
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           maxLength={nicknameLimits.max}
-          placeholder={`${nicknameLimits.min}–${nicknameLimits.max} characters`}
-          aria-label="Nickname"
+          placeholder={t('nickChars', { min: nicknameLimits.min, max: nicknameLimits.max })}
+          aria-label={t('nickname')}
         />
 
         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
           <button type="button" className="arc-btn arc-btn--ghost" onClick={onSkip}>
-            Play anonymously
+            {t('playAnonymously')}
           </button>
           <button type="submit" className="arc-btn arc-btn--primary" disabled={!valid}>
-            Save
+            {t('save')}
           </button>
         </div>
       </form>

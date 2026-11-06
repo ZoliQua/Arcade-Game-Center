@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { ARCADE_GAMES } from '@arcade/kit';
+import { ARCADE_GAMES, formatNumber, gameName, useLang, useMessages, type Lang } from '@arcade/kit';
+import { pt, PORTAL_MESSAGES } from './i18n';
 import {
   apiConfigured,
   fetchAllLeaderboards,
@@ -8,23 +9,23 @@ import {
 } from './services/api';
 
 const ORDER: GameId[] = ARCADE_GAMES.map((g) => g.id);
-const GAME_LABEL = Object.fromEntries(ARCADE_GAMES.map((g) => [g.id, g.name])) as Record<GameId, string>;
 
 type LeaderboardData = Record<GameId, LeaderboardEntry[]>;
 const EMPTY = Object.fromEntries(ORDER.map((id) => [id, []])) as unknown as LeaderboardData;
 
-function fmtRelative(at: string): string {
+function fmtRelative(at: string, lang: Lang): string {
   // API v2 sends ISO-8601 UTC; v1 sent 'YYYY-MM-DD HH:MM:SS' (UTC).
   const t = new Date(at.includes('T') ? at : at.replace(' ', 'T') + 'Z').getTime();
   if (Number.isNaN(t)) return at;
   const diffSec = Math.max(1, Math.floor((Date.now() - t) / 1000));
-  if (diffSec < 60) return `${diffSec}s ago`;
-  if (diffSec < 3600) return `${Math.floor(diffSec / 60)}m ago`;
-  if (diffSec < 86400) return `${Math.floor(diffSec / 3600)}h ago`;
-  return `${Math.floor(diffSec / 86400)}d ago`;
+  if (diffSec < 60) return pt(lang, 'agoSeconds', { n: diffSec });
+  if (diffSec < 3600) return pt(lang, 'agoMinutes', { n: Math.floor(diffSec / 60) });
+  if (diffSec < 86400) return pt(lang, 'agoHours', { n: Math.floor(diffSec / 3600) });
+  return pt(lang, 'agoDays', { n: Math.floor(diffSec / 86400) });
 }
 
 export function Leaderboard() {
+  const t = useMessages(PORTAL_MESSAGES);
   const [data, setData] = useState<LeaderboardData>(EMPTY);
   const [status, setStatus] = useState<'idle' | 'loading' | 'ok' | 'error'>('idle');
 
@@ -49,12 +50,12 @@ export function Leaderboard() {
   return (
     <div>
       <div className="section-head">
-        <h2>Best runs</h2>
+        <h2>{t('lbTitle')}</h2>
         <span>
-          {status === 'loading' && 'Loading…'}
-          {status === 'ok' && 'Top 10 per game · global'}
-          {status === 'error' && !apiConfigured && 'Leaderboard server not configured'}
-          {status === 'error' && apiConfigured && 'Could not reach leaderboard server'}
+          {status === 'loading' && t('loading')}
+          {status === 'ok' && t('lbOk')}
+          {status === 'error' && !apiConfigured && t('lbNotConfigured')}
+          {status === 'error' && apiConfigured && t('lbUnreachable')}
         </span>
       </div>
 
@@ -80,6 +81,8 @@ type GameLeaderboardProps = {
 };
 
 function GameLeaderboard({ game, entries, status }: GameLeaderboardProps) {
+  const [lang] = useLang();
+  const t = useMessages(PORTAL_MESSAGES);
   return (
     <div className="arc-panel" style={{ padding: 0, overflow: 'hidden' }}>
       <div
@@ -96,26 +99,26 @@ function GameLeaderboard({ game, entries, status }: GameLeaderboardProps) {
         }}
       >
         <span style={{ color: 'var(--text-strong)', fontWeight: 600 }}>
-          {GAME_LABEL[game]}
+          {gameName(game, lang)}
         </span>
-        <span>{entries.length === 0 ? '—' : `${entries.length} ${entries.length === 1 ? 'entry' : 'entries'}`}</span>
+        <span>{entries.length === 0 ? '—' : t(entries.length === 1 ? 'entriesOne' : 'entriesMany', { n: entries.length })}</span>
       </div>
 
       {status === 'loading' && entries.length === 0 && (
         <div style={{ padding: '18px', color: 'var(--text-mute)', fontSize: 13 }}>
-          Loading…
+          {t('loading')}
         </div>
       )}
 
       {status === 'error' && (
         <div style={{ padding: '18px', color: 'var(--text-mute)', fontSize: 13 }}>
-          Unavailable.
+          {t('unavailable')}
         </div>
       )}
 
       {status === 'ok' && entries.length === 0 && (
         <div style={{ padding: '18px', color: 'var(--text-mute)', fontSize: 13 }}>
-          No scores yet — be the first.
+          {t('noScores')}
         </div>
       )}
 
@@ -148,7 +151,7 @@ function GameLeaderboard({ game, entries, status }: GameLeaderboardProps) {
               textAlign: 'right',
             }}
           >
-            {row.score.toLocaleString()}
+            {formatNumber(row.score, lang)}
           </span>
           <span
             style={{
@@ -157,7 +160,7 @@ function GameLeaderboard({ game, entries, status }: GameLeaderboardProps) {
               textAlign: 'right',
             }}
           >
-            {fmtRelative(row.at)}
+            {fmtRelative(row.at, lang)}
           </span>
         </div>
       ))}

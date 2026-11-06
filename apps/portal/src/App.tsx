@@ -6,11 +6,13 @@ import {
   readString,
   shouldIgnoreKey,
   useArcadeTheme,
+  useLang,
   writeString,
   type ArcadeStatusInfo,
 } from '@arcade/kit';
 import { Header, Sidebar, type LiveStatus } from '@arcade/ui';
 import { GAME_MODULES } from './games';
+import { routeTitle } from './i18n';
 import { useAllStats, useSavedSessions } from './hooks/usePortalData';
 import { useScoreSubmitter } from './hooks/useScoreSubmitter';
 import { Landing } from './Landing';
@@ -27,6 +29,7 @@ const SIDEBAR_COLLAPSED_KEY = 'arcade.sidebarCollapsed';
 export default function App() {
   const [route, navigate] = useHashRoute();
   const [theme, setTheme, toggleTheme] = useArcadeTheme();
+  const [lang] = useLang();
   const [collapsed, setCollapsed] = useState(() => readString(SIDEBAR_COLLAPSED_KEY) === '1');
   const [live, setLive] = useState<LiveStatus>(null);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
@@ -46,8 +49,8 @@ export default function App() {
   useEffect(() => setLive(null), [playingId]);
 
   useEffect(() => {
-    document.title = playingId ? `${gameInfo(playingId).name} · Zoltan's Arcade` : "Zoltan's Arcade";
-  }, [playingId]);
+    document.title = routeTitle(route, lang);
+  }, [route, lang]);
 
   const toggleCollapsed = useCallback(() => {
     setCollapsed((c) => {

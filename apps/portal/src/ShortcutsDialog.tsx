@@ -1,19 +1,20 @@
 import { useEffect, useRef } from 'react';
-import { gameInfo, KeyHelp, type ArcadeGameId } from '@arcade/kit';
-
-const GLOBAL_KEYS: [string, string][] = [
-  ['T', 'Toggle dark / light theme'],
-  ['?', 'Show / hide this help'],
-];
-
-const GAME_KEYS: [string, string][] = [
-  ['P Esc', 'Pause / resume'],
-  ['R', 'Restart / new round'],
-  ['Space Enter', 'Start · primary action'],
-];
+import { gameName, KeyHelp, useLang, useMessages, type ArcadeGameId } from '@arcade/kit';
+import { PORTAL_MESSAGES } from './i18n';
 
 export function ShortcutsDialog({ gameId, onClose }: { gameId: ArcadeGameId | null; onClose: () => void }) {
   const closeRef = useRef<HTMLButtonElement>(null);
+  const [lang] = useLang();
+  const t = useMessages(PORTAL_MESSAGES);
+  const globalKeys: [string, string][] = [
+    ['T', t('keyTheme')],
+    ['?', t('keyHelp')],
+  ];
+  const gameKeys: [string, string][] = [
+    ['P Esc', t('keyPause')],
+    ['R', t('keyRestart')],
+    [`${t('keySpace')} Enter`, t('keyStart')],
+  ];
 
   useEffect(() => {
     closeRef.current?.focus();
@@ -25,25 +26,25 @@ export function ShortcutsDialog({ gameId, onClose }: { gameId: ArcadeGameId | nu
   }, [onClose]);
 
   return (
-    <div className="portal-dialog" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts" onClick={onClose}>
+    <div className="portal-dialog" role="dialog" aria-modal="true" aria-label={t('shortcutsTitle')} onClick={onClose}>
       <div className="arc-panel portal-dialog__card" onClick={(e) => e.stopPropagation()}>
-        <h2>Keyboard shortcuts</h2>
+        <h2>{t('shortcutsTitle')}</h2>
         <section>
-          <h3 className="arc-panel__title">Everywhere</h3>
-          <KeyHelp rows={GLOBAL_KEYS} />
+          <h3 className="arc-panel__title">{t('everywhere')}</h3>
+          <KeyHelp rows={globalKeys} />
         </section>
         <section>
-          <h3 className="arc-panel__title">In every game</h3>
-          <KeyHelp rows={GAME_KEYS} />
+          <h3 className="arc-panel__title">{t('inEveryGame')}</h3>
+          <KeyHelp rows={gameKeys} />
         </section>
         <p>
           {gameId
-            ? `${gameInfo(gameId).name}'s own controls are listed in the Keys panel next to the board.`
-            : 'Each game lists its own controls in the Keys panel next to the board.'}
+            ? t('gameKeysNote', { name: gameName(gameId, lang) })
+            : t('gameKeysGeneric')}
         </p>
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
           <button ref={closeRef} type="button" className="arc-btn" onClick={onClose}>
-            Close
+            {t('close')}
           </button>
         </div>
       </div>

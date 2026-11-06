@@ -1,16 +1,23 @@
 import { useState, type CSSProperties } from 'react';
 import {
   formatClock,
+  formatNumber,
   formatSavedAt,
+  gameName,
+  gameTagline,
   prefersReducedMotion,
   summarize,
   useInView,
+  useKitMessages,
+  useLang,
+  useMessages,
   type ArcadeGameId,
   type GameStats,
   type SessionMeta,
 } from '@arcade/kit';
 import { GAMES, type PortalGame, type Route } from '@arcade/ui';
 import { GAME_MODULES } from './games';
+import { PORTAL_MESSAGES, tagLabel } from './i18n';
 
 type LandingProps = {
   navigate: (route: Route) => void;
@@ -19,6 +26,8 @@ type LandingProps = {
 };
 
 export function Landing({ navigate, stats, sessions }: LandingProps) {
+  const [lang] = useLang();
+  const t = useMessages(PORTAL_MESSAGES);
   const totals = summarize(stats);
   const saved = GAMES.filter((g) => sessions[g.id]);
   const play = (id: ArcadeGameId) => navigate({ view: 'play', gameId: id });
@@ -27,23 +36,20 @@ export function Landing({ navigate, stats, sessions }: LandingProps) {
     <>
       <section className="landing__hero">
         <div>
-          <h1>Eleven classics, one home.</h1>
-          <p>
-            Pick a game — every card below is the real game playing itself. Runs autosave, so you can
-            leave mid-game and continue later; best scores and play time follow you across sessions.
-          </p>
+          <h1>{t('heroTitle')}</h1>
+          <p>{t('heroBody')}</p>
         </div>
         <dl className="landing__hero-stats">
           <div className="stat-card">
-            <dt>Games played</dt>
-            <dd>{totals.plays.toLocaleString()}</dd>
+            <dt>{t('gamesPlayed')}</dt>
+            <dd>{formatNumber(totals.plays, lang)}</dd>
           </div>
           <div className="stat-card">
-            <dt>Total score</dt>
-            <dd>{totals.totalScore.toLocaleString()}</dd>
+            <dt>{t('totalScore')}</dt>
+            <dd>{formatNumber(totals.totalScore, lang)}</dd>
           </div>
           <div className="stat-card">
-            <dt>Time played</dt>
+            <dt>{t('timePlayed')}</dt>
             <dd>{formatClock(totals.totalSeconds)}</dd>
           </div>
         </dl>
@@ -52,8 +58,8 @@ export function Landing({ navigate, stats, sessions }: LandingProps) {
       {saved.length > 0 && (
         <section aria-labelledby="continue-head">
           <div className="section-head">
-            <h2 id="continue-head">Continue where you left off</h2>
-            <span>{saved.length} saved {saved.length === 1 ? 'run' : 'runs'}</span>
+            <h2 id="continue-head">{t('continueHead')}</h2>
+            <span>{t(saved.length === 1 ? 'savedRunsOne' : 'savedRunsMany', { n: saved.length })}</span>
           </div>
           <div className="continue">
             {saved.map((g) => {
@@ -70,12 +76,16 @@ export function Landing({ navigate, stats, sessions }: LandingProps) {
                     <g.Icon size={16} />
                   </span>
                   <span>
-                    <strong>{g.name}</strong>
+                    <strong>{gameName(g.id, lang)}</strong>
                     <small>
-                      {s.score.toLocaleString()} pts · {formatClock(s.seconds)} · {formatSavedAt(s.savedAt)}
+                      {t('savedLine', {
+                        score: formatNumber(s.score, lang),
+                        time: formatClock(s.seconds),
+                        ago: formatSavedAt(s.savedAt, Date.now(), lang),
+                      })}
                     </small>
                   </span>
-                  <span className="arc-btn arc-btn--primary">Continue</span>
+                  <span className="arc-btn arc-btn--primary">{t('continue')}</span>
                 </button>
               );
             })}
@@ -85,8 +95,8 @@ export function Landing({ navigate, stats, sessions }: LandingProps) {
 
       <section aria-labelledby="games-head">
         <div className="section-head">
-          <h2 id="games-head">Games</h2>
-          <span>{GAMES.length} available · keyboard-first</span>
+          <h2 id="games-head">{t('gamesHead')}</h2>
+          <span>{t('gamesCount', { n: GAMES.length })}</span>
         </div>
         <div className="cards">
           {GAMES.map((g) => (
@@ -109,6 +119,10 @@ function GameCard({
   saved?: SessionMeta;
   onPlay: () => void;
 }) {
+  const [lang] = useLang();
+  const t = useMessages(PORTAL_MESSAGES);
+  const kit = useKitMessages();
+  const name = gameName(game.id, lang);
   const [hover, setHover] = useState(false);
   const [previewRef, inView] = useInView<HTMLDivElement>();
   // Demos run whenever the card is on screen; with reduced motion only on hover/focus.
@@ -132,10 +146,10 @@ function GameCard({
       }}
       tabIndex={0}
       role="link"
-      aria-label={`Play ${game.name}${saved ? ' — continue saved run' : ''}`}
+      aria-label={t(saved ? 'playAriaSaved' : 'playAria', { name })}
     >
       <div className="game-card__preview" ref={previewRef}>
-        {saved && <span className="game-card__saved">Saved run</span>}
+        {saved && <span className="game-card__saved">{t('savedBadge')}</span>}
         <Demo active={active} />
       </div>
       <div className="game-card__body">
@@ -144,20 +158,20 @@ function GameCard({
             <span className="game-card__icon">
               <game.Icon size={16} />
             </span>
-            <span className="game-card__title">{game.name}</span>
+            <span className="game-card__title">{name}</span>
           </div>
-          <span className="game-card__chip">{game.tag}</span>
+          <span className="game-card__chip">{tagLabel(game.tag, lang)}</span>
         </div>
-        <p className="game-card__desc">{game.tagline}</p>
+        <p className="game-card__desc">{gameTagline(game.id, lang)}</p>
         <div className="game-card__meta">
           <span>
-            Best <strong>{stats.best.toLocaleString()}</strong>
+            {kit('best')} <strong>{formatNumber(stats.best, lang)}</strong>
           </span>
           <span>
-            Plays <strong>{stats.plays.toLocaleString()}</strong>
+            {kit('plays')} <strong>{formatNumber(stats.plays, lang)}</strong>
           </span>
           <span style={{ flex: 1 }} />
-          <span>{saved ? 'Continue →' : 'Play →'}</span>
+          <span>{saved ? t('continueCta') : t('playCta')}</span>
         </div>
       </div>
     </article>
