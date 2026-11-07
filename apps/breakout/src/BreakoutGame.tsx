@@ -2,17 +2,23 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties, type Poin
 import {
   clearSession,
   formatClock,
+  formatNumber,
+  gameName,
   GameOverlay,
   KeyHelp,
   SaveBadge,
   StatPanel,
   useArcadeRun,
+  useKitMessages,
+  useLang,
+  useMessages,
   useRestoredSession,
   useRunTimer,
   useSessionAutosave,
   type ArcadeGameProps,
   type OverlayAction,
 } from './arcade';
+import { levelName, MESSAGES, type BreakoutMessageKey } from './i18n';
 import { Playfield } from './components/Playfield';
 import { PowerUpList } from './components/PowerUpList';
 import { SoundToggle } from './components/SoundToggle';
@@ -30,11 +36,11 @@ import styles from './App.module.css';
 /** Bump when GameState changes shape; older saves are then discarded. */
 const SESSION_SCHEMA = 1;
 
-const KEYS: [string, string][] = [
-  ['← →', 'Move paddle (or A D)'],
-  ['Space', 'Start · launch ball'],
-  ['P Esc', 'Pause / resume'],
-  ['R', 'Restart'],
+const keyRows = (t: (key: BreakoutMessageKey) => string): [string, string][] => [
+  ['← →', t('keyMove')],
+  [t('kbdSpace'), t('keyLaunch')],
+  ['P Esc', t('keyPause')],
+  ['R', t('keyRestart')],
 ];
 
 /** Pointer position over the board → logical x of the playfield. */
@@ -48,6 +54,11 @@ const newRun = (): GameState => createInitialState({ status: 'running', seed: ra
 
 export function BreakoutGame(props: ArcadeGameProps = {}) {
   const { embedded = false } = props;
+  const t = useMessages(MESSAGES);
+  const k = useKitMessages();
+  const [lang] = useLang();
+  const name = gameName('breakout', lang);
+  const num = (n: number) => formatNumber(n, lang);
   const restored = useRestoredSession<GameState>('breakout', SESSION_SCHEMA, isBreakoutState);
   const [state, setState] = useState<GameState>(() =>
     restored && restored.data.status !== 'gameOver' ? { ...restored.data, status: 'paused' } : createInitialState(),
@@ -190,48 +201,50 @@ export function BreakoutGame(props: ArcadeGameProps = {}) {
   let overlay: { title: string; message: string; actions: OverlayAction[] } | null = null;
   if (state.status === 'idle') {
     overlay = {
-      title: 'Breakout',
-      message:
-        'Keep the ball in play and smash every brick. Steer with ← → or the mouse; hit near the paddle edge for a sharper angle. Catch the falling capsules for power-ups.',
-      actions: [{ label: 'Start', onClick: startNewRun, primary: true, kbd: 'Space' }],
+      title: name,
+      message: t('idleBody'),
+      actions: [{ label: k('start'), onClick: startNewRun, primary: true, kbd: t('kbdSpace') }],
     };
   } else if (state.status === 'paused') {
     overlay = welcomeBack
       ? {
-          title: 'Welcome back',
-          message: `Your saved run was restored — score ${state.score}, level ${state.level}, ${state.lives} ${
-            state.lives === 1 ? 'life' : 'lives'
-          } left, ${formatClock(seconds)} played.`,
+          title: k('welcomeBack'),
+          message: t('welcomeBody', {
+            score: num(state.score),
+            level: num(state.level),
+            lives: t(state.lives === 1 ? 'livesOne' : 'livesMany', { n: num(state.lives) }),
+            time: formatClock(seconds),
+          }),
           actions: [
-            { label: 'Continue', onClick: togglePause, primary: true, kbd: 'P' },
-            { label: 'New game', onClick: startNewRun, kbd: 'R' },
+            { label: t('continue'), onClick: togglePause, primary: true, kbd: 'P' },
+            { label: k('newGame'), onClick: startNewRun, kbd: 'R' },
           ],
         }
       : {
-          title: 'Paused',
-          message: 'Your run is autosaved — you can close the tab and continue later.',
+          title: k('paused'),
+          message: t('pausedBody'),
           actions: [
-            { label: 'Resume', onClick: togglePause, primary: true, kbd: 'P' },
-            { label: 'Restart', onClick: startNewRun, kbd: 'R' },
+            { label: k('resume'), onClick: togglePause, primary: true, kbd: 'P' },
+            { label: k('restart'), onClick: startNewRun, kbd: 'R' },
           ],
         };
   } else if (state.status === 'gameOver') {
     overlay = {
-      title: 'Game over',
-      message: `Score ${state.score} · Level ${state.level} · Best ${best}${newBest ? ' — new best!' : ''}`,
-      actions: [{ label: 'Play again', onClick: startNewRun, primary: true, kbd: 'R' }],
+      title: k('gameOver'),
+      message: t(newBest ? 'overBodyNewBest' : 'overBody', { score: num(state.score), level: num(state.level), best: num(best) }),
+      actions: [{ label: t('playAgain'), onClick: startNewRun, primary: true, kbd: 'R' }],
     };
   }
 
-  const statusLabel = state.status === 'running' && awaitingLaunch(state) ? 'Launch!' : undefined;
+  const statusLabel = state.status === 'running' && awaitingLaunch(state) ? t('launch') : undefined;
 
   return (
     <div className={`arc-game ${styles.game}`} style={{ '--game-color': 'var(--game-breakout)' } as CSSProperties}>
       {!embedded && (
         <header className="arc-game__head">
           <div>
-            <h1 className="arc-game__title">Breakout</h1>
-            <p className="arc-game__sub">Bounce the ball, smash every brick.</p>
+            <h1 className="arc-game__title">{name}</h1>
+            <p className="arc-game__sub">{t('sub')}</p>
           </div>
         </header>
       )}
@@ -240,11 +253,11 @@ export function BreakoutGame(props: ArcadeGameProps = {}) {
         status={state.status}
         statusLabel={statusLabel}
         items={[
-          { label: 'Score', value: state.score },
-          { label: 'Best', value: best, highlight: newBest },
-          { label: 'Level', value: state.level },
-          { label: 'Lives', value: state.lives },
-          { label: 'Time', value: formatClock(seconds) },
+          { label: k('score'), value: num(state.score) },
+          { label: k('best'), value: num(best), highlight: newBest },
+          { label: k('level'), value: num(state.level) },
+          { label: t('lives'), value: num(state.lives) },
+          { label: k('time'), value: formatClock(seconds) },
         ]}
       />
 
@@ -256,21 +269,21 @@ export function BreakoutGame(props: ArcadeGameProps = {}) {
 
         <aside className={styles.side}>
           <section className="arc-panel">
-            <h2 className="arc-panel__title">Game</h2>
+            <h2 className="arc-panel__title">{t('panelGame')}</h2>
             <div className={styles.buttons}>
               <button
                 type="button"
                 className="arc-btn arc-btn--primary"
                 onClick={state.status === 'running' ? togglePause : primary}
               >
-                {state.status === 'running' ? 'Pause' : state.status === 'paused' ? 'Resume' : 'Start'}
+                {state.status === 'running' ? k('pause') : state.status === 'paused' ? k('resume') : k('start')}
               </button>
               <button type="button" className="arc-btn" onClick={startNewRun} disabled={state.status === 'idle'}>
-                Restart
+                {k('restart')}
               </button>
             </div>
             <p className={styles.level}>
-              Level {state.level} · <strong>{layout.name}</strong>
+              {t('levelLine', { level: num(state.level) })} <strong>{levelName(layout.name, t)}</strong>
             </p>
             <div className={styles.save}>
               <SaveBadge savedAt={inProgress ? savedAt : null} onDiscard={discardSave} />
@@ -278,19 +291,19 @@ export function BreakoutGame(props: ArcadeGameProps = {}) {
           </section>
 
           <section className="arc-panel">
-            <h2 className="arc-panel__title">Power-ups</h2>
+            <h2 className="arc-panel__title">{t('panelPowerUps')}</h2>
             <PowerUpList effects={state.effects} />
           </section>
 
           <section className="arc-panel">
-            <h2 className="arc-panel__title">Settings</h2>
+            <h2 className="arc-panel__title">{t('panelSettings')}</h2>
             <SoundToggle enabled={sound.enabled} onChange={sound.setEnabled} />
           </section>
 
           <section className="arc-panel">
-            <h2 className="arc-panel__title">Keys</h2>
-            <KeyHelp rows={KEYS} />
-            <p className={styles.note}>Mouse or touch: move over the board to steer, click or tap to launch.</p>
+            <h2 className="arc-panel__title">{t('panelKeys')}</h2>
+            <KeyHelp rows={keyRows(t)} />
+            <p className={styles.note}>{t('pointerNote')}</p>
           </section>
         </aside>
       </div>

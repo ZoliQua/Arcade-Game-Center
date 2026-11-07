@@ -1,14 +1,16 @@
 import { MAX_SPEED, MIN_SPEED } from '../logic/constants';
 
 type Props = {
+  /** Translated field label ("Speed"). */
+  label: string;
   speed: number;
   onChange: (speed: number) => void;
 };
 
-export function SpeedControl({ speed, onChange }: Props) {
+export function SpeedControl({ label, speed, onChange }: Props) {
   return (
     <label className="arc-field">
-      <span>Speed</span>
+      <span>{label}</span>
       <input
         type="range"
         min={MIN_SPEED}

@@ -1,4 +1,6 @@
 import { memo, type PointerEvent as ReactPointerEvent } from 'react';
+import { formatNumber, useLang, useMessages } from '../arcade';
+import { bannerText, MESSAGES } from '../i18n';
 import { BALL_R, BANNER_MS, DROP_H, DROP_W, FIELD_H, FIELD_W, PADDLE_H, PADDLE_Y, paddleWidth } from '../logic/constants';
 import { awaitingLaunch, brickRect } from '../logic/game';
 import type { Brick, GameState } from '../logic/types';
@@ -62,6 +64,8 @@ type Props = {
 };
 
 export function Playfield({ state, variant = 'full', onPointerMove, onPointerDown }: Props) {
+  const t = useMessages(MESSAGES);
+  const [lang] = useLang();
   const mini = variant === 'mini';
   const pw = paddleWidth(state.effects.wideMs);
   const bannerOpacity = state.bannerMs > 0 ? Math.min(1, state.bannerMs / (BANNER_MS * 0.35)) : 0;
@@ -74,7 +78,7 @@ export function Playfield({ state, variant = 'full', onPointerMove, onPointerDow
       viewBox={`0 0 ${FIELD_W} ${FIELD_H}`}
       preserveAspectRatio="xMidYMid meet"
       role={mini ? undefined : 'img'}
-      aria-label={mini ? undefined : `Breakout playfield, level ${state.level}, ${state.bricks.length} bricks`}
+      aria-label={mini ? undefined : t('playfield', { level: formatNumber(state.level, lang), bricks: formatNumber(state.bricks.length, lang) })}
       aria-hidden={mini ? true : undefined}
       onPointerMove={onPointerMove}
       onPointerDown={onPointerDown}
@@ -117,12 +121,12 @@ export function Playfield({ state, variant = 'full', onPointerMove, onPointerDow
 
       {bannerOpacity > 0 && !mini && (
         <text x={FIELD_W / 2} y={FIELD_H * 0.64} className={styles.banner} opacity={bannerOpacity}>
-          {state.banner}
+          {bannerText(state.banner, t)}
         </text>
       )}
       {showHint && (
         <text x={FIELD_W / 2} y={FIELD_H * 0.64} className={styles.hint}>
-          Space · click · tap to launch
+          {t('launchHint')}
         </text>
       )}
     </svg>

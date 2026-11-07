@@ -13,10 +13,11 @@ export const ROW_COLORS: readonly string[] = [
   '#b37dff',
 ];
 
-export const POWERUP_INFO: Record<PowerUpKind, { letter: string; label: string; color: string }> = {
-  wide: { letter: 'W', label: 'Wide paddle', color: '#4aa8ff' },
-  multi: { letter: 'M', label: 'Multiball', color: '#b37dff' },
-  slow: { letter: 'S', label: 'Slow ball', color: '#42d392' },
-  catch: { letter: 'C', label: 'Catch', color: '#f4b860' },
-  life: { letter: '+', label: 'Extra life', color: '#ef4c55' },
+/** Capsule letter and colour; the names live in `i18n.ts` (`POWERUP_KEY`). */
+export const POWERUP_INFO: Record<PowerUpKind, { letter: string; color: string }> = {
+  wide: { letter: 'W', color: '#4aa8ff' },
+  multi: { letter: 'M', color: '#b37dff' },
+  slow: { letter: 'S', color: '#42d392' },
+  catch: { letter: 'C', color: '#f4b860' },
+  life: { letter: '+', color: '#ef4c55' },
 };

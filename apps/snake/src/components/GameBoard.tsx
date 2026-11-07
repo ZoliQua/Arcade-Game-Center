@@ -8,11 +8,13 @@ type Props = {
   food: Position;
   /** `mini` renders the compact landing-page variant without ARIA grid roles. */
   variant?: 'full' | 'mini';
+  /** Accessible name of the full board. */
+  label?: string;
 };
 
 type CellKind = 'empty' | 'head' | 'body' | 'food';
 
-export const GameBoard = memo(function GameBoard({ gridSize, snake, food, variant = 'full' }: Props) {
+export const GameBoard = memo(function GameBoard({ gridSize, snake, food, variant = 'full', label = 'Snake game board' }: Props) {
   const cells = useMemo(() => {
     const grid: CellKind[][] = Array.from({ length: gridSize }, () =>
       Array.from({ length: gridSize }, () => 'empty' as CellKind),
@@ -43,7 +45,7 @@ export const GameBoard = memo(function GameBoard({ gridSize, snake, food, varian
         gridTemplateRows: `repeat(${gridSize}, 1fr)`,
       }}
       role={mini ? undefined : 'grid'}
-      aria-label={mini ? undefined : 'Snake game board'}
+      aria-label={mini ? undefined : label}
       aria-hidden={mini ? true : undefined}
     >
       {cells.flatMap((row, y) =>

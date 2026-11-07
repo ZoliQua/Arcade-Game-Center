@@ -1,9 +1,13 @@
 type Props = {
+  /** Translated field label and On / Off values. */
+  label: string;
+  onLabel: string;
+  offLabel: string;
   wrapWalls: boolean;
   onChange: (wrapWalls: boolean) => void;
 };
 
-export function WrapToggle({ wrapWalls, onChange }: Props) {
+export function WrapToggle({ label, onLabel, offLabel, wrapWalls, onChange }: Props) {
   return (
     <label className="arc-field">
       <input
@@ -11,8 +15,8 @@ export function WrapToggle({ wrapWalls, onChange }: Props) {
         checked={wrapWalls}
         onChange={(event) => onChange(event.target.checked)}
       />
-      <span>Wrap walls</span>
-      <strong aria-live="polite">{wrapWalls ? 'On' : 'Off'}</strong>
+      <span>{label}</span>
+      <strong aria-live="polite">{wrapWalls ? onLabel : offLabel}</strong>
     </label>
   );
 }

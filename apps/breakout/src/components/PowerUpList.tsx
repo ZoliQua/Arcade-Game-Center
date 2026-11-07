@@ -1,3 +1,5 @@
+import { useMessages } from '../arcade';
+import { MESSAGES, POWERUP_KEY } from '../i18n';
 import type { Effects, PowerUpKind } from '../logic/types';
 import { POWERUP_INFO } from './palette';
 import styles from './PowerUpList.module.css';
@@ -13,6 +15,7 @@ const remaining = (kind: PowerUpKind, effects: Effects): number => {
 
 /** Legend of the capsules, with a countdown next to the active timed ones. */
 export function PowerUpList({ effects }: { effects: Effects }) {
+  const t = useMessages(MESSAGES);
   return (
     <ul className={styles.list}>
       {ORDER.map((kind) => {
@@ -23,7 +26,7 @@ export function PowerUpList({ effects }: { effects: Effects }) {
             <span className={styles.capsule} style={{ background: info.color }} aria-hidden="true">
               {info.letter}
             </span>
-            <span className={styles.label}>{info.label}</span>
+            <span className={styles.label}>{t(POWERUP_KEY[kind])}</span>
             {ms > 0 && <span className={styles.timer}>{Math.ceil(ms / 1000)}s</span>}
           </li>
         );

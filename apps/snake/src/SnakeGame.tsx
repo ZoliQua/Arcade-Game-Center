@@ -2,11 +2,16 @@ import { useCallback, useState, type CSSProperties } from 'react';
 import {
   clearSession,
   formatClock,
+  formatNumber,
+  gameName,
   GameOverlay,
   KeyHelp,
   SaveBadge,
   StatPanel,
   useArcadeRun,
+  useKitMessages,
+  useLang,
+  useMessages,
   useRestoredSession,
   useRunTimer,
   useSessionAutosave,
@@ -18,6 +23,7 @@ import { SpeedControl } from './components/SpeedControl';
 import { WrapToggle } from './components/WrapToggle';
 import { useGameLoop } from './hooks/useGameLoop';
 import { useKeyboardDirection } from './hooks/useKeyboardDirection';
+import { MESSAGES, type SnakeMessageKey } from './i18n';
 import { tickMsForSpeed } from './logic/constants';
 import { advanceGame, createInitialState, isBoardFull } from './logic/game';
 import { isSnakeState } from './logic/persist';
@@ -28,15 +34,20 @@ import styles from './App.module.css';
 /** Bump when GameState changes shape; older saves are then discarded. */
 const SESSION_SCHEMA = 1;
 
-const KEYS: [string, string][] = [
-  ['← ↑ → ↓', 'Steer (or WASD)'],
-  ['Space', 'Start / pause'],
-  ['P Esc', 'Pause / resume'],
-  ['R', 'Restart'],
+/** Key-help rows; `null` keys stand for the translated name of the Space bar. */
+const KEYS: [string | null, SnakeMessageKey][] = [
+  ['← ↑ → ↓', 'keySteer'],
+  [null, 'keyStartPause'],
+  ['P Esc', 'keyPauseResume'],
+  ['R', 'keyRestart'],
 ];
 
 export function SnakeGame(props: ArcadeGameProps = {}) {
   const { embedded = false } = props;
+  const t = useMessages(MESSAGES);
+  const k = useKitMessages();
+  const [lang] = useLang();
+  const num = (n: number) => formatNumber(n, lang);
   const restored = useRestoredSession<GameState>('snake', SESSION_SCHEMA, isSnakeState);
   const [state, setState] = useState<GameState>(() =>
     restored ? { ...restored.data, status: 'paused' } : createInitialState(),
@@ -122,33 +133,33 @@ export function SnakeGame(props: ArcadeGameProps = {}) {
   let overlay: { title: string; message: string; actions: OverlayAction[] } | null = null;
   if (state.status === 'idle') {
     overlay = {
-      title: 'Snake',
-      message: 'Eat the red dots to grow. Each bite scores your current speed (1–10).',
-      actions: [{ label: 'Start', onClick: startNewRun, primary: true, kbd: 'Space' }],
+      title: gameName('snake', lang),
+      message: t('idleMessage'),
+      actions: [{ label: k('start'), onClick: startNewRun, primary: true, kbd: t('keySpace') }],
     };
   } else if (state.status === 'paused') {
     overlay = welcomeBack
       ? {
-          title: 'Welcome back',
-          message: `Your saved run was restored — score ${state.score}, ${formatClock(seconds)} played.`,
+          title: k('welcomeBack'),
+          message: t('welcomeMessage', { score: num(state.score), time: formatClock(seconds) }),
           actions: [
-            { label: 'Continue', onClick: togglePause, primary: true, kbd: 'P' },
-            { label: 'New game', onClick: startNewRun, kbd: 'R' },
+            { label: t('continue'), onClick: togglePause, primary: true, kbd: 'P' },
+            { label: k('newGame'), onClick: startNewRun, kbd: 'R' },
           ],
         }
       : {
-          title: 'Paused',
-          message: 'Your run is autosaved — you can close the tab and continue later.',
+          title: k('paused'),
+          message: t('pausedMessage'),
           actions: [
-            { label: 'Resume', onClick: togglePause, primary: true, kbd: 'P' },
-            { label: 'Restart', onClick: startNewRun, kbd: 'R' },
+            { label: k('resume'), onClick: togglePause, primary: true, kbd: 'P' },
+            { label: k('restart'), onClick: startNewRun, kbd: 'R' },
           ],
         };
   } else if (state.status === 'gameOver') {
     overlay = {
-      title: won ? 'Board cleared!' : 'Game over',
-      message: `Score ${state.score} · Best ${best}${newBest ? ' — new best!' : ''}`,
-      actions: [{ label: 'Play again', onClick: startNewRun, primary: true, kbd: 'R' }],
+      title: won ? t('boardCleared') : k('gameOver'),
+      message: t('gameOverMessage', { score: num(state.score), best: num(best) }) + (newBest ? t('newBestSuffix') : ''),
+      actions: [{ label: t('playAgain'), onClick: startNewRun, primary: true, kbd: 'R' }],
     };
   }
 
@@ -157,8 +168,8 @@ export function SnakeGame(props: ArcadeGameProps = {}) {
       {!embedded && (
         <header className="arc-game__head">
           <div>
-            <h1 className="arc-game__title">Snake</h1>
-            <p className="arc-game__sub">Eat, grow, don&apos;t bite yourself.</p>
+            <h1 className="arc-game__title">{gameName('snake', lang)}</h1>
+            <p className="arc-game__sub">{t('subtitle')}</p>
           </div>
         </header>
       )}
@@ -166,28 +177,28 @@ export function SnakeGame(props: ArcadeGameProps = {}) {
       <StatPanel
         status={state.status}
         items={[
-          { label: 'Score', value: state.score },
-          { label: 'Best', value: best, highlight: newBest },
-          { label: 'Length', value: state.snake.length },
-          { label: 'Time', value: formatClock(seconds) },
+          { label: k('score'), value: num(state.score) },
+          { label: k('best'), value: num(best), highlight: newBest },
+          { label: t('length'), value: state.snake.length },
+          { label: k('time'), value: formatClock(seconds) },
         ]}
       />
 
       <div className={styles.layout}>
         <div className={`arc-game__board ${styles.boardWrap}`}>
-          <GameBoard gridSize={state.gridSize} snake={state.snake} food={state.food} />
+          <GameBoard gridSize={state.gridSize} snake={state.snake} food={state.food} label={t('board')} />
           {overlay && <GameOverlay {...overlay} />}
         </div>
 
         <aside className={styles.side}>
           <section className="arc-panel">
-            <h2 className="arc-panel__title">Game</h2>
+            <h2 className="arc-panel__title">{t('panelGame')}</h2>
             <div className={styles.buttons}>
               <button type="button" className="arc-btn arc-btn--primary" onClick={primary}>
-                {state.status === 'running' ? 'Pause' : state.status === 'paused' ? 'Resume' : 'Start'}
+                {state.status === 'running' ? k('pause') : state.status === 'paused' ? k('resume') : k('start')}
               </button>
               <button type="button" className="arc-btn" onClick={startNewRun} disabled={state.status === 'idle'}>
-                Restart
+                {k('restart')}
               </button>
             </div>
             <div className={styles.save}>
@@ -196,16 +207,20 @@ export function SnakeGame(props: ArcadeGameProps = {}) {
           </section>
 
           <section className="arc-panel">
-            <h2 className="arc-panel__title">Settings</h2>
+            <h2 className="arc-panel__title">{t('panelSettings')}</h2>
             <div className={styles.settings}>
-              <SpeedControl speed={state.speed} onChange={(speed) => setState((p) => ({ ...p, speed }))} />
-              <WrapToggle wrapWalls={state.wrapWalls} onChange={(wrapWalls) => setState((p) => ({ ...p, wrapWalls }))} />
+              <SpeedControl label={t('speed')} speed={state.speed} onChange={(speed) => setState((p) => ({ ...p, speed }))} />
+              <WrapToggle
+                label={t('wrapWalls')}
+                onLabel={t('on')}
+                offLabel={t('off')}
+                wrapWalls={state.wrapWalls} onChange={(wrapWalls) => setState((p) => ({ ...p, wrapWalls }))} />
             </div>
           </section>
 
           <section className="arc-panel">
-            <h2 className="arc-panel__title">Keys</h2>
-            <KeyHelp rows={KEYS} />
+            <h2 className="arc-panel__title">{t('panelKeys')}</h2>
+            <KeyHelp rows={KEYS.map(([keys, action]) => [keys ?? t('keySpace'), t(action)])} />
           </section>
         </aside>
       </div>
