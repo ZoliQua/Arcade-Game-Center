@@ -3,6 +3,25 @@
 All notable changes to Arcade-Game-Center. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 versioning: [SemVer](https://semver.org/).
 
+## [3.0.0] — 2026-11-09
+
+### Added
+- **Dental mode** in the portal and all eleven games: a shared `arcade.dental` preference („Fogas mód” / "Dental mode" /
+  „Zahnmodus”), off by default, switched in the portal settings or any game's settings, or by `?dental=1|0`. Presentation
+  only; shapes differ, never colour alone.
+- **Languages**: English, Hungarian and German in the portal and all eleven games (shared `arcade.lang`, top-bar switch),
+  `<html lang>` and document titles follow the language, numbers use the locale's grouping.
+- **URL hand-off**: `?lang=en|hu|de&dental=1|0` (also inside the hash route) sets and saves the language and dental
+  mode, so links from dulzoltan.hu arrive in the visitor's language.
+- **Google Tag Manager** (container `GTM-MTSQ5JGF`, shared with dulzoltan.hu) and `arcade_page_view` virtual page views
+  on every route change.
+
+### Changed
+- **Domain move**: the arcade lives at `https://dulzoltan.hu/arcade/`; every README, package description and doc link
+  in all repositories was updated. See `docs/DEPLOY.md`, "Moving to dulzoltan.hu (v3)". Browser data is not migrated; the
+  server-side leaderboard is kept.
+- All eleven games translated and released as minor versions with the new kit.
+
 ## [2.3.0] — 2026-11-04
 
 ### Added

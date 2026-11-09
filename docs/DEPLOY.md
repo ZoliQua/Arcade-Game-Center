@@ -1,12 +1,12 @@
 # Deploy
 
-One static build plus a small PHP API. Production target: **https://drdul.hu/arcade/**
+One static build plus a small PHP API. Production target: **https://dulzoltan.hu/arcade/**
 (cPanel + LFTP, no SSH).
 
 | Piece | Source | Destination |
 | --- | --- | --- |
-| Portal (static) | `apps/portal/dist/` | `public_html/arcade/` |
-| Leaderboard API | `arcade-api/` | `public_html/arcade/api/` |
+| Portal (static) | `apps/portal/dist/` | `<document root>/arcade/` |
+| Leaderboard API | `arcade-api/` | `<document root>/arcade/api/` |
 
 The portal builds with relative asset paths and hash routing (`#/play/snake`), so it works from any sub-folder without
 server rewrites.
@@ -18,10 +18,10 @@ server rewrites.
 2. Generate a shared key: `php -r "echo bin2hex(random_bytes(24));"`
 3. Copy `arcade-api/_config.example.php` → `arcade-api/_config.php` (gitignored), fill in the DB credentials and the key.
    Keep `trust_proxy` **false** unless the API is behind a proxy/CDN that sets `X-Forwarded-For`.
-4. Copy `apps/portal/.env.example` → `apps/portal/.env` (gitignored): `VITE_ARCADE_API_BASE=https://drdul.hu/arcade/api`
+4. Copy `apps/portal/.env.example` → `apps/portal/.env` (gitignored): `VITE_ARCADE_API_BASE=https://dulzoltan.hu/arcade/api`
    and the same key in `VITE_ARCADE_API_KEY`. The key ships in the JS bundle — it only stops naive bots; rate limit and
    score caps do the rest.
-5. Upload `_config.php` once to `public_html/arcade/api/_config.php`.
+5. Upload `_config.php` once to `<document root>/arcade/api/_config.php`.
 
 The first request creates the table automatically.
 
@@ -66,9 +66,9 @@ npm run check        # lint, typecheck, tests, sync check, build
 lftp -e "
   set ssl:verify-certificate no
   set ftp:ssl-allow yes
-  open -u USER,PASS ftp.drdul.hu
-  mirror -R --delete --exclude '\\.well-known/' apps/portal/dist public_html/arcade
-  mirror -R --exclude '_config\\.php\$' --exclude 'tests/' arcade-api public_html/arcade/api
+  open -u USER,PASS <your FTP host>
+  mirror -R --delete --exclude '\\.well-known/' apps/portal/dist <document root>/arcade
+  mirror -R --exclude '_config\\.php\$' --exclude 'tests/' arcade-api <document root>/arcade/api
   bye
 "
 ```
@@ -90,3 +90,24 @@ server in `arcade-api/` against a local MySQL and add `http://localhost:5173` to
 
 `arcade-api/tests/smoke.sh <base-url> <api-key>` checks the happy path and every rejection (bad key, unknown game,
 cap, nickname, method). It inserts rows — run it only against a scratch database, never production.
+
+## Moving to dulzoltan.hu (v3)
+
+v3 moves the arcade from the old domain to `https://dulzoltan.hu/arcade/`. The same cPanel account hosts both, and the
+document root is not necessarily `public_html` — look it up first (cPanel `DomainInfo/domains_data`). Use the cPanel
+account's own FTP host (`<your FTP host>` in the commands above); the same account serves both domains, so the database and
+credentials stay the same once `api/` (with `_config.php`) is copied server-side.
+
+1. Build with the new API base: `VITE_ARCADE_API_BASE=https://dulzoltan.hu/arcade/api` in `apps/portal/.env`, then
+   `npm run check`.
+2. Copy the portal **and** `api/` to `<dulzoltan.hu document root>/arcade/`. Keep the live `_config.php` by copying it
+   **server-side** from the old `arcade/api/` (cPanel File Manager or a server-side `cp`); never download it, never
+   overwrite it from the repo. The API mirror still excludes `_config.php`.
+3. Make sure `allowed_origins` in the live `_config.php` lists `https://dulzoltan.hu` and `https://www.dulzoltan.hu`.
+4. On the old domain, put an `arcade/.htaccess` with a path-preserving 301:
+   `RedirectMatch 301 ^/arcade/?(.*)$ https://dulzoltan.hu/arcade/$1`. The `#/play/<id>` hash survives the redirect in
+   browsers. Leave the old `api/` in place; removing it is a manual decision.
+5. Browser data (local stats, autosaves, nickname, settings) is **not** migrated — it is stored per origin, so
+   players start fresh on the new domain. The server-side leaderboard is kept (same database, same credentials).
+6. Verify live: the landing page lists all eleven games and the demos animate, a game plays, a leaderboard GET
+   answers for every game id, `api/_config.php` returns 403, Google Tag Manager loads, no console errors.

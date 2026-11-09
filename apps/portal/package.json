@@ -1,6 +1,6 @@
 {
   "name": "@arcade/portal",
-  "version": "2.3.0",
+  "version": "3.0.0",
   "private": true,
   "type": "module",
   "description": "The Zoltan's Arcade portal app: landing page with live demos, all eleven games, stats, saves, leaderboard and settings.",

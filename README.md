@@ -12,7 +12,7 @@ Every game is also its **own repository** that builds and runs standalone.
 ![vite](https://img.shields.io/badge/Vite-5-646cff?logo=vite&logoColor=white)
 ![typescript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript&logoColor=white)
 
-Live: **https://drdul.hu/arcade/**
+Live: **https://dulzoltan.hu/arcade/**
 
 ---
 
@@ -53,6 +53,8 @@ Live: **https://drdul.hu/arcade/**
 - 💾 **Autosave & resume** — leave any game mid-run, reload, switch games: the run is restored paused (*Welcome back*); a *Continue where you left off* strip lists saved runs
 - 🏆 **One scoring model** — every finished run is recorded once with the same rules (best, plays, wins, total score, play time); duel games share one round-score formula
 - 🧭 **Hash routing** — `#/play/snake`, `#/leaderboard`, `#/settings`: reloads, bookmarks and the back button just work
+- 🌍 **Three languages** — English, Hungarian and German in every game and the portal, from the top bar or settings; `?lang=en|hu|de` hands the language over from a link, and numbers follow the locale's grouping
+- 🦷 **Dental mode** — a „Fogas mód” / "Dental mode" / „Zahnmodus” toggle, off by default (or `?dental=1`), shared by the portal and all eleven games, each re-skinned with teeth, toothbrushes and toothpaste; presentation only
 - 🌗 **One design system** — tokens and `arc-*` components shared by the portal and every game, dark & light theme (**T**), synced across tabs
 - 📊 **Live header** — status, score and run time come straight from the mounted game
 - 🌍 **Global leaderboard** — small PHP + MySQL API with rate limiting and sanity caps
