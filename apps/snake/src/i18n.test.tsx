@@ -33,7 +33,7 @@ describe('Snake translations', () => {
     expect(dialog.textContent).toContain('Friss die roten Punkte');
     expect(within(dialog).getByRole('button', { name: /Start/ })).toBeTruthy();
     expect(screen.getByRole('heading', { name: 'Einstellungen' })).toBeTruthy();
-    expect(screen.getByText('Durch Wände')).toBeTruthy();
+    expect(screen.getByText('Wände durchlässig')).toBeTruthy();
   });
 
   it('switching language mid-run keeps the score and the board', () => {

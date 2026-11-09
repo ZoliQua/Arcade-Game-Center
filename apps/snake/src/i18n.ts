@@ -71,7 +71,7 @@ export const MESSAGES: Messages<SnakeMessageKey> = {
     panelSettings: 'Einstellungen',
     panelKeys: 'Tasten',
     speed: 'Tempo',
-    wrapWalls: 'Durch Wände',
+    wrapWalls: 'Wände durchlässig',
     on: 'An',
     off: 'Aus',
     board: 'Snake-Spielfeld',

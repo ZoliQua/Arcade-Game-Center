@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { ArcadeDemoProps } from '../arcade';
+import { useDental, type ArcadeDemoProps } from '../arcade';
 import { GameBoard } from '../components/GameBoard';
 import { useGameLoop } from '../hooks/useGameLoop';
 import { chooseDirection } from '../logic/autopilot';
@@ -18,6 +18,7 @@ const freshDemo = (): GameState =>
  */
 export function SnakeDemo({ active = true }: ArcadeDemoProps) {
   const [state, setState] = useState(freshDemo);
+  const [dental] = useDental();
 
   const tick = useCallback(() => {
     setState((prev) => {
@@ -36,7 +37,14 @@ export function SnakeDemo({ active = true }: ArcadeDemoProps) {
 
   return (
     <div className="arc-demo">
-      <GameBoard gridSize={state.gridSize} snake={state.snake} food={state.food} variant="mini" />
+      <GameBoard
+        gridSize={state.gridSize}
+        snake={state.snake}
+        food={state.food}
+        direction={state.direction}
+        dental={dental}
+        variant="mini"
+      />
     </div>
   );
 }

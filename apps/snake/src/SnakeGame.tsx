@@ -9,6 +9,7 @@ import {
   SaveBadge,
   StatPanel,
   useArcadeRun,
+  useDental,
   useKitMessages,
   useLang,
   useMessages,
@@ -18,6 +19,7 @@ import {
   type ArcadeGameProps,
   type OverlayAction,
 } from './arcade';
+import { DentalToggle } from './components/DentalToggle';
 import { GameBoard } from './components/GameBoard';
 import { SpeedControl } from './components/SpeedControl';
 import { WrapToggle } from './components/WrapToggle';
@@ -54,6 +56,7 @@ export function SnakeGame(props: ArcadeGameProps = {}) {
   );
   const [runId, setRunId] = useState(0);
   const [welcomeBack, setWelcomeBack] = useState(restored !== null);
+  const [dental] = useDental();
 
   const seconds = useRunTimer(state.status === 'running', runId, runId === 0 ? (restored?.seconds ?? 0) : 0);
 
@@ -186,7 +189,14 @@ export function SnakeGame(props: ArcadeGameProps = {}) {
 
       <div className={styles.layout}>
         <div className={`arc-game__board ${styles.boardWrap}`}>
-          <GameBoard gridSize={state.gridSize} snake={state.snake} food={state.food} label={t('board')} />
+          <GameBoard
+            gridSize={state.gridSize}
+            snake={state.snake}
+            food={state.food}
+            direction={state.direction}
+            dental={dental}
+            label={t('board')}
+          />
           {overlay && <GameOverlay {...overlay} />}
         </div>
 
@@ -214,7 +224,10 @@ export function SnakeGame(props: ArcadeGameProps = {}) {
                 label={t('wrapWalls')}
                 onLabel={t('on')}
                 offLabel={t('off')}
-                wrapWalls={state.wrapWalls} onChange={(wrapWalls) => setState((p) => ({ ...p, wrapWalls }))} />
+                wrapWalls={state.wrapWalls}
+                onChange={(wrapWalls) => setState((p) => ({ ...p, wrapWalls }))}
+              />
+              <DentalToggle hintClassName={styles.hint} />
             </div>
           </section>
 

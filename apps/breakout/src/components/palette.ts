@@ -13,6 +13,24 @@ export const ROW_COLORS: readonly string[] = [
   '#b37dff',
 ];
 
+/** Dental mode: tartar shades (deep → pale, top → bottom); the row marks add shape cues. */
+export const TARTAR_COLORS: readonly string[] = [
+  '#c98f3c',
+  '#d69d48',
+  '#e1ad57',
+  '#eabd68',
+  '#f0cb7a',
+  '#f2d68f',
+  '#efdea6',
+  '#e9e1bc',
+  '#e2dfcd',
+];
+
+/** Dental mode: the mark drawn on each brick cycles by column (and row) — three different shapes. */
+export const BRICK_MARKS = ['brush', 'paste', 'probe'] as const;
+export type BrickMark = (typeof BRICK_MARKS)[number];
+export const brickMark = (col: number, row: number): BrickMark => BRICK_MARKS[(col + row) % BRICK_MARKS.length];
+
 /** Capsule letter and colour; the names live in `i18n.ts` (`POWERUP_KEY`). */
 export const POWERUP_INFO: Record<PowerUpKind, { letter: string; color: string }> = {
   wide: { letter: 'W', color: '#4aa8ff' },

@@ -8,7 +8,7 @@ export type BreakoutMessageKey =
   | 'overBody' | 'overBodyNewBest'
   | 'panelGame' | 'panelPowerUps' | 'panelSettings' | 'panelKeys'
   | 'levelLine' | 'pointerNote'
-  | 'sound' | 'on' | 'off'
+  | 'sound' | 'on' | 'off' | 'dentalHint'
   | 'playfield' | 'launchHint'
   | 'bannerLevel' | 'bannerBallLost' | 'bannerLastBall' | 'bannerGameOver'
   | 'levelClassic' | 'levelPyramid' | 'levelCheckers' | 'levelFortress' | 'levelInvader' | 'levelBulwark'
@@ -38,6 +38,7 @@ export const MESSAGES: Messages<BreakoutMessageKey> = {
     levelLine: 'Level {level} ·',
     pointerNote: 'Mouse or touch: move over the board to steer, click or tap to launch.',
     sound: 'Sound effects',
+    dentalHint: 'Toothbrush paddle, toothpaste ball, tartar bricks',
     on: 'On',
     off: 'Off',
     playfield: 'Breakout playfield, level {level}, {bricks} bricks',
@@ -84,6 +85,7 @@ export const MESSAGES: Messages<BreakoutMessageKey> = {
     levelLine: '{level}. szint ·',
     pointerNote: 'Egér vagy érintés: mozogj a pálya fölött az irányításhoz, kattints vagy koppints az indításhoz.',
     sound: 'Hangeffektek',
+    dentalHint: 'Fogkefe ütő, fogkrém labda, fogkő téglák',
     on: 'Be',
     off: 'Ki',
     playfield: 'Breakout pálya, {level}. szint, {bricks} tégla',
@@ -130,6 +132,7 @@ export const MESSAGES: Messages<BreakoutMessageKey> = {
     levelLine: 'Level {level} ·',
     pointerNote: 'Maus oder Touch: Über das Spielfeld fahren zum Steuern, klicken oder tippen zum Starten.',
     sound: 'Soundeffekte',
+    dentalHint: 'Zahnbürsten-Schläger, Zahnpasta-Ball, Zahnstein-Ziegel',
     on: 'An',
     off: 'Aus',
     playfield: 'Breakout-Spielfeld, Level {level}, {bricks} Steine',

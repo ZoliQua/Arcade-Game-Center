@@ -21,6 +21,7 @@ import {
 import { levelName, MESSAGES, type BreakoutMessageKey } from './i18n';
 import { Playfield } from './components/Playfield';
 import { PowerUpList } from './components/PowerUpList';
+import { DentalToggle } from './components/DentalToggle';
 import { SoundToggle } from './components/SoundToggle';
 import { useBreakoutKeys } from './hooks/useBreakoutKeys';
 import { useFrameLoop } from './hooks/useFrameLoop';
@@ -297,7 +298,10 @@ export function BreakoutGame(props: ArcadeGameProps = {}) {
 
           <section className="arc-panel">
             <h2 className="arc-panel__title">{t('panelSettings')}</h2>
-            <SoundToggle enabled={sound.enabled} onChange={sound.setEnabled} />
+            <div className={styles.settings}>
+              <SoundToggle enabled={sound.enabled} onChange={sound.setEnabled} />
+              <DentalToggle />
+            </div>
           </section>
 
           <section className="arc-panel">

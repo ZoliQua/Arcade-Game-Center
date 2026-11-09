@@ -1,15 +1,46 @@
 import { memo, type PointerEvent as ReactPointerEvent } from 'react';
-import { formatNumber, useLang, useMessages } from '../arcade';
+import { formatNumber, useDental, useLang, useMessages } from '../arcade';
 import { bannerText, MESSAGES } from '../i18n';
 import { BALL_R, BANNER_MS, DROP_H, DROP_W, FIELD_H, FIELD_W, PADDLE_H, PADDLE_Y, paddleWidth } from '../logic/constants';
 import { awaitingLaunch, brickRect } from '../logic/game';
 import type { Brick, GameState } from '../logic/types';
-import { POWERUP_INFO, ROW_COLORS } from './palette';
+import { brickMark, POWERUP_INFO, ROW_COLORS, TARTAR_COLORS, type BrickMark } from './palette';
 import styles from './Playfield.module.css';
 
 const GAP = 1.5;
 
-const BrickLayer = memo(function BrickLayer({ bricks }: { bricks: readonly Brick[] }) {
+/** Dental mode: a small dark mark centred on a tartar brick — brush, paste blob or probe (three shapes). */
+function BrickMarkShape({ mark, cx, cy }: { mark: BrickMark; cx: number; cy: number }) {
+  if (mark === 'brush') {
+    return (
+      <g className={styles.markFill} data-testid="breakout-brick-mark" data-mark="brush">
+        <rect x={cx - 10} y={cy + 0.5} width={15} height={2.4} rx={1.2} />
+        <rect x={cx + 4} y={cy - 0.2} width={7} height={3.1} rx={0.8} />
+        <path d={`M${cx + 5} ${cy - 3.6}v3.2M${cx + 7.5} ${cy - 3.6}v3.2M${cx + 10} ${cy - 3.6}v3.2`} className={styles.markLine} />
+      </g>
+    );
+  }
+  if (mark === 'paste') {
+    return (
+      <path
+        d={`M${cx - 6} ${cy + 3}q0-5.5 6-5.5q6 0 6 5.5q-6 2.6-12 0zM${cx} ${cy - 2.5}q2.6-1.2 0.8-3.4`}
+        className={styles.markFill}
+        data-testid="breakout-brick-mark"
+        data-mark="paste"
+      />
+    );
+  }
+  return (
+    <path
+      d={`M${cx - 10} ${cy + 3.2}L${cx + 4} ${cy - 1}q4-1.6 4 2.2`}
+      className={styles.markLine}
+      data-testid="breakout-brick-mark"
+      data-mark="probe"
+    />
+  );
+}
+
+const BrickLayer = memo(function BrickLayer({ bricks, dental }: { bricks: readonly Brick[]; dental: boolean }) {
   return (
     <g>
       {bricks.map((b) => {
@@ -26,11 +57,11 @@ const BrickLayer = memo(function BrickLayer({ bricks }: { bricks: readonly Brick
             </g>
           );
         }
-        const color = ROW_COLORS[b.row % ROW_COLORS.length];
+        const color = (dental ? TARTAR_COLORS : ROW_COLORS)[b.row % ROW_COLORS.length];
         const damaged = b.hp < b.max;
         return (
           <g key={`${b.col}-${b.row}`} opacity={damaged ? 0.55 + 0.45 * (b.hp / b.max) : 1}>
-            <rect x={x} y={y} width={w} height={h} rx={2} fill={color} />
+            <rect x={x} y={y} width={w} height={h} rx={2} fill={color} className={dental ? styles.tartar : undefined} />
             <rect x={x + 2} y={y + 2} width={w - 4} height={2} rx={1} className={styles.shine} />
             {b.max > 1 && (
               <rect
@@ -48,12 +79,33 @@ const BrickLayer = memo(function BrickLayer({ bricks }: { bricks: readonly Brick
                 className={styles.crack}
               />
             )}
+            {dental && <BrickMarkShape mark={brickMark(b.col, b.row)} cx={x + w / 2} cy={y + h / 2 + 0.5} />}
           </g>
         );
       })}
     </g>
   );
 });
+
+/**
+ * Dental-mode paddle: a toothbrush lying flat, drawn entirely inside the
+ * paddle's hit box (x … x + w, PADDLE_Y … PADDLE_Y + PADDLE_H) — handle on the
+ * left, head with a bristle block on the right.
+ */
+function Toothbrush({ x, w, className }: { x: number; w: number; className: string }) {
+  const headX = x + w * 0.66;
+  const headW = w * 0.34;
+  const count = Math.max(4, Math.round(headW / 3.2));
+  const bristles = Array.from({ length: count }, (_, i) => headX + 2 + (i * (headW - 4)) / (count - 1));
+  return (
+    <g className={className} data-testid="breakout-paddle-brush">
+      <rect x={x} y={PADDLE_Y + 3} width={w * 0.72} height={5} rx={2.5} className={styles.brushHandle} />
+      <rect x={headX} y={PADDLE_Y + 5.5} width={headW} height={4.5} rx={1.5} className={styles.brushHandle} />
+      <rect x={headX + 1} y={PADDLE_Y} width={headW - 2} height={6} rx={1} className={styles.bristles} />
+      <path d={bristles.map((bx) => `M${bx.toFixed(1)} ${PADDLE_Y + 0.8}v4.4`).join('')} className={styles.bristleLine} />
+    </g>
+  );
+}
 
 type Props = {
   state: GameState;
@@ -66,6 +118,7 @@ type Props = {
 export function Playfield({ state, variant = 'full', onPointerMove, onPointerDown }: Props) {
   const t = useMessages(MESSAGES);
   const [lang] = useLang();
+  const [dental] = useDental();
   const mini = variant === 'mini';
   const pw = paddleWidth(state.effects.wideMs);
   const bannerOpacity = state.bannerMs > 0 ? Math.min(1, state.bannerMs / (BANNER_MS * 0.35)) : 0;
@@ -82,9 +135,10 @@ export function Playfield({ state, variant = 'full', onPointerMove, onPointerDow
       aria-hidden={mini ? true : undefined}
       onPointerMove={onPointerMove}
       onPointerDown={onPointerDown}
+      data-dental={dental ? 'true' : 'false'}
     >
       <rect x={0} y={0} width={FIELD_W} height={FIELD_H} className={styles.bg} />
-      <BrickLayer bricks={state.bricks} />
+      <BrickLayer bricks={state.bricks} dental={dental} />
 
       {state.drops.map((d, i) => {
         const info = POWERUP_INFO[d.kind];
@@ -98,26 +152,43 @@ export function Playfield({ state, variant = 'full', onPointerMove, onPointerDow
         );
       })}
 
-      <rect
-        x={state.paddleX - pw / 2}
-        y={PADDLE_Y}
-        width={pw}
-        height={PADDLE_H}
-        rx={PADDLE_H / 2}
-        className={`${styles.paddle} ${state.effects.catchMs > 0 ? styles.paddleCatch : ''} ${
-          effectsEnding(state.effects.wideMs) ? styles.blink : ''
-        }`}
-      />
-
-      {state.balls.map((b, i) => (
-        <circle
-          key={i}
-          cx={b.x}
-          cy={b.y}
-          r={BALL_R}
-          className={`${styles.ball} ${state.effects.slowMs > 0 ? styles.ballSlow : ''}`}
+      {dental ? (
+        <Toothbrush
+          x={state.paddleX - pw / 2}
+          w={pw}
+          className={`${styles.brush} ${state.effects.catchMs > 0 ? styles.paddleCatch : ''} ${
+            effectsEnding(state.effects.wideMs) ? styles.blink : ''
+          }`}
         />
-      ))}
+      ) : (
+        <rect
+          x={state.paddleX - pw / 2}
+          y={PADDLE_Y}
+          width={pw}
+          height={PADDLE_H}
+          rx={PADDLE_H / 2}
+          className={`${styles.paddle} ${state.effects.catchMs > 0 ? styles.paddleCatch : ''} ${
+            effectsEnding(state.effects.wideMs) ? styles.blink : ''
+          }`}
+        />
+      )}
+
+      {state.balls.map((b, i) =>
+        dental ? (
+          <g key={i} data-testid="breakout-ball-paste">
+            <circle cx={b.x} cy={b.y} r={BALL_R} className={`${styles.paste} ${state.effects.slowMs > 0 ? styles.ballSlow : ''}`} />
+            <path d={`M${b.x - 3} ${b.y + 0.4}q1.5-1.6 3 0t3 0`} className={styles.pasteStripe} />
+          </g>
+        ) : (
+          <circle
+            key={i}
+            cx={b.x}
+            cy={b.y}
+            r={BALL_R}
+            className={`${styles.ball} ${state.effects.slowMs > 0 ? styles.ballSlow : ''}`}
+          />
+        ),
+      )}
 
       {bannerOpacity > 0 && !mini && (
         <text x={FIELD_W / 2} y={FIELD_H * 0.64} className={styles.banner} opacity={bannerOpacity}>
