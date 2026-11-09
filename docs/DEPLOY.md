@@ -18,8 +18,8 @@ server rewrites.
 2. Generate a shared key: `php -r "echo bin2hex(random_bytes(24));"`
 3. Copy `arcade-api/_config.example.php` → `arcade-api/_config.php` (gitignored), fill in the DB credentials and the key.
    Keep `trust_proxy` **false** unless the API is behind a proxy/CDN that sets `X-Forwarded-For`.
-4. Copy `apps/portal/.env.example` → `apps/portal/.env` (gitignored): `VITE_ARCADE_API_BASE=https://dulzoltan.hu/arcade/api`
-   and the same key in `VITE_ARCADE_API_KEY`. The key ships in the JS bundle — it only stops naive bots; rate limit and
+4. Copy `apps/portal/.env.example` → `apps/portal/.env` (gitignored): `VITE_ARCADE_API_BASE=/arcade/api` (same-origin,
+   relative) and the same key in `VITE_ARCADE_API_KEY`. The key ships in the JS bundle — it only stops naive bots; rate limit and
    score caps do the rest.
 5. Upload `_config.php` once to `<document root>/arcade/api/_config.php`.
 
@@ -83,7 +83,8 @@ lftp -e "
 npm run build && npm run preview     # http://localhost:4173
 ```
 
-Without `.env` the leaderboard shows "server not configured" — expected. To test the API locally, run PHP's built-in
+Without `.env` the leaderboard shows "server not configured" — expected. With the relative base the local dev/preview
+server has no `/arcade/api/`, so the leaderboard shows its error state unless you proxy that path to a PHP server. To test the API locally, run PHP's built-in
 server in `arcade-api/` against a local MySQL and add `http://localhost:5173` to `allowed_origins`.
 
 ## API smoke test
@@ -98,12 +99,17 @@ document root is not necessarily `public_html` — look it up first (cPanel `Dom
 account's own FTP host (`<your FTP host>` in the commands above); the same account serves both domains, so the database and
 credentials stay the same once `api/` (with `_config.php`) is copied server-side.
 
-1. Build with the new API base: `VITE_ARCADE_API_BASE=https://dulzoltan.hu/arcade/api` in `apps/portal/.env`, then
-   `npm run check`.
+1. Build with the same-origin API base `VITE_ARCADE_API_BASE=/arcade/api` in `apps/portal/.env`, then
+   `npm run check`. The base is relative on purpose: the bundle calls the API on whatever host served the page, so it
+   works on `https://dulzoltan.hu` and `https://www.dulzoltan.hu` alike (no hard-coded host, no cross-origin call).
 2. Copy the portal **and** `api/` to `<dulzoltan.hu document root>/arcade/`. Keep the live `_config.php` by copying it
    **server-side** from the old `arcade/api/` (cPanel File Manager or a server-side `cp`); never download it, never
    overwrite it from the repo. The API mirror still excludes `_config.php`.
-3. Make sure `allowed_origins` in the live `_config.php` lists `https://dulzoltan.hu` and `https://www.dulzoltan.hu`.
+3. Make sure `allowed_origins` in the live `_config.php` lists `https://dulzoltan.hu` and `https://www.dulzoltan.hu`
+   (keep both, even though same-origin requests and the redirect below make the apex the only host in practice).
+   The portal's `/arcade/.htaccess` (shipped from `apps/portal/public/.htaccess`) 301-redirects
+   `www.dulzoltan.hu/arcade/…` to `https://dulzoltan.hu/arcade/…` (path and query kept), so local stats, autosaves and
+   settings — stored per origin — never split between the two hosts.
 4. On the old domain, put an `arcade/.htaccess` with a path-preserving 301:
    `RedirectMatch 301 ^/arcade/?(.*)$ https://dulzoltan.hu/arcade/$1`. The `#/play/<id>` hash survives the redirect in
    browsers. Leave the old `api/` in place; removing it is a manual decision.

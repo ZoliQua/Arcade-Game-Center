@@ -190,7 +190,7 @@ describe('translated kit chrome', () => {
     const langBtn = getByRole('button', { name: /Sprache/ });
     expect(langBtn.textContent).toContain('DE');
     fireEvent.click(langBtn);
-    fireEvent.click(getByRole('menuitemradio', { name: 'Magyar' }));
+    fireEvent.click(getByRole('button', { name: /Magyar/ }));
     expect(document.title).toBe("Négy a sorban · Zoltan's Arcade");
     expect(getByText('Négy a sorban a GitHubon')).toBeTruthy();
 

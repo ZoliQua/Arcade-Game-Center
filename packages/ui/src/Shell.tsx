@@ -1,16 +1,14 @@
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { type CSSProperties, type ReactNode } from 'react';
 import {
   formatClock,
   formatNumber,
   gameName,
-  LANG_NAMES,
-  LANGS,
+  LangMenu,
   useKitMessages,
   useLang,
   useMessages,
   type ArcadeGameId,
   type KitMessageKey,
-  type Lang,
   type ArcadeStatus,
   type ArcadeTheme,
   type GameStats,
@@ -18,7 +16,7 @@ import {
 } from '@arcade/kit';
 import { APP_VERSION, GAMES } from './games';
 import { SHELL_MESSAGES } from './i18n';
-import { IconChevron, IconGlobe, IconHome, IconKbd, IconLogo, IconMoon, IconSettings, IconSun, IconTrophy } from './Icons';
+import { IconChevron, IconHome, IconKbd, IconLogo, IconMoon, IconSettings, IconSun, IconTrophy } from './Icons';
 
 export type Route =
   | { view: 'home' }
@@ -154,69 +152,6 @@ const STATUS_KEY: Record<ArcadeStatus, KitMessageKey> = {
   gameOver: 'statusGameOver',
 };
 
-/** Globe + current language code; opens an English / Magyar / Deutsch menu. */
-function LangMenu({ lang, onPick, label }: { lang: Lang; onPick: (l: Lang) => void; label: string }) {
-  const [open, setOpen] = useState(false);
-  const rootRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const onDown = (e: PointerEvent) => {
-      if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false);
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false);
-    };
-    document.addEventListener('pointerdown', onDown);
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.removeEventListener('pointerdown', onDown);
-      document.removeEventListener('keydown', onKey);
-    };
-  }, [open]);
-
-  return (
-    <div className="arc-lang header__lang" ref={rootRef}>
-      <button
-        type="button"
-        className="arc-lang__btn"
-        aria-haspopup="menu"
-        aria-expanded={open}
-        aria-label={`${label}: ${LANG_NAMES[lang]}`}
-        title={label}
-        onClick={() => setOpen((o) => !o)}
-      >
-        <IconGlobe size={15} />
-        <span className="arc-lang__code">{lang.toUpperCase()}</span>
-      </button>
-      {open && (
-        <ul className="arc-menu__list arc-lang__list" role="menu" aria-label={label}>
-          {LANGS.map((l) => (
-            <li key={l} role="none">
-              <button
-                type="button"
-                role="menuitemradio"
-                aria-checked={l === lang}
-                lang={l}
-                onClick={() => {
-                  onPick(l);
-                  setOpen(false);
-                }}
-              >
-                <span className="arc-lang__mark" aria-hidden="true">
-                  {l === lang ? '✓' : ''}
-                </span>
-                {LANG_NAMES[l]}
-                <small aria-hidden="true">{l.toUpperCase()}</small>
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-}
-
 type HeaderProps = {
   route: Route;
   theme: ArcadeTheme;
@@ -278,7 +213,7 @@ export function Header({ route, theme, onToggleTheme, onOpenShortcuts, onOpenSet
         >
           <IconKbd />
         </button>
-        <LangMenu lang={lang} onPick={setLang} label={kit('language')} />
+        <LangMenu lang={lang} onPick={setLang} label={kit('language')} className="header__lang" />
         <button
           type="button"
           className="icon-btn"

@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { applyLang, ARCADE_GAMES, emptyStats, type ArcadeGameId, type GameStats } from '@arcade/kit';
 import { Header, Sidebar, type Route } from '@arcade/ui';
 
@@ -44,7 +44,7 @@ describe('portal shell language switcher', () => {
     expect(within(nav).getByRole('button', { name: 'Settings' })).toBeTruthy();
 
     fireEvent.click(screen.getByRole('button', { name: /language/i }));
-    fireEvent.click(screen.getByRole('menuitemradio', { name: /Deutsch/ }));
+    fireEvent.click(screen.getByRole('button', { name: /Deutsch/ }));
 
     const navDe = screen.getByRole('complementary', { name: 'Hauptnavigation' });
     expect(within(navDe).getByRole('button', { name: 'Einstellungen' })).toBeTruthy();
@@ -60,5 +60,25 @@ describe('portal shell language switcher', () => {
     );
     expect(screen.getByRole('button', { name: 'Ranglista' })).toBeTruthy();
     expect(screen.getByText(/12\s345/)).toBeTruthy();
+  });
+
+  it('Escape closes the language list without reaching the game, focus back on the trigger', () => {
+    const onEsc = vi.fn((e: KeyboardEvent) => e.key === 'Escape');
+    window.addEventListener('keydown', onEsc);
+    render(<Shell />);
+    const trigger = screen.getByRole('button', { name: /language/i });
+    fireEvent.click(trigger);
+    const list = screen.getByRole('list', { name: 'Language' });
+    const english = within(list).getByRole('button', { name: /English/ });
+    expect(english.getAttribute('aria-pressed')).toBe('true');
+    expect(within(list).getByRole('button', { name: /Deutsch/ }).getAttribute('aria-pressed')).toBe('false');
+    english.focus();
+    fireEvent.keyDown(english, { key: 'Escape' });
+    expect(onEsc).not.toHaveBeenCalled();
+    expect(screen.queryByRole('list', { name: 'Language' })).toBeNull();
+    expect(document.activeElement).toBe(trigger);
+    fireEvent.keyDown(trigger, { key: 'Escape' });
+    expect(onEsc).toHaveBeenCalledTimes(1);
+    window.removeEventListener('keydown', onEsc);
   });
 });

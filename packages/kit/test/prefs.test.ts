@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { applyUrlPrefs, readUrlPrefs, withPrefs } from '../src/prefs';
+import { applyUrlPrefs, readUrlPrefs, stripPrefParams, withPrefs } from '../src/prefs';
 import { applyLang, readLang } from '../src/i18n';
 import { applyDental, readDental } from '../src/dental';
 
@@ -69,5 +69,21 @@ describe('applyUrlPrefs with blocked storage', () => {
     expect(readLang()).toBe('de');
     expect(readDental()).toBe(true);
     expect(document.documentElement.lang).toBe('de');
+  });
+});
+
+describe('stripPrefParams', () => {
+  it('removes lang and dental from the query and the hash query, keeping the rest', () => {
+    expect(stripPrefParams({ pathname: '/arcade/', search: '?lang=de&dental=1', hash: '#/play/snake' })).toBe(
+      '/arcade/#/play/snake',
+    );
+    expect(stripPrefParams({ pathname: '/', search: '?utm_source=x&lang=hu', hash: '#/settings?dental=0' })).toBe(
+      '/?utm_source=x#/settings',
+    );
+  });
+
+  it('returns null when there is nothing to remove', () => {
+    expect(stripPrefParams({ pathname: '/', search: '?utm_source=x', hash: '#/leaderboard' })).toBeNull();
+    expect(stripPrefParams({ pathname: '/Snake-Game/', search: '', hash: '' })).toBeNull();
   });
 });

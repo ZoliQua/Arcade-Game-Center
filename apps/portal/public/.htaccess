@@ -2,6 +2,14 @@
 # index.html must always be revalidated so a new deploy is picked up at once;
 # the hashed files in assets/ never change and may be cached for a year.
 
+# One canonical host: www.dulzoltan.hu/arcade/… → dulzoltan.hu/arcade/… (path and
+# query kept), so local stats, saves and settings never split between two origins.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTP_HOST} ^www\.dulzoltan\.hu$ [NC]
+  RewriteRule ^(.*)$ https://dulzoltan.hu/arcade/$1 [R=301,L]
+</IfModule>
+
 <IfModule mod_headers.c>
   <FilesMatch "^(index\.html)?$">
     Header set Cache-Control "no-cache, must-revalidate"
