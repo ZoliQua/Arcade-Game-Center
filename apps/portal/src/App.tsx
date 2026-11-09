@@ -8,6 +8,7 @@ import {
   useArcadeTheme,
   useLang,
   writeString,
+  type ArcadeGameId,
   type ArcadeStatusInfo,
 } from '@arcade/kit';
 import { Header, Sidebar, type LiveStatus } from '@arcade/ui';
@@ -43,6 +44,9 @@ export default function App() {
   const [nickPromptOpen, setNickPromptOpen] = useState(
     () => !getNickname() && readString(NICK_PROMPT_DISMISSED_KEY) !== '1',
   );
+
+  // A ranked run that ended while no nickname was set: offered once, submitted after a name is chosen.
+  const [pendingScore, setPendingScore] = useState<{ game: ArcadeGameId; score: number } | null>(null);
 
   const playingId = route.view === 'play' ? route.gameId : null;
 
@@ -85,7 +89,9 @@ export default function App() {
   const onStatusChange = useCallback((info: ArcadeStatusInfo) => setLive(info), []);
   const onGameOver = useCallback(
     (score: number) => {
-      if (playingId) submitScore(playingId, score);
+      if (playingId && submitScore(playingId, score) === 'needs-nickname') {
+        setPendingScore({ game: playingId, score: Math.floor(score) });
+      }
     },
     [playingId, submitScore],
   );
@@ -131,7 +137,20 @@ export default function App() {
 
       {shortcutsOpen && <ShortcutsDialog gameId={playingId} onClose={() => setShortcutsOpen(false)} />}
 
-      {nickPromptOpen && (
+      {pendingScore && (
+        <NicknamePrompt
+          score={pendingScore.score}
+          onSet={(nick) => {
+            setNickname(nick);
+            submitScore(pendingScore.game, pendingScore.score, nick);
+            setPendingScore(null);
+            setNickPromptOpen(false);
+          }}
+          onSkip={() => setPendingScore(null)}
+        />
+      )}
+
+      {nickPromptOpen && !pendingScore && (
         <NicknamePrompt
           onSet={(nick) => {
             setNickname(nick);

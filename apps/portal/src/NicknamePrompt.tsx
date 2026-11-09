@@ -1,15 +1,19 @@
 import { useState } from 'react';
-import { useMessages } from '@arcade/kit';
+import { formatNumber, useLang, useMessages } from '@arcade/kit';
 import { PORTAL_MESSAGES } from './i18n';
 import { nicknameLimits, setNickname } from './services/nickname';
 
 type Props = {
+  /** Set when a ranked run just ended without a nickname: the prompt offers to put this score on the board. */
+  score?: number;
   onSet: (nick: string) => void;
   onSkip: () => void;
 };
 
-export function NicknamePrompt({ onSet, onSkip }: Props) {
+export function NicknamePrompt({ score, onSet, onSkip }: Props) {
   const t = useMessages(PORTAL_MESSAGES);
+  const [lang] = useLang();
+  const forScore = score !== undefined;
   const [draft, setDraft] = useState('');
   const valid = draft.trim().length >= nicknameLimits.min && draft.trim().length <= nicknameLimits.max;
 
@@ -29,8 +33,10 @@ export function NicknamePrompt({ onSet, onSkip }: Props) {
         }}
       >
         <div>
-          <h2 id="nick-title">{t('nickTitle')}</h2>
-          <p>{t('nickBody')}</p>
+          <h2 id="nick-title">
+            {forScore ? t('nickScoreTitle', { score: formatNumber(score, lang) }) : t('nickTitle')}
+          </h2>
+          <p>{forScore ? t('nickScoreBody') : t('nickBody')}</p>
         </div>
 
         <input
@@ -46,7 +52,7 @@ export function NicknamePrompt({ onSet, onSkip }: Props) {
 
         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
           <button type="button" className="arc-btn arc-btn--ghost" onClick={onSkip}>
-            {t('playAnonymously')}
+            {forScore ? t('notNow') : t('playAnonymously')}
           </button>
           <button type="submit" className="arc-btn arc-btn--primary" disabled={!valid}>
             {t('save')}

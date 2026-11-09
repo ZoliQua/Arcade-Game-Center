@@ -79,6 +79,9 @@ export type PortalMessageKey =
   | 'cancel'
   // Nickname prompt
   | 'nickTitle'
+  | 'nickScoreTitle'
+  | 'nickScoreBody'
+  | 'notNow'
   | 'nickBody'
   | 'nickChars'
   | 'playAnonymously'
@@ -170,6 +173,9 @@ export const PORTAL_MESSAGES: Messages<PortalMessageKey> = {
     cancel: 'Cancel',
 
     nickTitle: 'Pick a nickname',
+    nickScoreTitle: 'Put {score} points on the leaderboard?',
+    nickScoreBody: 'Scores are saved to the global leaderboard under a nickname. Pick one and this run counts too.',
+    notNow: 'Not now',
     nickBody: 'Shown on the global leaderboard. You can change it later in Settings.',
     nickChars: '{min}–{max} characters',
     playAnonymously: 'Play anonymously',
@@ -260,6 +266,9 @@ export const PORTAL_MESSAGES: Messages<PortalMessageKey> = {
     cancel: 'Mégse',
 
     nickTitle: 'Válassz becenevet',
+    nickScoreTitle: 'Felkerüljön a {score} pont a ranglistára?',
+    nickScoreBody: 'A pontok becenévvel kerülnek a globális ranglistára. Válassz egyet, és ez a játék is beszámít.',
+    notNow: 'Most nem',
     nickBody: 'A globális ranglistán jelenik meg. Később a Beállításokban módosíthatod.',
     nickChars: '{min}–{max} karakter',
     playAnonymously: 'Játék név nélkül',
@@ -350,6 +359,9 @@ export const PORTAL_MESSAGES: Messages<PortalMessageKey> = {
     cancel: 'Abbrechen',
 
     nickTitle: 'Wähl einen Spitznamen',
+    nickScoreTitle: '{score} Punkte in die Bestenliste eintragen?',
+    nickScoreBody: 'Punkte landen mit einem Spitznamen in der weltweiten Bestenliste. Wähl einen, dann zählt auch diese Runde.',
+    notNow: 'Jetzt nicht',
     nickBody: 'Erscheint in der weltweiten Bestenliste. Du kannst ihn später in den Einstellungen ändern.',
     nickChars: '{min}–{max} Zeichen',
     playAnonymously: 'Anonym spielen',
