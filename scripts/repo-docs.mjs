@@ -31,6 +31,9 @@ const REPOS = {
   connect4: { dir: 'Connect-Four-Game', name: 'Connect Four' },
   nutsort: { dir: 'Nut-Sort-Game', name: 'Nut Sort' },
   holdem: { dir: 'Texas-Holdem-Game', name: "Texas Hold'em", logicDir: 'src/engine' },
+  minesweeper: { dir: 'Minesweeper-Game', name: 'Minesweeper' },
+  solitaire: { dir: 'Solitaire-Game', name: 'Solitaire' },
+  ulti: { dir: 'Ulti-Game', name: 'Ulti', logicDir: 'src/engine' },
   center: { dir: 'Arcade-Game-Center', name: 'Arcade-Game-Center', monorepo: true },
 };
 

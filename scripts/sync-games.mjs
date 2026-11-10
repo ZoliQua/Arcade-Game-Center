@@ -35,7 +35,16 @@ export const GAMES = {
   connect4: 'Connect-Four-Game',
   nutsort: 'Nut-Sort-Game',
   holdem: 'Texas-Holdem-Game',
+  minesweeper: 'Minesweeper-Game',
+  solitaire: 'Solitaire-Game',
+  ulti: 'Ulti-Game',
 };
+
+/**
+ * Registered in the kit before their repo exists: skipped with a note.
+ * An id leaves PENDING as soon as its repo exists. Any other missing repo is an error.
+ */
+const PENDING = new Set(['minesweeper', 'solitaire', 'ulti']);
 
 const SYNCED = ['src', 'index.html', 'public', 'vite.config.ts'];
 const IGNORED = new Set(['.DS_Store', 'node_modules', 'dist']);
@@ -57,6 +66,17 @@ function ids(arg) {
     process.exit(2);
   }
   return [arg];
+}
+
+/** Games registered before their repo exists are skipped (with a note), not failed. */
+function repoExists(id, verb) {
+  if (existsSync(repoDir(id))) return true;
+  if (!PENDING.has(id)) {
+    console.error(`[${id}] standalone repo not found at ${repoDir(id)}`);
+    process.exit(1);
+  }
+  console.log(`note: [${id}] standalone repo not found at ${repoDir(id)} (skipped ${verb})`);
+  return false;
 }
 
 function listFiles(dir, base = dir) {
@@ -133,7 +153,8 @@ function check() {
         for (const p of diffTrees(join(appDir(id), entry), join(repoDir(id), entry))) problems.push(`[${id}] ${p}`);
       }
     } else {
-      problems.push(`[${id}] standalone repo not found at ${repoDir(id)} (skipped)`);
+      if (PENDING.has(id)) console.log(`note: [${id}] standalone repo not found at ${repoDir(id)} (skipped)`);
+      else problems.push(`[${id}] standalone repo not found at ${repoDir(id)}`);
     }
   }
   if (kitFiles.length === 0) problems.push('[kit] packages/kit/src is empty');
@@ -153,10 +174,10 @@ switch (cmd) {
     syncKit();
     break;
   case 'pull':
-    for (const id of ids(arg)) copyGame(id, repoDir(id), appDir(id));
+    for (const id of ids(arg)) if (repoExists(id, 'pull')) copyGame(id, repoDir(id), appDir(id));
     break;
   case 'push':
-    for (const id of ids(arg)) copyGame(id, appDir(id), repoDir(id));
+    for (const id of ids(arg)) if (repoExists(id, 'push')) copyGame(id, appDir(id), repoDir(id));
     break;
   case 'check':
     check();
