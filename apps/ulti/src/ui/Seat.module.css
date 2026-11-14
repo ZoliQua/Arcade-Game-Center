@@ -1,0 +1,94 @@
+.seat {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas: 'figure info' 'backs backs';
+  gap: 4px 8px;
+  align-items: center;
+  padding: 6px 8px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-md, 10px);
+  background: var(--panel-bg-soft);
+  min-width: 0;
+}
+
+.turn {
+  border: 2px solid var(--text-strong);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+  padding: 5px 7px;
+}
+
+.figure {
+  grid-area: figure;
+  width: clamp(44px, 11vw, 64px);
+}
+
+.figure svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.info {
+  grid-area: info;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.name {
+  font-weight: 700;
+  color: var(--text-strong);
+}
+
+.units {
+  font-variant-numeric: tabular-nums;
+  font-size: 14px;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.badge {
+  font-size: 11px;
+  line-height: 1.2;
+  padding: 1px 6px;
+  border: 1px solid var(--panel-border-strong);
+  border-radius: 999px;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.turnBadge {
+  border: 2px solid var(--text-strong);
+  color: var(--text-strong);
+  font-weight: 700;
+}
+
+.backs {
+  grid-area: backs;
+  display: flex;
+  padding-left: 2px;
+  min-height: 34px;
+}
+
+.back {
+  width: clamp(16px, 3.6vw, 24px);
+  margin-left: clamp(-14px, -2.4vw, -9px);
+}
+
+.back:first-child {
+  margin-left: 0;
+}
+
+.bottom {
+  grid-template-areas: 'figure info';
+}
+
+.left,
+.right {
+  align-self: start;
+}

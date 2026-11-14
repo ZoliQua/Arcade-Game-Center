@@ -11,6 +11,9 @@ import { SpaceInvadersDemo, SpaceInvadersGame } from '@arcade/invaders';
 import { ConnectFourDemo, ConnectFourGame } from '@arcade/connect4';
 import { NutSortDemo, NutSortGame } from '@arcade/nutsort';
 import { HoldemDemo, HoldemGame } from '@arcade/holdem';
+import { MinesweeperDemo, MinesweeperGame } from '@arcade/minesweeper';
+import { SolitaireDemo, SolitaireGame } from '@arcade/solitaire';
+import { UltiDemo, UltiGame } from '@arcade/ulti';
 
 export type GameModule = {
   Game: ComponentType<ArcadeGameProps>;
@@ -30,4 +33,7 @@ export const GAME_MODULES: Record<ArcadeGameId, GameModule> = {
   connect4: { Game: ConnectFourGame, Demo: ConnectFourDemo },
   nutsort: { Game: NutSortGame, Demo: NutSortDemo },
   holdem: { Game: HoldemGame, Demo: HoldemDemo },
+  minesweeper: { Game: MinesweeperGame, Demo: MinesweeperDemo },
+  solitaire: { Game: SolitaireGame, Demo: SolitaireDemo },
+  ulti: { Game: UltiGame, Demo: UltiDemo },
 };

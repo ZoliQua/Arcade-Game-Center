@@ -207,6 +207,33 @@ export const IconHoldem = ({ size = 18, color = 'currentColor' }: IconProps) => 
   </svg>
 );
 
+export const IconMinesweeper = ({ size = 18, color = 'currentColor' }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.4">
+    <circle cx="10" cy="14" r="5" fill={color} fillOpacity="0.25" />
+    <path d="M10 6.5v2M10 19.5v2M2.5 14h2M15.5 14h2M4.7 8.7l1.4 1.4M13.9 17.9l1.4 1.4M4.7 19.3l1.4-1.4M13.9 10.1l1.4-1.4" />
+    <circle cx="8.3" cy="12.3" r="1" fill={color} stroke="none" />
+    <path d="M17 2.5v8" />
+    <path d="M17 2.5l4.5 2-4.5 2" fill={color} />
+  </svg>
+);
+
+export const IconSolitaire = ({ size = 18, color = 'currentColor' }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.4">
+    <rect x="3.5" y="5" width="9" height="13.5" rx="1.4" transform="rotate(-12 8 11.75)" />
+    <rect x="10" y="4.5" width="9" height="13.5" rx="1.4" fill={color} fillOpacity="0.25" transform="rotate(12 14.5 11.25)" />
+    <path d="M14.6 8.6c-1.4 1.2-2.6 2.2-2.6 3.3 0 .9 1.2 1.4 2.1.6.2 1-.3 1.6-.8 2h2.6c-.5-.4-1-1-.8-2 .9.8 2.1.3 2.1-.6 0-1.1-1.2-2.1-2.6-3.3z" transform="rotate(12 14.5 11.25)" />
+  </svg>
+);
+
+export const IconUlti = ({ size = 18, color = 'currentColor' }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.4">
+    <rect x="5" y="2.5" width="14" height="19" rx="1.8" />
+    <path d="M8.6 11.2c0-1.9 1.5-3 3.4-3s3.4 1.1 3.4 3z" fill={color} fillOpacity="0.4" />
+    <path d="M9.2 11.2c0 3 1.2 5.3 2.8 5.3s2.8-2.3 2.8-5.3" />
+    <path d="M12 8.2V6.4M12 6.6c.8-.8 1.8-.9 2.6-.6" />
+  </svg>
+);
+
 export const IconSave = ({ size = 18 }: IconProps) => (
   <svg width={size} height={size} viewBox="0 0 24 24" {...stroke}>
     <path d="M5 3h11l3 3v15H5z" />

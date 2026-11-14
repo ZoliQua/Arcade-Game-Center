@@ -105,7 +105,7 @@ export const PORTAL_MESSAGES: Messages<PortalMessageKey> = {
     titleLeaderboard: 'Leaderboard',
     titleSettings: 'Settings',
 
-    heroTitle: 'Eleven classics, one home.',
+    heroTitle: 'Fourteen classics, one home.',
     heroBody:
       'Pick a game — every card below is the real game playing itself. Runs autosave, so you can leave mid-game and continue later; best scores and play time follow you across sessions.',
     gamesPlayed: 'Games played',
@@ -198,7 +198,7 @@ export const PORTAL_MESSAGES: Messages<PortalMessageKey> = {
     titleLeaderboard: 'Ranglista',
     titleSettings: 'Beállítások',
 
-    heroTitle: 'Tizenegy klasszikus egy helyen.',
+    heroTitle: 'Tizennégy klasszikus egy helyen.',
     heroBody:
       'Válassz egy játékot – minden kártyán maga a valódi játék fut. A játszmák automatikusan mentődnek, így bármikor abbahagyhatod és később folytathatod; a rekordjaid és a játékidőd is megmaradnak.',
     gamesPlayed: 'Lejátszott játszmák',
@@ -291,7 +291,7 @@ export const PORTAL_MESSAGES: Messages<PortalMessageKey> = {
     titleLeaderboard: 'Bestenliste',
     titleSettings: 'Einstellungen',
 
-    heroTitle: 'Elf Klassiker unter einem Dach.',
+    heroTitle: 'Vierzehn Klassiker unter einem Dach.',
     heroBody:
       'Such dir ein Spiel aus – auf jeder Karte unten spielt sich das echte Spiel selbst. Alles wird automatisch gespeichert: Hör mittendrin auf und mach später weiter. Bestwerte und Spielzeit bleiben dir erhalten.',
     gamesPlayed: 'Gespielte Runden',

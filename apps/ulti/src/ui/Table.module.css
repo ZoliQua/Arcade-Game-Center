@@ -1,0 +1,27 @@
+.table {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+  border-radius: var(--radius-lg, 14px);
+  background: radial-gradient(ellipse at 50% 40%, rgba(110, 69, 39, 0.22), transparent 70%), var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  min-width: 0;
+}
+
+.top {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+}
+
+.bottom > section {
+  align-self: center;
+}

@@ -1,0 +1,24 @@
+{
+  "name": "@arcade/solitaire",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Type-safe Solitaire in React + Vite + TypeScript — Klondike (draw 1 / draw 3), Spider (1, 2 or 4 suits) and FreeCell (Microsoft deal numbers) with drag and drop, click-to-move, full keyboard play, hints, undo, auto-complete, safe auto-moves to the foundations, autosave & resume, dental mode and English / Hungarian / German. Part of Arcade-Game-Center.",
+  "license": "MIT",
+  "homepage": "https://github.com/ZoliQua/Solitaire-Game#readme",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit -p ."
+  },
+  "peerDependencies": {
+    "react": "^18",
+    "react-dom": "^18"
+  }
+}

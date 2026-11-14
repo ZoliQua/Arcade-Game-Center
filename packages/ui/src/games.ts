@@ -7,11 +7,14 @@ import {
   IconGomoku,
   IconInvaders,
   IconHoldem,
+  IconMinesweeper,
   IconNutSort,
   IconPacman,
   IconSnake,
+  IconSolitaire,
   IconTetris,
   IconTicTacToe,
+  IconUlti,
 } from './Icons';
 
 type IconCmp = ComponentType<{ size?: number; color?: string }>;
@@ -28,6 +31,9 @@ export const GAME_ICONS: Record<ArcadeGameId, IconCmp> = {
   connect4: IconConnectFour,
   nutsort: IconNutSort,
   holdem: IconHoldem,
+  minesweeper: IconMinesweeper,
+  solitaire: IconSolitaire,
+  ulti: IconUlti,
 };
 
 export type PortalGame = ArcadeGameInfo & { Icon: IconCmp; color: string };
@@ -39,5 +45,5 @@ export const GAMES: PortalGame[] = ARCADE_GAMES.map((g) => ({
   color: `var(${g.colorVar})`,
 }));
 
-export const APP_VERSION = '3.0';
+export const APP_VERSION = '3.1';
 
