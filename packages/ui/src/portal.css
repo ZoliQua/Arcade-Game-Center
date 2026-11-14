@@ -26,7 +26,16 @@
   top: 0;
   height: 100vh;
   z-index: 5;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
+.sidebar:focus { outline: none; }
+.sidebar__top {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+.sidebar__top .sidebar__brand { flex: 1; min-width: 0; }
 .sidebar__brand {
   font: inherit;
   color: inherit;
@@ -78,6 +87,43 @@
   padding: 14px 8px 6px;
 }
 [data-collapsed="true"] .sidebar__section-label { opacity: 0; height: 8px; padding: 6px 0 0; }
+
+/* The "Games" label folds the game list down to the active game. */
+.sidebar__section-toggle {
+  font: inherit;
+  font-size: 10.5px;
+  background: none;
+  border: 0;
+  border-radius: var(--radius-md);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-align: left;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.sidebar__section-toggle:hover { color: var(--text); }
+.sidebar__section-toggle:focus-visible { outline: 2px solid var(--accent-ring); outline-offset: -2px; }
+.sidebar__section-text { flex: 1; }
+.sidebar__section-count {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+.sidebar__section-chevron { display: grid; transition: transform 140ms ease; }
+.sidebar__section-toggle[aria-expanded="true"] .sidebar__section-chevron { transform: rotate(90deg); }
+[data-collapsed="true"] .sidebar__section-toggle {
+  opacity: 1;
+  height: auto;
+  padding: 8px 0;
+  justify-content: center;
+}
+[data-collapsed="true"] .sidebar__section-text,
+[data-collapsed="true"] .sidebar__section-count { display: none; }
+.sidebar__games { display: flex; flex-direction: column; gap: 8px; }
+.sidebar__games:empty { display: none; }
+.sidebar__close { flex-shrink: 0; }
 
 .nav-item {
   display: flex;
@@ -186,6 +232,7 @@
 .header__chip .sep { color: var(--text-mute); }
 
 .header__actions { display: flex; align-items: center; gap: 6px; }
+.header .header__menu { display: none; flex-shrink: 0; }
 
 .icon-btn {
   width: 34px; height: 34px;
@@ -252,16 +299,90 @@
 }
 .portal-input:focus-visible { outline: 2px solid var(--accent-ring); outline-offset: 1px; }
 
-/* ─── SMALL SCREENS ───────────────────────────────────────── */
-@media (max-width: 760px) {
+/* ─── TOUCH ───────────────────────────────────────────────── */
+@media (pointer: coarse) {
+  .icon-btn { width: 44px; height: 44px; }
+  .nav-item { min-height: 44px; }
+  .sidebar__section-toggle { min-height: 44px; }
+}
+
+/* ─── SMALL SCREENS: the sidebar is an off-canvas drawer ──── */
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 940;
+  background: var(--overlay-bg);
+}
+@media (max-width: 899.98px) {
   .arcade,
-  .arcade[data-collapsed="false"] { grid-template-columns: var(--sidebar-w-collapsed) 1fr; }
-  .arcade .sidebar__title,
-  .arcade .nav-item__label,
-  .arcade .nav-item__badge { display: none; }
-  .arcade .sidebar__section-label { opacity: 0; height: 8px; padding: 6px 0 0; }
-  .content__body { padding: 18px 14px 28px; }
-  .header { padding: 0 14px; }
+  .arcade[data-collapsed] { grid-template-columns: minmax(0, 1fr); }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 950;
+    width: min(300px, 86vw);
+    height: 100vh;
+    height: 100dvh;
+    padding:
+      calc(env(safe-area-inset-top) + 14px)
+      14px
+      calc(env(safe-area-inset-bottom) + 14px)
+      calc(env(safe-area-inset-left) + 14px);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.35);
+    transform: translateX(-105%);
+    visibility: hidden;
+    transition: transform 200ms ease, visibility 0s linear 200ms;
+  }
+  .sidebar[data-drawer="open"] {
+    transform: none;
+    visibility: visible;
+    transition: transform 200ms ease;
+  }
+  /* The drawer always shows full labels; the desktop rail mode does not apply. */
+  .arcade[data-collapsed] .sidebar__title { display: flex; }
+  .arcade[data-collapsed] .nav-item__label { display: block; }
+  .arcade[data-collapsed] .nav-item__badge { display: inline; }
+  .arcade[data-collapsed] .nav-item__saved { position: static; }
+  .arcade[data-collapsed] .sidebar__section-label { opacity: 1; height: auto; padding: 14px 8px 6px; }
+  .arcade[data-collapsed] .sidebar__section-toggle { justify-content: flex-start; padding: 6px 8px; }
+  .arcade[data-collapsed] .sidebar__section-text { display: block; }
+  .arcade[data-collapsed] .sidebar__section-count { display: inline; }
+  .sidebar__footer { display: none; }
+
+  .header .header__menu { display: grid; margin-left: -8px; }
+  .header {
+    gap: 8px;
+    padding: 0 max(12px, env(safe-area-inset-right)) 0 max(12px, env(safe-area-inset-left));
+  }
+  .header__crumbs { font-size: 14px; }
   .header__crumbs strong,
   .header__crumbs strong + .sep { display: none; }
+  .header__crumbs > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .header__actions { gap: 2px; }
+  .content__body {
+    padding: 14px max(12px, env(safe-area-inset-right)) calc(env(safe-area-inset-bottom) + 24px)
+      max(12px, env(safe-area-inset-left));
+    gap: 18px;
+  }
 }
+@media (max-width: 899.98px) and (pointer: coarse) {
+  /* No keyboard on a phone: the shortcuts list is noise there. */
+  .header__shortcuts { display: none; }
+}
+@media (max-width: 520px) {
+  /* The game's own stats strip already shows status, score and time; the game name gets the room. */
+  .header__chip { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sidebar,
+  .sidebar[data-drawer="open"] { transition: none; }
+}
+
+/* ─── IMMERSIVE: the full-screen game hides the portal chrome ─ */
+html[data-arcade-immersive] .sidebar,
+html[data-arcade-immersive] .sidebar-backdrop,
+html[data-arcade-immersive] .header { display: none; }
+html[data-arcade-immersive] .arcade { grid-template-columns: minmax(0, 1fr); }

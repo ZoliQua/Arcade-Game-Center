@@ -11,6 +11,7 @@ import {
   IconNutSort,
   IconPacman,
   IconSnake,
+  IconSnapszer,
   IconSolitaire,
   IconTetris,
   IconTicTacToe,
@@ -34,6 +35,7 @@ export const GAME_ICONS: Record<ArcadeGameId, IconCmp> = {
   minesweeper: IconMinesweeper,
   solitaire: IconSolitaire,
   ulti: IconUlti,
+  snapszer: IconSnapszer,
 };
 
 export type PortalGame = ArcadeGameInfo & { Icon: IconCmp; color: string };

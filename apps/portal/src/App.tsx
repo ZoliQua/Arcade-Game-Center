@@ -10,8 +10,9 @@ import {
   writeString,
   type ArcadeGameId,
   type ArcadeStatusInfo,
+  type GameOverInfo,
 } from '@arcade/kit';
-import { Header, Sidebar, type LiveStatus } from '@arcade/ui';
+import { Header, NARROW_QUERY, Sidebar, useMediaQuery, type LiveStatus, type Route } from '@arcade/ui';
 import { trackRoute } from './analytics';
 import { GAME_MODULES } from './games';
 import { routeTitle } from './i18n';
@@ -27,12 +28,16 @@ import { ShortcutsDialog } from './ShortcutsDialog';
 
 const NICK_PROMPT_DISMISSED_KEY = 'arcade.nickPromptDismissed';
 const SIDEBAR_COLLAPSED_KEY = 'arcade.sidebarCollapsed';
+const SIDEBAR_GAMES_COLLAPSED_KEY = 'arcade.sidebarGamesCollapsed';
 
 export default function App() {
   const [route, navigate] = useHashRoute();
   const [theme, setTheme, toggleTheme] = useArcadeTheme();
   const [lang] = useLang();
   const [collapsed, setCollapsed] = useState(() => readString(SIDEBAR_COLLAPSED_KEY) === '1');
+  const [gamesCollapsed, setGamesCollapsed] = useState(() => readString(SIDEBAR_GAMES_COLLAPSED_KEY) === '1');
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const narrow = useMediaQuery(NARROW_QUERY);
   const [live, setLive] = useState<LiveStatus>(null);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
 
@@ -46,7 +51,9 @@ export default function App() {
   );
 
   // A ranked run that ended while no nickname was set: offered once, submitted after a name is chosen.
-  const [pendingScore, setPendingScore] = useState<{ game: ArcadeGameId; score: number } | null>(null);
+  const [pendingScore, setPendingScore] = useState<{ game: ArcadeGameId; score: number; finished: boolean } | null>(
+    null,
+  );
 
   const playingId = route.view === 'play' ? route.gameId : null;
 
@@ -69,6 +76,36 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed by the route's hash
   }, [routeKey]);
 
+  // The drawer closes on every route change (back button included) and when the screen grows wide.
+  useEffect(() => setDrawerOpen(false), [routeKey, narrow]);
+
+  // While the drawer is open the page behind it does not scroll.
+  const drawerShown = narrow && drawerOpen;
+  useEffect(() => {
+    if (!drawerShown) return;
+    const html = document.documentElement;
+    const prev = html.style.overflow;
+    html.style.overflow = 'hidden';
+    return () => {
+      html.style.overflow = prev;
+    };
+  }, [drawerShown]);
+
+  const go = useCallback(
+    (next: Route) => {
+      setDrawerOpen(false);
+      navigate(next);
+    },
+    [navigate],
+  );
+
+  const toggleGames = useCallback(() => {
+    setGamesCollapsed((c) => {
+      writeString(SIDEBAR_GAMES_COLLAPSED_KEY, c ? '0' : '1');
+      return !c;
+    });
+  }, []);
+
   const toggleCollapsed = useCallback(() => {
     setCollapsed((c) => {
       writeString(SIDEBAR_COLLAPSED_KEY, c ? '0' : '1');
@@ -88,10 +125,13 @@ export default function App() {
 
   const onStatusChange = useCallback((info: ArcadeStatusInfo) => setLive(info), []);
   const onGameOver = useCallback(
-    (score: number) => {
-      if (playingId && submitScore(playingId, score) === 'needs-nickname') {
-        setPendingScore({ game: playingId, score: Math.floor(score) });
-      }
+    (score: number, info?: GameOverInfo) => {
+      if (!playingId) return;
+      const game = playingId;
+      const finished = info?.finished === true;
+      void submitScore(game, score, undefined, finished).then((outcome) => {
+        if (outcome === 'needs-nickname') setPendingScore({ game, score: Math.floor(score), finished });
+      });
     },
     [playingId, submitScore],
   );
@@ -99,14 +139,18 @@ export default function App() {
   const Game = playingId ? GAME_MODULES[playingId].Game : null;
 
   return (
-    <div className="arcade" data-collapsed={collapsed ? 'true' : 'false'}>
+    <div className="arcade" data-collapsed={collapsed ? 'true' : 'false'} data-drawer={drawerShown ? 'open' : 'closed'}>
       <Sidebar
         route={route}
-        navigate={navigate}
+        navigate={go}
         collapsed={collapsed}
         onToggleCollapsed={toggleCollapsed}
+        gamesCollapsed={gamesCollapsed}
+        onToggleGames={toggleGames}
         stats={stats}
         sessions={sessions}
+        drawerOpen={drawerOpen}
+        onCloseDrawer={() => setDrawerOpen(false)}
       />
       <div className="content">
         <Header
@@ -114,11 +158,13 @@ export default function App() {
           theme={theme}
           onToggleTheme={toggleTheme}
           onOpenShortcuts={() => setShortcutsOpen(true)}
-          onOpenSettings={() => navigate({ view: 'settings' })}
+          onOpenSettings={() => go({ view: 'settings' })}
           live={live}
+          onOpenMenu={() => setDrawerOpen(true)}
+          menuOpen={drawerShown}
         />
         <main className="content__body">
-          {route.view === 'home' && <Landing navigate={navigate} stats={stats} sessions={sessions} />}
+          {route.view === 'home' && <Landing navigate={go} stats={stats} sessions={sessions} />}
           {Game && playingId && (
             <div
               className="play-view"
@@ -142,7 +188,7 @@ export default function App() {
           score={pendingScore.score}
           onSet={(nick) => {
             setNickname(nick);
-            submitScore(pendingScore.game, pendingScore.score, nick);
+            void submitScore(pendingScore.game, pendingScore.score, nick, pendingScore.finished);
             setPendingScore(null);
             setNickPromptOpen(false);
           }}

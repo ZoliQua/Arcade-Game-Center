@@ -20,7 +20,11 @@ export type ShellMessageKey =
   | 'liveTitle'
   | 'points'
   | 'shortcuts'
-  | 'shortcutsTitle';
+  | 'shortcutsTitle'
+  | 'menu'
+  | 'closeMenu'
+  | 'showGames'
+  | 'hideGames';
 
 export const SHELL_MESSAGES: Messages<ShellMessageKey> = {
   en: {
@@ -39,6 +43,10 @@ export const SHELL_MESSAGES: Messages<ShellMessageKey> = {
     points: '{n} pts',
     shortcuts: 'Keyboard shortcuts',
     shortcutsTitle: 'Keyboard shortcuts (?)',
+    menu: 'Menu',
+    closeMenu: 'Close menu',
+    showGames: 'Show all games',
+    hideGames: 'Hide the game list',
   },
   hu: {
     mainNav: 'Fő navigáció',
@@ -56,6 +64,10 @@ export const SHELL_MESSAGES: Messages<ShellMessageKey> = {
     points: '{n} pont',
     shortcuts: 'Billentyűparancsok',
     shortcutsTitle: 'Billentyűparancsok (?)',
+    menu: 'Menü',
+    closeMenu: 'Menü bezárása',
+    showGames: 'Az összes játék mutatása',
+    hideGames: 'A játéklista elrejtése',
   },
   de: {
     mainNav: 'Hauptnavigation',
@@ -73,5 +85,9 @@ export const SHELL_MESSAGES: Messages<ShellMessageKey> = {
     points: '{n} Pkt.',
     shortcuts: 'Tastenkürzel',
     shortcutsTitle: 'Tastenkürzel (?)',
+    menu: 'Menü',
+    closeMenu: 'Menü schließen',
+    showGames: 'Alle Spiele zeigen',
+    hideGames: 'Spieleliste ausblenden',
   },
 };

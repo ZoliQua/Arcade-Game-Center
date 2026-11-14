@@ -30,3 +30,17 @@
     gap: 8px;
   }
 }
+
+/* TEMPORARY: Snapszer "coming soon" placeholder (replaced in Task 24). */
+.coming-soon {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 48px 20px;
+  text-align: center;
+}
+.coming-soon h2 { margin: 0; color: var(--text-strong); font-size: 20px; }
+.coming-soon p { margin: 0; color: var(--text-dim); max-width: 42ch; }
+.coming-soon__icon,
+.coming-soon--demo { color: var(--game-color, var(--text-dim)); }
+.coming-soon--demo { width: 100%; height: 100%; display: grid; place-items: center; padding: 0; }

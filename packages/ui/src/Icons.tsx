@@ -234,6 +234,28 @@ export const IconUlti = ({ size = 18, color = 'currentColor' }: IconProps) => (
   </svg>
 );
 
+export const IconSnapszer = ({ size = 18, color = 'currentColor' }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.4" strokeLinejoin="round">
+    {/* A fan of three cards; the front one carries a heart pip. */}
+    <rect x="4.2" y="5" width="9.5" height="14" rx="1.5" transform="rotate(-16 9 19)" />
+    <rect x="7.3" y="4" width="9.5" height="14" rx="1.5" transform="rotate(-2 12 18)" fill={color} fillOpacity="0.12" />
+    <rect x="10.4" y="5" width="9.5" height="14" rx="1.5" transform="rotate(14 15 19)" fill={color} fillOpacity="0.2" />
+    <path d="M15 11.4c-.6-.9-2-.6-1.9.5.1.9 1.3 1.6 1.9 2.1.6-.5 1.8-1.2 1.9-2.1.1-1.1-1.3-1.4-1.9-.5z" fill={color} fillOpacity="0.55" transform="rotate(14 15 19)" />
+  </svg>
+);
+
+export const IconMenu = ({ size = 20 }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" {...stroke}>
+    <path d="M4 7h16M4 12h16M4 17h16" />
+  </svg>
+);
+
+export const IconClose = ({ size = 20 }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" {...stroke}>
+    <path d="M6 6l12 12M18 6L6 18" />
+  </svg>
+);
+
 export const IconSave = ({ size = 18 }: IconProps) => (
   <svg width={size} height={size} viewBox="0 0 24 24" {...stroke}>
     <path d="M5 3h11l3 3v15H5z" />

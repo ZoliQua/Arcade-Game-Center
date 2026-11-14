@@ -8,12 +8,21 @@ vi.mock('./services/api', async (importOriginal) => ({
   submitScore: (...args: unknown[]) => submitScore(...(args as [])),
 }));
 
-// A stand-in game: one button ends a ranked run with 1234 points.
+// A stand-in game: one button ends a ranked run with 1234 points, one finishes a run early on 0 points,
+// one reaches a natural game over on 0 points (the kit never reports that, but the portal must not rank it either).
 function FakeGame({ onGameOver }: ArcadeGameProps) {
   return (
-    <button type="button" onClick={() => onGameOver?.(1234)}>
-      end run
-    </button>
+    <>
+      <button type="button" onClick={() => onGameOver?.(1234)}>
+        end run
+      </button>
+      <button type="button" onClick={() => onGameOver?.(0, { finished: true })}>
+        finish at zero
+      </button>
+      <button type="button" onClick={() => onGameOver?.(0)}>
+        game over at zero
+      </button>
+    </>
   );
 }
 vi.mock('./games', () => ({
@@ -43,7 +52,7 @@ describe('a ranked run that ends without a nickname', () => {
     render(<App />);
     fireEvent.click(screen.getByRole('button', { name: 'end run' }));
 
-    const dialog = screen.getByRole('dialog');
+    const dialog = await screen.findByRole('dialog');
     expect(dialog.textContent).toContain(formatNumber(1234, 'en'));
     expect(submitScore).not.toHaveBeenCalled();
 
@@ -57,22 +66,71 @@ describe('a ranked run that ends without a nickname', () => {
     expect(screen.queryByRole('dialog')).toBeNull();
   });
 
-  it('sends nothing when the player skips, and asks again after the next run', () => {
+  it('sends nothing when the player skips, and asks again after the next run', async () => {
     render(<App />);
     fireEvent.click(screen.getByRole('button', { name: 'end run' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Not now' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Not now' }));
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(submitScore).not.toHaveBeenCalled();
 
     fireEvent.click(screen.getByRole('button', { name: 'end run' }));
-    expect(screen.getByRole('dialog')).toBeTruthy();
+    expect(await screen.findByRole('dialog')).toBeTruthy();
   });
 
-  it('submits straight away when a nickname is set', () => {
+  it('submits straight away when a nickname is set', async () => {
     localStorage.setItem('arcade.nickname', 'Zoli');
     render(<App />);
-    fireEvent.click(screen.getByRole('button', { name: 'end run' }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'end run' }));
+    });
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(submitScore).toHaveBeenCalledWith('2048', 'Zoli', 1234);
+  });
+});
+
+describe('a run the player finished early', () => {
+  it('a finished 0-point run is submitted', async () => {
+    localStorage.setItem('arcade.nickname', 'Zoli');
+    render(<App />);
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'finish at zero' }));
+    });
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(submitScore).toHaveBeenCalledTimes(1);
+    expect(submitScore).toHaveBeenCalledWith('2048', 'Zoli', 0);
+  });
+
+  it('a finished 0-point run asks for a nickname once', async () => {
+    render(<App />);
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'finish at zero' }));
+    });
+    expect(screen.getAllByRole('dialog')).toHaveLength(1);
+    expect(screen.getByRole('dialog').textContent).toContain(formatNumber(0, 'en'));
+    expect(submitScore).not.toHaveBeenCalled();
+
+    fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Zoli' } });
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+    });
+    expect(submitScore).toHaveBeenCalledTimes(1);
+    expect(submitScore).toHaveBeenCalledWith('2048', 'Zoli', 0);
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('a natural 0-point game over is not submitted', async () => {
+    localStorage.setItem('arcade.nickname', 'Zoli');
+    render(<App />);
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'game over at zero' }));
+    });
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(submitScore).not.toHaveBeenCalled();
+
+    localStorage.removeItem('arcade.nickname');
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'game over at zero' }));
+    });
+    expect(screen.queryByRole('dialog')).toBeNull();
   });
 });

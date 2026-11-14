@@ -181,7 +181,14 @@
 @media (max-width: 900px) {
   .landing__hero { grid-template-columns: 1fr; }
 }
+@media (max-width: 900px) {
+  /* Compact stats strip: three small tiles in one row. */
+  .landing__hero { padding: 16px; gap: 14px; }
+  .landing__hero-stats { gap: 8px; }
+  .landing__hero-stats .stat-card { padding: 8px 10px; }
+  .landing__hero-stats .stat-card dt { font-size: 9.5px; letter-spacing: 0.08em; margin-bottom: 4px; }
+  .landing__hero-stats .stat-card dd { font-size: 16px; }
+}
 @media (max-width: 520px) {
-  .landing__hero-stats { grid-template-columns: 1fr 1fr; }
   .landing__hero h1 { font-size: 26px; }
 }

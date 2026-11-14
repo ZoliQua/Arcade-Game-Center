@@ -98,7 +98,10 @@ export type PortalMessageKey =
   | 'keyStart'
   | 'gameKeysNote'
   | 'gameKeysGeneric'
-  | 'close';
+  | 'close'
+  // TEMPORARY Snapszer placeholder (replaced in Task 24)
+  | 'comingSoon'
+  | 'comingSoonBody';
 
 export const PORTAL_MESSAGES: Messages<PortalMessageKey> = {
   en: {
@@ -194,6 +197,8 @@ export const PORTAL_MESSAGES: Messages<PortalMessageKey> = {
     gameKeysNote: "{name}'s own controls are listed next to the board.",
     gameKeysGeneric: 'Each game lists its own controls next to the board.',
     close: 'Close',
+    comingSoon: 'Coming soon',
+    comingSoonBody: '{name} is on its way to the arcade. Until then, try another game.',
   },
   hu: {
     brand: "Zoltan's Arcade",
@@ -288,6 +293,8 @@ export const PORTAL_MESSAGES: Messages<PortalMessageKey> = {
     gameKeysNote: '{name}: a játék saját irányítása a pálya mellett látható.',
     gameKeysGeneric: 'Minden játék a pálya mellett mutatja a saját irányítását.',
     close: 'Bezárás',
+    comingSoon: 'Hamarosan',
+    comingSoonBody: 'A {name} már úton van a játékterembe. Addig próbálj ki egy másik játékot!',
   },
   de: {
     brand: "Zoltan's Arcade",
@@ -382,6 +389,8 @@ export const PORTAL_MESSAGES: Messages<PortalMessageKey> = {
     gameKeysNote: 'Die Steuerung von {name} steht direkt neben dem Spielfeld.',
     gameKeysGeneric: 'Jedes Spiel zeigt seine Steuerung direkt neben dem Spielfeld.',
     close: 'Schließen',
+    comingSoon: 'Bald verfügbar',
+    comingSoonBody: '{name} ist auf dem Weg in die Spielhalle. Bis dahin probier doch ein anderes Spiel aus.',
   },
 };
 
