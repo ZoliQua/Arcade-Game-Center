@@ -146,6 +146,16 @@ function gameItems(nav: HTMLElement) {
     .filter((b) => gameButtonNames.includes(b.getAttribute('title') ?? ''));
 }
 
+describe('sidebar brand', () => {
+  it('shows the logo image (favicon.svg) next to the title', () => {
+    const { container } = render(<Shell />);
+    const img = container.querySelector('.sidebar__brand img.sidebar__logo-img') as HTMLImageElement;
+    expect(img).not.toBeNull();
+    expect(img.getAttribute('src')).toMatch(/favicon\.svg$/);
+    expect(img.getAttribute('alt')).toBe('');
+  });
+});
+
 describe('collapsible game list', () => {
   beforeEach(() => {
     vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(null);

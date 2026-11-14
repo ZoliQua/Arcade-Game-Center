@@ -22,7 +22,6 @@ import {
   IconClose,
   IconHome,
   IconKbd,
-  IconLogo,
   IconMenu,
   IconMoon,
   IconSettings,
@@ -141,7 +140,7 @@ export function Sidebar({
         <div className="sidebar__top">
           <button type="button" className="sidebar__brand" onClick={() => navigate({ view: 'home' })}>
             <span className="sidebar__logo">
-              <IconLogo />
+              <img className="sidebar__logo-img" src={`${import.meta.env.BASE_URL}favicon.svg`} alt="" />
             </span>
             <span className="sidebar__title">
               <strong>Zoltan&apos;s Arcade</strong>

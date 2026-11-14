@@ -6,6 +6,7 @@ declare module '*.module.css' {
 declare module '*.css';
 
 interface ImportMetaEnv {
+  readonly BASE_URL: string;
   readonly VITE_ARCADE_API_BASE?: string;
   readonly VITE_ARCADE_API_KEY?: string;
 }

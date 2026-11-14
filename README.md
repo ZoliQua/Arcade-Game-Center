@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/arcade-logo/arcade-wordmark-light.svg">
+    <img src="docs/arcade-logo/arcade-wordmark-dark.svg" alt="Zoltan's Arcade" width="420">
+  </picture>
+</p>
+
 # 🕹️ Zoltan's Arcade — Arcade-Game-Center
 
 One portal for fourteen browser games — **Tetris, Snake, 2048, Pac-Man, Gomoku, Tic-Tac-Toe, Breakout, Space Invaders,

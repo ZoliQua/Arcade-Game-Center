@@ -52,14 +52,16 @@
   margin-bottom: 8px;
 }
 .sidebar__logo {
-  width: 36px; height: 36px;
-  border-radius: 9px;
+  width: 40px; height: 40px;
   display: grid; place-items: center;
-  background: linear-gradient(135deg, var(--accent) 0%, #b07cff 100%);
-  box-shadow: 0 0 0 1px rgba(255,255,255,0.06) inset, 0 6px 18px rgba(107,140,255,0.35);
   flex-shrink: 0;
 }
-.sidebar__logo svg { display: block; }
+.sidebar__logo-img {
+  display: block;
+  width: 40px; height: 40px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(105,121,255,0.35));
+}
 .sidebar__title {
   display: flex; flex-direction: column;
   min-width: 0;
