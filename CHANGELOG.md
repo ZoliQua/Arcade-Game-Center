@@ -44,6 +44,15 @@ versioning: [SemVer](https://semver.org/).
 ### Removed
 - The temporary Snapszer placeholder (`SnapszerPlaceholder.tsx`, its "coming soon" strings and styles).
 
+### Fixed
+- Kit on touch screens: the header controls (icon buttons, language menu, dental toggle, top-bar buttons) are 44 px
+  targets under `(pointer: coarse)` (desktop keeps 34 px), and key hints (`<kbd>`) are hidden in buttons and in the
+  `GameOverlay` actions, so phones no longer show „Enter”, „Esc” or letter keys.
+- Texas Hold'em: the action bar fits 360–390 px phones in every language (shrinkable grid tracks, wrapping labels), and
+  Finish in the middle of a hand forfeits the chips you already put in the pot (the others' bets still count), so it is
+  no escape from a losing hand; rules text and README updated.
+- `scripts/mobile-smoke.mjs` taps the start button inside the overlay card by its word alone (it no longer has a key hint on touch).
+
 ## [3.1.0] — 2026-11-14
 
 ### Added

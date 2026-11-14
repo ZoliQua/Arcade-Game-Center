@@ -199,7 +199,8 @@ async function smoke(browser, base, id, shots) {
     await step('width', () => noOverflow(page));
     await step('start', async () => {
       if (spec.start === false) return;
-      await page.getByRole('button', { name: /^(Indítás|Osztás|Beszállok)\s*\S/ }).first().tap();
+      // The start button of the overlay card; on touch it carries no key hint, so its name is just the word.
+      await page.locator('.arc-overlay__card').getByRole('button', { name: /^(Indítás|Osztás|Beszállok)(\s|$)/ }).first().tap();
     });
     await step(spec.what, () => spec.act(page));
     await step('width after play', () => noOverflow(page));
