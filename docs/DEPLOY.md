@@ -25,6 +25,24 @@ server rewrites.
 
 The first request creates the table automatically.
 
+### Upgrading to v3.2 (fifteen games)
+
+Add Snapszer to the live `_config.php` `max_score` map, otherwise its scores are rejected with `unknown_game`
+(match score: unit lead × 100 plus 500 for the win, times the difficulty factor, capped at 5,000):
+
+```php
+'snapszer'    => 5000,
+```
+
+Upload the whole `apps/portal/dist/` (new game chunk, new icons `favicon.svg`, `favicon-32.png`, `apple-touch-icon.png`,
+`icon-192.png`, `icon-512.png`, `social-card.png` and `manifest.webmanifest`). Before uploading, the headless iPhone smoke run
+checks every game in the build:
+
+```bash
+npm run build
+CHROMIUM_PATH=/path/to/chrome-headless-shell node scripts/mobile-smoke.mjs   # 15 lines, all OK
+```
+
 ### Upgrading to v3.1 (fourteen games)
 
 Add Minesweeper, Solitaire and Ulti to the live `_config.php` `max_score` map, otherwise their scores are rejected with
@@ -127,5 +145,5 @@ credentials stay the same once `api/` (with `_config.php`) is copied server-side
    browsers. Leave the old `api/` in place; removing it is a manual decision.
 5. Browser data (local stats, autosaves, nickname, settings) is **not** migrated — it is stored per origin, so
    players start fresh on the new domain. The server-side leaderboard is kept (same database, same credentials).
-6. Verify live: the landing page lists all fourteen games and the demos animate, a game plays, a leaderboard GET
+6. Verify live: the landing page lists all fifteen games and the demos animate, a game plays, a leaderboard GET
    answers for every game id, `api/_config.php` returns 403, Google Tag Manager loads, no console errors.

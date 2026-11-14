@@ -3,6 +3,47 @@
 All notable changes to Arcade-Game-Center. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 versioning: [SemVer](https://semver.org/).
 
+## [3.2.0] — 2026-11-14
+
+### Added
+- **Snapszer** („Snapszer”, "Snapszer", „Schnapsen”) joins the arcade (fifteen games), from its own standalone repo
+  [Snapszer-Game](https://github.com/ZoliQua/Snapszer-Game) (v1.0.0) mirrored into `apps/snapszer`: the Hungarian race to 66
+  for two players against Gazsi or three players against Gazsi and Rozi, on the shared Hungarian (Tell) deck, with the
+  turned-up trump, exchange and closing, 20 / 40, „Elég!”, snapszer and kontra, and a seven-unit match („rádli”).
+  It replaces the temporary "coming soon" placeholder.
+- **Rules in every game**: a „Szabályok” / "Rules" / „Regeln” button opens an in-page dialog with the goal, how to play,
+  the rules, the scoring (numbers computed from each game's own constants), dental mode and, on touch screens, „Mobilon” /
+  "On mobile" / „Auf dem Handy”.
+- **Finish early in every game**: „Befejezés” / "Finish" / „Beenden” with an in-page confirmation ranks the score reached so
+  far, even 0 (the portal now submits finished 0-point runs). Ulti and Snapszer allow it between deals only; Hold'em and Ulti need a
+  minimum number of completed hands / deals for a non-zero score.
+- **Touch and full screen in every game**: swipes, taps, long presses and on-screen pads from the kit (`useSwipe`,
+  `useLongPress`, `TouchPad`, `TouchHelp`), no page scroll while a finger is on a board, thumb-sized targets, and a
+  full-screen button (`useImmersive`): the element Fullscreen API where it exists, a safe-area-aware CSS immersive mode on
+  iPhone, during which the portal hides its sidebar and header.
+- **Shared Hungarian deck** in the kit (moved from Ulti, closer to the real Tell deck, double-headed figures), used by Ulti and Snapszer.
+- **Portal**: collapsible game list in the sidebar, a mobile drawer (menu button below 900 px), the new Zoltan's Arcade logo,
+  favicons, home-screen icons and a web app manifest.
+- `scripts/mobile-smoke.mjs`: a headless iPhone 13 smoke run (390 × 844, touch, DPR 3, no element Fullscreen API) of every
+  game in the built portal — start, first touch action, Rules („Mobilon”), full screen on and off, no horizontal page scroll;
+  one line per game, not part of CI. `playwright-core` 1.58.2 is a dev dependency for it.
+- `arcade-api`: `max_score` cap for `snapszer` (5,000: unit lead × 100 plus 500 for the win, times the difficulty factor, capped).
+- `README.de.md` and `README.hu.md`: the README in German and Hungarian, with a language line under the title.
+
+### Changed
+- Landing headline „Tizenöt klasszikus egy helyen.” / "Fifteen classics, one home." / „Fünfzehn Klassiker unter einem Dach.”;
+  package and page descriptions list all fifteen games. Portal version 3.2.
+- All fourteen existing games mirrored at their new releases: Tetris 1.3.0, Snake 2.3.0, 2048 1.3.0, Pac-Man 1.3.0,
+  Gomoku 2.3.0, Tic-Tac-Toe 2.3.0, Breakout 1.2.0, Space Invaders 1.2.0, Connect Four 1.2.0, Nut Sort 1.2.0,
+  Texas Hold'em 1.2.0, Minesweeper 1.1.0, Solitaire 1.1.0, Ulti 1.1.0.
+- `scripts/sync-games.mjs`: no game is pending any more; every registered game needs its sibling repo.
+- Monorepo test setup: the `PointerEvent` polyfill carries `pointerType` (as the game repos' own polyfills do, so touch
+  taps are not read as mouse clicks), `window.scrollTo` is stubbed for jsdom, and each `apps/<id>` test file runs with
+  that app folder as the working directory, like `npm test` in the standalone repo.
+
+### Removed
+- The temporary Snapszer placeholder (`SnapszerPlaceholder.tsx`, its "coming soon" strings and styles).
+
 ## [3.1.0] — 2026-11-14
 
 ### Added
