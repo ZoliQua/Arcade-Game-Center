@@ -23,3 +23,4 @@ export * from './components/Finish';
 export * from './components/Rules';
 export * from './components/TouchPad';
 export * from './components/Fullscreen';
+export * from './hungarian';

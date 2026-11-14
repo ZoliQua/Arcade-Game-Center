@@ -34,6 +34,7 @@ const REPOS = {
   minesweeper: { dir: 'Minesweeper-Game', name: 'Minesweeper' },
   solitaire: { dir: 'Solitaire-Game', name: 'Solitaire' },
   ulti: { dir: 'Ulti-Game', name: 'Ulti', logicDir: 'src/engine' },
+  snapszer: { dir: 'Snapszer-Game', name: 'Snapszer', logicDir: 'src/engine' },
   center: { dir: 'Arcade-Game-Center', name: 'Arcade-Game-Center', monorepo: true },
 };
 

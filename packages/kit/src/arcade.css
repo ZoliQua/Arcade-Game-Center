@@ -46,6 +46,7 @@
   --game-minesweeper: #9aa4b8;
   --game-solitaire: #2fa36b;
   --game-ulti: #c8553d;
+  --game-snapszer: #b0703a;
 
   /* Tetromino palette (matches Tetris logic/constants.ts) */
   --tetro-I: #31c7ef;
@@ -99,6 +100,7 @@
   --game-minesweeper: #5b6577;
   --game-solitaire: #1f7a4f;
   --game-ulti: #9c3b27;
+  --game-snapszer: #8a5428;
   --shadow-sm: 0 2px 8px rgba(15, 16, 22, 0.06);
   --shadow-md: 0 8px 24px rgba(15, 16, 22, 0.1);
   --shadow-lg: 0 18px 48px rgba(15, 16, 22, 0.14);

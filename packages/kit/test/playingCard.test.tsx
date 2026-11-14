@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { PlayingCard } from '../src/components/PlayingCard';
 import { cardBackLabel, cardLabel } from '../src/cardLabels';
-import { gameInfo, gameName, gameTagline } from '../src/registry';
+import { ARCADE_GAMES, gameInfo, gameName, gameTagline } from '../src/registry';
 
 describe('PlayingCard', () => {
   it('renders rank and suit symbol', () => {
@@ -49,5 +49,20 @@ describe('new game registry entries', () => {
       expect(gameInfo(id).repo).toMatch(/^https:\/\/github\.com\/ZoliQua\/\w+-Game$/);
       expect(gameTagline(id, 'de').length).toBeGreaterThan(10);
     }
+  });
+});
+
+describe('snapszer registry entry', () => {
+  it('fifteen games, Snapszer named in every language', () => {
+    expect(ARCADE_GAMES).toHaveLength(15);
+    expect(gameName('snapszer', 'de')).toBe('Schnapsen');
+    expect(gameName('snapszer', 'hu')).toBe('Snapszer');
+    expect(gameName('snapszer', 'en')).toBe('Snapszer');
+    const info = gameInfo('snapszer');
+    expect(info.tag).toBe('Cards');
+    expect(info.colorVar).toBe('--game-snapszer');
+    expect(gameTagline('snapszer', 'en')).toBe('The Hungarian two- and three-player trick game, with the Hungarian deck.');
+    expect(gameTagline('snapszer', 'hu')).toBe('A magyar ütésvivő kártyajáték két vagy három játékossal, magyar kártyával.');
+    expect(gameTagline('snapszer', 'de')).toBe('Das ungarische Stichspiel zu zweit oder zu dritt, mit ungarischem Blatt.');
   });
 });
