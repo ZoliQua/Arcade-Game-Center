@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { applyLang } from '../src/i18n';
 import { useLongPress, useSwipe, type SwipeDir } from '../src/touch';
 import { TouchPad } from '../src/components/TouchPad';
@@ -118,6 +118,41 @@ describe('useSwipe', () => {
   });
 });
 
+/** A game that shows its board only after Start (the board element appears after the first render). */
+function LateBoard({ onSwipe }: { onSwipe: (d: SwipeDir) => void }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [started, setStarted] = useState(false);
+  const [round, setRound] = useState(0);
+  useSwipe(ref, onSwipe);
+  return (
+    <>
+      <button type="button" onClick={() => setStarted(true)}>
+        start
+      </button>
+      <button type="button" onClick={() => setRound((r) => r + 1)}>
+        next
+      </button>
+      {started && <div key={round} ref={ref} data-testid="late" />}
+    </>
+  );
+}
+
+describe('useSwipe with a board that mounts later', () => {
+  it('binds when the board appears after a state change, and rebinds to a replaced element', () => {
+    const onSwipe = vi.fn();
+    render(<LateBoard onSwipe={onSwipe} />);
+    fireEvent.click(screen.getByText('start'));
+    fireEvent.pointerDown(screen.getByTestId('late'), touch(100, 100));
+    fireEvent.pointerUp(screen.getByTestId('late'), touch(100, 160));
+    expect(onSwipe).toHaveBeenCalledWith('down', expect.anything());
+    fireEvent.click(screen.getByText('next'));
+    fireEvent.pointerDown(screen.getByTestId('late'), touch(100, 100));
+    fireEvent.pointerUp(screen.getByTestId('late'), touch(30, 100));
+    expect(onSwipe).toHaveBeenLastCalledWith('left', expect.anything());
+    expect(onSwipe).toHaveBeenCalledTimes(2);
+  });
+});
+
 function Pressable({ onLong, onClick }: { onLong: (e: PointerEvent) => void; onClick: () => void }) {
   const handlers = useLongPress(onLong);
   return (
@@ -149,6 +184,37 @@ describe('useLongPress', () => {
     fireEvent.click(btn);
     expect(onClick).toHaveBeenCalledTimes(1);
     delete (navigator as { vibrate?: unknown }).vibrate;
+  });
+
+  it('leaving the element while still holding does not end the swallow before the release', () => {
+    vi.useFakeTimers();
+    const onLong = vi.fn();
+    const onClick = vi.fn();
+    render(<Pressable onLong={onLong} onClick={onClick} />);
+    const btn = screen.getByRole('button');
+    fireEvent.pointerDown(btn, touch(10, 10));
+    act(() => vi.advanceTimersByTime(400));
+    expect(onLong).toHaveBeenCalledTimes(1);
+    fireEvent.pointerLeave(btn, touch(10, 10));
+    act(() => vi.advanceTimersByTime(800));
+    fireEvent.pointerUp(btn, touch(10, 10));
+    fireEvent.click(btn);
+    expect(onClick).not.toHaveBeenCalled();
+    fireEvent.click(btn);
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it('a long press released without a click stops swallowing shortly after the release', () => {
+    vi.useFakeTimers();
+    const onClick = vi.fn();
+    render(<Pressable onLong={() => {}} onClick={onClick} />);
+    const btn = screen.getByRole('button');
+    fireEvent.pointerDown(btn, touch(10, 10));
+    act(() => vi.advanceTimersByTime(400));
+    fireEvent.pointerUp(btn, touch(10, 10));
+    act(() => vi.advanceTimersByTime(500));
+    fireEvent.click(btn);
+    expect(onClick).toHaveBeenCalledTimes(1);
   });
 
   it('a short press does not fire and keeps the click', () => {

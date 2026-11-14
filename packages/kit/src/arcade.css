@@ -269,11 +269,9 @@ body {
 }
 /* Compact layout (phones): the stats become one slim strip above the board instead of a 2×2 block. */
 @media (max-width: 640px) {
-  .arc-stats {
-    gap: 6px 8px;
-  }
   /* The strip owns the full row; the status pill wraps under it instead of squeezing the values. */
   .arc-stats {
+    gap: 6px 8px;
     justify-content: flex-end;
   }
   .arc-stats__grid {
@@ -287,8 +285,8 @@ body {
     border-radius: var(--radius-sm);
   }
   .arc-stat dt {
-    font-size: 9px;
-    letter-spacing: 0.06em;
+    font-size: 11px;
+    letter-spacing: 0.04em;
     margin-bottom: 1px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -513,7 +511,7 @@ body {
   display: inline-flex;
 }
 .arc-pad__label {
-  font-size: 10px;
+  font-size: 11px;
   line-height: 1.1;
   color: var(--text-dim);
   max-width: 100%;

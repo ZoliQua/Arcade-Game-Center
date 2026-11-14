@@ -41,6 +41,7 @@ afterEach(() => {
   delete (document as { fullscreenEnabled?: unknown }).fullscreenEnabled;
   delete (document as { fullscreenElement?: unknown }).fullscreenElement;
   delete (document as { exitFullscreen?: unknown }).exitFullscreen;
+  delete (HTMLElement.prototype as { requestFullscreen?: unknown }).requestFullscreen;
   delete document.documentElement.dataset.arcadeImmersive;
   document.body.removeAttribute('style');
 });
@@ -145,7 +146,6 @@ describe('useImmersive with the Fullscreen API', () => {
       document.dispatchEvent(new Event('fullscreenchange'));
     });
     expect(screen.getByTestId('state').textContent).toBe('off');
-    delete (HTMLElement.prototype as { requestFullscreen?: unknown }).requestFullscreen;
   });
 
   it('falls back to immersive mode when requestFullscreen is refused', async () => {
@@ -158,7 +158,6 @@ describe('useImmersive with the Fullscreen API', () => {
     });
     expect(request).toHaveBeenCalledTimes(1);
     expect(html().dataset.arcadeImmersive).toBe('1');
-    delete (HTMLElement.prototype as { requestFullscreen?: unknown }).requestFullscreen;
   });
 });
 
