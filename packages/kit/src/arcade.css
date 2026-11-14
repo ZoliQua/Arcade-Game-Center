@@ -391,6 +391,137 @@ body {
   gap: 4px;
 }
 
+/* ─── Modals: Rules dialog, Finish confirm ──────────────────── */
+/* Fixed to the viewport but rendered in place (no portal), so it also shows inside a full-screen game. */
+.arc-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
+    max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  background: var(--overlay-bg);
+  backdrop-filter: blur(3px);
+  overscroll-behavior: contain;
+}
+.arc-modal__card {
+  width: 100%;
+  max-height: 85vh;
+  max-height: 85dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  color: var(--text);
+  text-align: left;
+}
+.arc-modal__card:focus {
+  outline: none;
+}
+.arc-modal .arc-btn {
+  min-height: 44px;
+}
+
+.arc-rules__btn svg,
+.arc-finish__btn svg {
+  flex: none;
+}
+.arc-rules {
+  max-width: 560px;
+}
+.arc-rules__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px 12px 20px;
+  border-bottom: 1px solid var(--panel-border);
+}
+.arc-rules__title {
+  margin: 0;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+  color: var(--text-strong);
+}
+.arc-rules__close {
+  flex: none;
+}
+.arc-rules__body {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 6px 20px 18px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.arc-rules__section {
+  padding-top: 12px;
+}
+.arc-rules__section + .arc-rules__section {
+  margin-top: 4px;
+  border-top: 1px dashed var(--panel-border);
+}
+.arc-rules__heading {
+  margin: 0 0 6px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+}
+.arc-rules__section p {
+  margin: 0 0 8px;
+}
+.arc-rules__section ul,
+.arc-rules__section ol {
+  margin: 0 0 8px;
+  padding-left: 20px;
+}
+.arc-rules__section li + li {
+  margin-top: 3px;
+}
+.arc-rules__section svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.arc-finish {
+  max-width: 360px;
+  padding: 20px 22px 18px;
+  text-align: center;
+}
+.arc-finish__msg {
+  margin: 0 0 16px;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--text-strong);
+}
+.arc-finish__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+.arc-finish__actions .arc-btn {
+  flex: 1 1 120px;
+}
+@media (pointer: coarse) {
+  .arc-rules__btn,
+  .arc-finish__btn {
+    min-height: 44px;
+  }
+}
+@media (max-width: 480px) {
+  .arc-rules__head {
+    padding: 10px 10px 10px 14px;
+  }
+  .arc-rules__body {
+    padding: 4px 14px 14px;
+  }
+}
+
 /* ─── Form controls ─────────────────────────────────────────── */
 .arc-field {
   display: flex;
