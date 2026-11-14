@@ -26,3 +26,33 @@
   border-radius: var(--radius-sm);
   color: var(--text-strong);
 }
+
+/*
+ * Touch: a bottom bar. Sticky (not fixed), so it stays inside the game — the portal, the standalone page and full
+ * screen alike — and stops at the end of the table column instead of covering the side panels.
+ */
+.bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+  box-shadow: 0 -6px 16px rgba(0, 0, 0, 0.25);
+}
+
+.bar .buttons {
+  flex-wrap: nowrap;
+}
+
+.bar .buttons > :global(.arc-btn) {
+  flex: 1 1 0;
+  min-height: 48px;
+}
+
+/* Landscape phones: the panel sits beside the table (top of the side column), not over it. */
+@media (orientation: landscape) and (max-height: 520px) {
+  .bar {
+    position: static;
+    box-shadow: none;
+    padding-bottom: 10px;
+  }
+}

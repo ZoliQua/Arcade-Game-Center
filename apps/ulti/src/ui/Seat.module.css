@@ -92,3 +92,45 @@
 .right {
   align-self: start;
 }
+
+/* Card count in words; shown where the backs are hidden (landscape phones). */
+.count {
+  display: none;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+/* Phones (portrait and landscape): each opponent on one line; your own seat hides (balance and turn are in the stats and the bar). */
+@media (orientation: landscape) and (max-height: 520px), (max-width: 520px) and (pointer: coarse) {
+  .seat {
+    grid-template-areas: 'figure info';
+    padding: 3px 8px;
+  }
+
+  .turn {
+    padding: 2px 7px;
+  }
+
+  .figure {
+    width: 30px;
+  }
+
+  .info {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px 8px;
+  }
+
+  .backs {
+    display: none;
+  }
+
+  .count {
+    display: inline;
+  }
+
+  .bottom {
+    display: none;
+  }
+}

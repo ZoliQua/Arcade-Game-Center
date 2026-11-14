@@ -30,6 +30,11 @@ export function setHand(hands: Hands, player: Player, hand: readonly HCard[]): H
   return [0, 1, 2].map((p) => (p === player ? hand : hands[p])) as unknown as Hands;
 }
 
+/** Cards dealt to each player; the forehand also takes the talon at once. */
+export const HAND_SIZE = 10;
+/** Cards in the talon. */
+export const TALON_SIZE = 2;
+
 const withLog = (state: DealState, ...entries: LogEntry[]): readonly LogEntry[] => [...state.log, ...entries];
 
 /** Shuffles with the seed, deals 10 each and the 2-card talon; the forehand takes the talon at once. */
@@ -38,8 +43,8 @@ export function dealCards(seed: number, dealer: Player): DealState {
   const forehand = nextPlayer(dealer);
   const hands = [0, 1, 2].map((p) => {
     const seat = (p - forehand + 3) % 3;
-    const own = deck.slice(seat * 10, seat * 10 + 10);
-    return p === forehand ? [...own, ...deck.slice(30, 32)] : own;
+    const own = deck.slice(seat * HAND_SIZE, seat * HAND_SIZE + HAND_SIZE);
+    return p === forehand ? [...own, ...deck.slice(3 * HAND_SIZE, 3 * HAND_SIZE + TALON_SIZE)] : own;
   }) as unknown as Hands;
   return {
     seed,

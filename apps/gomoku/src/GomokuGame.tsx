@@ -1,14 +1,18 @@
 import { useCallback, useEffect, useReducer, useRef, useState, type CSSProperties } from 'react';
 import {
-  DUEL_BASE_POINTS,
+  FinishButton,
   formatClock,
   formatNumber,
+  FullscreenButton,
   gameName,
   GameOverlay,
   KeyHelp,
+  RulesButton,
   SaveBadge,
   StatPanel,
+  TouchHelp,
   useArcadeRun,
+  useImmersive,
   useKitMessages,
   useLang,
   useMessages,
@@ -30,10 +34,11 @@ import { readBestStreaks, useBestStreaks } from './hooks/useBestStreak';
 import { useGomokuKeys } from './hooks/useGomokuKeys';
 import { useIconStyle } from './hooks/useIconStyle';
 import { useSound } from './hooks/useSound';
+import { useRulesSections } from './rules';
 import { advanceGame, arcadeStatusOf, createInitialState, isHumanTurn } from './logic/game';
 import { moveFocus } from './logic/grid';
 import { isGomokuState, restoreSavedState, wasRoundInProgress } from './logic/persist';
-import { isRanked, stateOutcome } from './logic/scoring';
+import { isRanked, stateOutcome, winScoreRange } from './logic/scoring';
 import type { GameAction, GameState, Mode } from './logic/types';
 import styles from './GomokuGame.module.css';
 
@@ -104,6 +109,11 @@ export function GomokuGame(props: ArcadeGameProps = {}) {
   const [state, dispatch] = useReducer(reducer, boot.state);
   const [welcomeBack, setWelcomeBack] = useState(restored !== null);
   const [confirmReset, setConfirmReset] = useState(false);
+  // The Finish confirm is open: the clock and the AI stand still without leaving `playing`.
+  const [finishOpen, setFinishOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const immersive = useImmersive(rootRef);
+  const rulesSections = useRulesSections();
 
   const { style: iconStyle, toggle: toggleIconStyle } = useIconStyle();
   const { speed: aiSpeed, delayMs: aiDelay, setSpeed: setAISpeed } = useAIDelay();
@@ -112,7 +122,7 @@ export function GomokuGame(props: ArcadeGameProps = {}) {
 
   const status = arcadeStatusOf(state.status);
   const seconds = useRunTimer(
-    status === 'running' && !confirmReset,
+    status === 'running' && !confirmReset && !finishOpen,
     state.round,
     state.round === boot.state.round ? boot.seconds : 0,
   );
@@ -134,14 +144,14 @@ export function GomokuGame(props: ArcadeGameProps = {}) {
   const savedAt = useSessionAutosave({
     gameId: 'gomoku',
     schema: SESSION_SCHEMA,
-    enabled: state.status !== 'idle',
-    discard: state.status === 'idle',
+    enabled: state.status !== 'idle' && state.status !== 'finished',
+    discard: state.status === 'idle' || state.status === 'finished',
     data: state,
     seconds,
     score: state.points,
   });
 
-  useAITurn(state, dispatch, aiDelay, !confirmReset);
+  useAITurn(state, dispatch, aiDelay, !confirmReset && !finishOpen);
 
   // Sound: one click per placed stone, a cue when a round ends.
   const lastMoveCountRef = useRef(state.moveCount);
@@ -175,6 +185,15 @@ export function GomokuGame(props: ArcadeGameProps = {}) {
     setWelcomeBack(false);
     dispatch({ type: state.status === 'idle' ? 'start' : 'newRound' });
   }, [state.status]);
+
+  const openRules = useCallback((open: boolean) => {
+    if (open) dispatch({ type: 'pause' });
+  }, []);
+
+  const finishEarly = useCallback(() => {
+    setWelcomeBack(false);
+    dispatch({ type: 'finish' });
+  }, []);
 
   const place = useCallback((index: number) => dispatch({ type: 'place', index }), []);
   const focusCell = useCallback((index: number) => dispatch({ type: 'focus', index }), []);
@@ -216,6 +235,7 @@ export function GomokuGame(props: ArcadeGameProps = {}) {
         return;
       case 'won':
       case 'draw':
+      case 'finished':
         newRound();
         return;
       case 'playing':
@@ -242,7 +262,7 @@ export function GomokuGame(props: ArcadeGameProps = {}) {
   const ranked = isRanked(state.mode);
   const record = tally(state, t, num, iconStyle === 'tooth');
   const modeLabel = t(MODE_KEY[state.mode]);
-  const interactive = state.status === 'playing' && isHumanTurn(state) && !confirmReset;
+  const interactive = state.status === 'playing' && isHumanTurn(state) && !confirmReset && !finishOpen;
 
   let overlay: { title: string; message: string; actions: OverlayAction[] } | null = null;
   if (confirmReset) {
@@ -280,7 +300,7 @@ export function GomokuGame(props: ArcadeGameProps = {}) {
         };
   } else if (status === 'gameOver') {
     overlay = {
-      title: resultTitle(state, t, iconStyle === 'tooth'),
+      title: state.status === 'finished' ? k('finishedEarly') : resultTitle(state, t, iconStyle === 'tooth'),
       message: ranked
         ? t(newBest ? 'roundNewBest' : 'roundRanked', { round: num(state.roundScore), points: num(state.points), best: num(best) })
         : t('roundPvp', { tally: record.label, record: record.value }),
@@ -300,6 +320,7 @@ export function GomokuGame(props: ArcadeGameProps = {}) {
 
   return (
     <div
+      ref={rootRef}
       className={`arc-game gmk-app ${styles.game}`}
       data-mode={state.mode}
       data-icon-style={iconStyle}
@@ -334,7 +355,7 @@ export function GomokuGame(props: ArcadeGameProps = {}) {
       />
 
       <div className={styles.layout}>
-        <div className={`arc-game__board ${styles.boardWrap}`}>
+        <div className={`arc-game__board arc-board-tap ${styles.boardWrap}`}>
           <GameBoard
             board={state.board}
             winningLine={state.winningLine}
@@ -359,6 +380,16 @@ export function GomokuGame(props: ArcadeGameProps = {}) {
                 {t('newRound')}
               </button>
             </div>
+            <div className={styles.tools}>
+              <RulesButton sections={rulesSections} gameId="gomoku" onOpenChange={openRules} hotkey={false} />
+              <FinishButton
+                score={state.roundScore}
+                visible={state.status === 'playing' || state.status === 'paused'}
+                onFinish={finishEarly}
+                onOpenChange={setFinishOpen}
+              />
+              <FullscreenButton immersive={immersive} />
+            </div>
             <button
               type="button"
               className={`arc-btn arc-btn--ghost ${styles.reset}`}
@@ -378,8 +409,8 @@ export function GomokuGame(props: ArcadeGameProps = {}) {
             <p className={styles.note}>
               {ranked
                 ? t('noteRanked', {
-                    min: num(DUEL_BASE_POINTS[state.mode as Exclude<Mode, 'pvp'>]),
-                    max: num(DUEL_BASE_POINTS[state.mode as Exclude<Mode, 'pvp'>] * 2),
+                    min: num(winScoreRange(state.mode as Exclude<Mode, 'pvp'>).min),
+                    max: num(winScoreRange(state.mode as Exclude<Mode, 'pvp'>).max),
                   })
                 : t('notePvp')}
             </p>
@@ -397,6 +428,12 @@ export function GomokuGame(props: ArcadeGameProps = {}) {
           <section className="arc-panel">
             <h2 className="arc-panel__title">{t('panelKeys')}</h2>
             <KeyHelp rows={keyRows(t)} />
+            <TouchHelp
+              rows={[
+                [t('touchTap'), t('touchTapAction')],
+                [t('touchRing'), t('touchRingAction')],
+              ]}
+            />
           </section>
         </aside>
       </div>

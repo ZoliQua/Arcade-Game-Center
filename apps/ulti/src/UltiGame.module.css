@@ -2,6 +2,37 @@
   max-width: 1180px;
 }
 
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: -4px;
+}
+
+/* Phones: one compact row of Rules · Finish · Full screen (each still ≥ 44 px tall). */
+@media (max-width: 520px) {
+  .tools {
+    gap: 6px;
+  }
+
+  .tools > :global(.arc-btn) {
+    flex: 1 1 auto;
+    min-width: 0;
+    justify-content: center;
+    gap: 5px;
+    padding-inline: 6px;
+    font-size: 12.5px;
+    white-space: nowrap;
+  }
+}
+
+.finishNote {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
 .layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 300px;
@@ -110,5 +141,97 @@
 @media (max-width: 900px) {
   .layout {
     grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/*
+ * Landscape phones (≈390 px tall): table on the left, actions · stats · tools in a side column on the right, the log
+ * and the other panels below. The wrappers step aside (display: contents) so their children join one grid.
+ */
+@media (orientation: landscape) and (max-height: 520px) {
+  .game.game {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 32%);
+    grid-template-areas:
+      'board actions'
+      'board stats'
+      'board tools'
+      'board .'
+      'aside aside';
+    grid-template-rows: auto auto auto 1fr auto;
+    gap: 6px 10px;
+    align-items: start;
+  }
+
+  .game > :global(.arc-game__head) {
+    display: none;
+  }
+
+  .layout,
+  .main {
+    display: contents;
+  }
+
+  .board {
+    grid-area: board;
+    min-height: 0;
+  }
+
+  .empty {
+    min-height: 200px;
+  }
+
+  .main > :global(.arc-panel) {
+    grid-area: actions;
+  }
+
+  .game > :global(.arc-stats) {
+    grid-area: stats;
+    gap: 4px;
+  }
+
+  .game > :global(.arc-stats) :global(.arc-stats__grid) {
+    flex: 1 1 100%;
+    grid-auto-flow: row;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
+  }
+
+  .game > :global(.arc-stats) :global(.arc-stat) {
+    padding: 3px 6px;
+  }
+
+  .game > :global(.arc-stats) :global(.arc-stat) dt {
+    font-size: 9px;
+    letter-spacing: 0.04em;
+    margin-bottom: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .game > :global(.arc-stats) :global(.arc-stat) dd {
+    font-size: 14px;
+  }
+
+  .tools {
+    grid-area: tools;
+    margin-top: 0;
+  }
+
+  .tools > :global(.arc-btn) {
+    flex: 1 1 auto;
+    padding-inline: 8px;
+    font-size: 12.5px;
+  }
+
+  .side {
+    grid-area: aside;
+  }
+}
+
+/* Portrait phones: the page title is already in the top bar; the subtitle would push the table down. */
+@media (max-width: 520px) and (pointer: coarse) {
+  .game > :global(.arc-game__head) :global(.arc-game__sub) {
+    display: none;
   }
 }

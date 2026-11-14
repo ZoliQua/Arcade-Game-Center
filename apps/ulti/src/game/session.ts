@@ -40,6 +40,8 @@ export interface UltiSession {
   readonly history: readonly DealRecord[];
   /** playing → dealOver (result shown) → next deal …; finished after the 10th deal. */
   readonly phase: 'playing' | 'dealOver' | 'finished';
+  /** Set when the player ended the session with Finish before the last deal (never saved: a finished session is dropped). */
+  readonly finishedEarly?: boolean;
 }
 
 export const dealerFor = (s: Pick<UltiSession, 'firstDealer'>, dealNo: number): Player =>
@@ -121,8 +123,30 @@ export function nextDeal(s: UltiSession): UltiSession {
   return { ...s, dealNo, deal: dealCards(dealSeed(s.seed, dealNo), dealerFor(s, dealNo)), phase: 'playing' };
 }
 
+/**
+ * Finish early ranks the session score only after at least half of the deals: otherwise one lucky first deal
+ * could be locked in.
+ */
+export const MIN_FINISH_DEALS = Math.ceil(DEALS_PER_SESSION / 2);
+
+/** Finish is offered only between deals (the result card is showing): never to escape a deal in progress. */
+export const canFinishEarly = (s: UltiSession): boolean => s.phase === 'dealOver';
+
+/** Finish early: the session ends after the deal just completed. Anything else (mid-deal, already over) is refused. */
+export function finishEarly(s: UltiSession): UltiSession {
+  if (!canFinishEarly(s)) return s;
+  return { ...s, phase: 'finished', finishedEarly: true };
+}
+
 /** Arcade score of the session so far (the human's units). */
 export const sessionScore = (s: UltiSession): number => arcadeScore(s.scores[0], s.difficulty);
+
+/**
+ * The score that goes on the leaderboard: the session score, except after an early finish with fewer than
+ * `MIN_FINISH_DEALS` completed deals, which ranks 0.
+ */
+export const rankedScore = (s: UltiSession): number =>
+  s.finishedEarly && s.history.length < MIN_FINISH_DEALS ? 0 : sessionScore(s);
 
 /** A whole session with bots in every seat (strength simulation). */
 export function playBotSession(levels: readonly [Level, Level, Level], seed: number, firstDealer?: Player): UltiSession {

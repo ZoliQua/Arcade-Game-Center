@@ -1,21 +1,28 @@
-import { useCallback, useState, type CSSProperties } from 'react';
+import { useCallback, useRef, useState, type CSSProperties } from 'react';
 import {
   clearSession,
   formatClock,
+  FinishButton,
   formatNumber,
+  FullscreenButton,
   gameName,
   GameOverlay,
   KeyHelp,
+  RulesButton,
   SaveBadge,
   StatPanel,
+  TouchHelp,
+  TouchPad,
   useArcadeRun,
   useDental,
+  useImmersive,
   useKitMessages,
   useLang,
   useMessages,
   useRestoredSession,
   useRunTimer,
   useSessionAutosave,
+  useSwipe,
   type ArcadeGameProps,
   type OverlayAction,
 } from './arcade';
@@ -26,6 +33,7 @@ import { WrapToggle } from './components/WrapToggle';
 import { useGameLoop } from './hooks/useGameLoop';
 import { useKeyboardDirection } from './hooks/useKeyboardDirection';
 import { MESSAGES, type SnakeMessageKey } from './i18n';
+import { useRulesSections } from './rules';
 import { tickMsForSpeed } from './logic/constants';
 import { advanceGame, createInitialState, isBoardFull } from './logic/game';
 import { isSnakeState } from './logic/persist';
@@ -44,6 +52,16 @@ const KEYS: [string | null, SnakeMessageKey][] = [
   ['R', 'keyRestart'],
 ];
 
+const DIR_OF_SWIPE = { up: 'UP', down: 'DOWN', left: 'LEFT', right: 'RIGHT' } as const satisfies Record<string, Direction>;
+
+const PAD: [string, string, SnakeMessageKey][] = [
+  ['up', '↑', 'padUp'],
+  ['left', '←', 'padLeft'],
+  ['right', '→', 'padRight'],
+  ['down', '↓', 'padDown'],
+];
+const PAD_DIRECTION: Record<string, Direction> = { up: 'UP', down: 'DOWN', left: 'LEFT', right: 'RIGHT' };
+
 export function SnakeGame(props: ArcadeGameProps = {}) {
   const { embedded = false } = props;
   const t = useMessages(MESSAGES);
@@ -57,8 +75,15 @@ export function SnakeGame(props: ArcadeGameProps = {}) {
   const [runId, setRunId] = useState(0);
   const [welcomeBack, setWelcomeBack] = useState(restored !== null);
   const [dental] = useDental();
+  const rootRef = useRef<HTMLDivElement>(null);
+  const boardRef = useRef<HTMLDivElement>(null);
+  const immersive = useImmersive(rootRef);
+  const rulesSections = useRulesSections();
+  // The Finish confirm is open: the snake and the clock stand still without leaving `running`.
+  const [finishOpen, setFinishOpen] = useState(false);
+  const live = state.status === 'running' && !finishOpen;
 
-  const seconds = useRunTimer(state.status === 'running', runId, runId === 0 ? (restored?.seconds ?? 0) : 0);
+  const seconds = useRunTimer(live, runId, runId === 0 ? (restored?.seconds ?? 0) : 0);
 
   const stats = useArcadeRun({
     gameId: 'snake',
@@ -66,7 +91,7 @@ export function SnakeGame(props: ArcadeGameProps = {}) {
     score: state.score,
     seconds,
     runKey: runId,
-    outcome: () => (isBoardFull(state.snake, state.gridSize) ? 'win' : 'over'),
+    outcome: () => (state.finishedEarly ? 'finished' : isBoardFull(state.snake, state.gridSize) ? 'win' : 'over'),
     props,
   });
 
@@ -82,7 +107,7 @@ export function SnakeGame(props: ArcadeGameProps = {}) {
   });
 
   const tick = useCallback(() => setState((prev) => advanceGame(prev)), []);
-  useGameLoop(state.status === 'running', tickMsForSpeed(state.speed), tick);
+  useGameLoop(live, tickMsForSpeed(state.speed), tick);
 
   const startNewRun = useCallback(() => {
     setWelcomeBack(false);
@@ -122,6 +147,22 @@ export function SnakeGame(props: ArcadeGameProps = {}) {
     });
   }, []);
 
+  const openRules = useCallback((open: boolean) => {
+    if (!open) return;
+    setState((prev) => (prev.status === 'running' ? { ...prev, status: 'paused' } : prev));
+  }, []);
+
+  const finishEarly = useCallback(() => {
+    setWelcomeBack(false);
+    setState((prev) => (prev.status === 'running' || prev.status === 'paused' ? { ...prev, status: 'gameOver', finishedEarly: true } : prev));
+  }, []);
+
+  useSwipe(boardRef, (dir) => handleDirection(DIR_OF_SWIPE[dir]), {
+    onTap: () => {
+      if (state.status === 'idle') startNewRun();
+    },
+  });
+
   useKeyboardDirection({
     onDirection: handleDirection,
     onPrimary: primary,
@@ -131,7 +172,7 @@ export function SnakeGame(props: ArcadeGameProps = {}) {
 
   const best = Math.max(stats.best, state.score);
   const newBest = state.score > 0 && state.score > stats.bestBeforeRun;
-  const won = state.status === 'gameOver' && isBoardFull(state.snake, state.gridSize);
+  const won = state.status === 'gameOver' && !state.finishedEarly && isBoardFull(state.snake, state.gridSize);
 
   let overlay: { title: string; message: string; actions: OverlayAction[] } | null = null;
   if (state.status === 'idle') {
@@ -160,14 +201,14 @@ export function SnakeGame(props: ArcadeGameProps = {}) {
         };
   } else if (state.status === 'gameOver') {
     overlay = {
-      title: won ? t('boardCleared') : k('gameOver'),
+      title: state.finishedEarly ? k('finishedEarly') : won ? t('boardCleared') : k('gameOver'),
       message: t('gameOverMessage', { score: num(state.score), best: num(best) }) + (newBest ? t('newBestSuffix') : ''),
       actions: [{ label: t('playAgain'), onClick: startNewRun, primary: true, kbd: 'R' }],
     };
   }
 
   return (
-    <div className={`arc-game ${styles.game}`} style={{ '--game-color': 'var(--game-snake)' } as CSSProperties}>
+    <div ref={rootRef} className={`arc-game ${styles.game}`} style={{ '--game-color': 'var(--game-snake)' } as CSSProperties}>
       {!embedded && (
         <header className="arc-game__head">
           <div>
@@ -188,7 +229,8 @@ export function SnakeGame(props: ArcadeGameProps = {}) {
       />
 
       <div className={styles.layout}>
-        <div className={`arc-game__board ${styles.boardWrap}`}>
+        <div className={styles.boardCol}>
+        <div ref={boardRef} className={`arc-game__board arc-board-touch ${styles.boardWrap}`}>
           <GameBoard
             gridSize={state.gridSize}
             snake={state.snake}
@@ -198,6 +240,16 @@ export function SnakeGame(props: ArcadeGameProps = {}) {
             label={t('board')}
           />
           {overlay && <GameOverlay {...overlay} />}
+        </div>
+        <TouchPad
+          layout="dpad"
+          buttons={PAD.map(([id, icon, label]) => ({
+            id,
+            icon,
+            label: t(label),
+            onPress: () => handleDirection(PAD_DIRECTION[id]),
+          }))}
+        />
         </div>
 
         <aside className={styles.side}>
@@ -210,6 +262,11 @@ export function SnakeGame(props: ArcadeGameProps = {}) {
               <button type="button" className="arc-btn" onClick={startNewRun} disabled={state.status === 'idle'}>
                 {k('restart')}
               </button>
+            </div>
+            <div className={styles.tools}>
+              <RulesButton sections={rulesSections} gameId="snake" onOpenChange={openRules} hotkey={false} />
+              <FinishButton score={state.score} visible={inProgress} onFinish={finishEarly} onOpenChange={setFinishOpen} />
+              <FullscreenButton immersive={immersive} />
             </div>
             <div className={styles.save}>
               <SaveBadge savedAt={inProgress ? savedAt : null} onDiscard={discardSave} />
@@ -234,6 +291,13 @@ export function SnakeGame(props: ArcadeGameProps = {}) {
           <section className="arc-panel">
             <h2 className="arc-panel__title">{t('panelKeys')}</h2>
             <KeyHelp rows={KEYS.map(([keys, action]) => [keys ?? t('keySpace'), t(action)])} />
+            <TouchHelp
+              rows={[
+                [t('touchSwipe'), t('touchSwipeAction')],
+                [t('touchTap'), t('touchTapAction')],
+                [t('touchDpad'), t('touchDpadAction')],
+              ]}
+            />
           </section>
         </aside>
       </div>

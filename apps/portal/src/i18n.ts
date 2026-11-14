@@ -98,10 +98,7 @@ export type PortalMessageKey =
   | 'keyStart'
   | 'gameKeysNote'
   | 'gameKeysGeneric'
-  | 'close'
-  // TEMPORARY Snapszer placeholder (replaced in Task 24)
-  | 'comingSoon'
-  | 'comingSoonBody';
+  | 'close';
 
 export const PORTAL_MESSAGES: Messages<PortalMessageKey> = {
   en: {
@@ -109,7 +106,7 @@ export const PORTAL_MESSAGES: Messages<PortalMessageKey> = {
     titleLeaderboard: 'Leaderboard',
     titleSettings: 'Settings',
 
-    heroTitle: 'Fourteen classics, one home.',
+    heroTitle: 'Fifteen classics, one home.',
     heroBody:
       'Pick a game — every card below is the real game playing itself. Runs autosave, so you can leave mid-game and continue later; best scores and play time follow you across sessions.',
     gamesPlayed: 'Games played',
@@ -197,15 +194,13 @@ export const PORTAL_MESSAGES: Messages<PortalMessageKey> = {
     gameKeysNote: "{name}'s own controls are listed next to the board.",
     gameKeysGeneric: 'Each game lists its own controls next to the board.',
     close: 'Close',
-    comingSoon: 'Coming soon',
-    comingSoonBody: '{name} is on its way to the arcade. Until then, try another game.',
   },
   hu: {
     brand: "Zoltan's Arcade",
     titleLeaderboard: 'Ranglista',
     titleSettings: 'Beállítások',
 
-    heroTitle: 'Tizennégy klasszikus egy helyen.',
+    heroTitle: 'Tizenöt klasszikus egy helyen.',
     heroBody:
       'Válassz egy játékot – minden kártyán maga a valódi játék fut. A játszmák automatikusan mentődnek, így bármikor abbahagyhatod és később folytathatod; a rekordjaid és a játékidőd is megmaradnak.',
     gamesPlayed: 'Lejátszott játszmák',
@@ -293,15 +288,13 @@ export const PORTAL_MESSAGES: Messages<PortalMessageKey> = {
     gameKeysNote: '{name}: a játék saját irányítása a pálya mellett látható.',
     gameKeysGeneric: 'Minden játék a pálya mellett mutatja a saját irányítását.',
     close: 'Bezárás',
-    comingSoon: 'Hamarosan',
-    comingSoonBody: 'A {name} már úton van a játékterembe. Addig próbálj ki egy másik játékot!',
   },
   de: {
     brand: "Zoltan's Arcade",
     titleLeaderboard: 'Bestenliste',
     titleSettings: 'Einstellungen',
 
-    heroTitle: 'Vierzehn Klassiker unter einem Dach.',
+    heroTitle: 'Fünfzehn Klassiker unter einem Dach.',
     heroBody:
       'Such dir ein Spiel aus – auf jeder Karte unten spielt sich das echte Spiel selbst. Alles wird automatisch gespeichert: Hör mittendrin auf und mach später weiter. Bestwerte und Spielzeit bleiben dir erhalten.',
     gamesPlayed: 'Gespielte Runden',
@@ -389,8 +382,6 @@ export const PORTAL_MESSAGES: Messages<PortalMessageKey> = {
     gameKeysNote: 'Die Steuerung von {name} steht direkt neben dem Spielfeld.',
     gameKeysGeneric: 'Jedes Spiel zeigt seine Steuerung direkt neben dem Spielfeld.',
     close: 'Schließen',
-    comingSoon: 'Bald verfügbar',
-    comingSoonBody: '{name} ist auf dem Weg in die Spielhalle. Bis dahin probier doch ein anderes Spiel aus.',
   },
 };
 

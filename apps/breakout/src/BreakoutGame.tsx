@@ -1,14 +1,19 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react';
 import {
   clearSession,
+  FinishButton,
   formatClock,
   formatNumber,
+  FullscreenButton,
   gameName,
   GameOverlay,
   KeyHelp,
+  RulesButton,
   SaveBadge,
   StatPanel,
+  TouchHelp,
   useArcadeRun,
+  useImmersive,
   useKitMessages,
   useLang,
   useMessages,
@@ -31,6 +36,7 @@ import { awaitingLaunch, createInitialState, step } from './logic/game';
 import { layoutForLevel } from './logic/levels';
 import { isBreakoutState } from './logic/persist';
 import { randomSeed } from './logic/rng';
+import { useRulesSections } from './rules';
 import type { GameEvent, GameState } from './logic/types';
 import styles from './App.module.css';
 
@@ -51,6 +57,10 @@ function toLogicalX(e: ReactPointerEvent<SVGSVGElement>): number | null {
   return ((e.clientX - rect.left) / rect.width) * FIELD_W;
 }
 
+/** A touch that moves less than this and ends within this time is a tap. */
+const TAP_SLOP_PX = 12;
+const TAP_MAX_MS = 500;
+
 const newRun = (): GameState => createInitialState({ status: 'running', seed: randomSeed() });
 
 export function BreakoutGame(props: ArcadeGameProps = {}) {
@@ -67,6 +77,11 @@ export function BreakoutGame(props: ArcadeGameProps = {}) {
   const [runId, setRunId] = useState(0);
   const [welcomeBack, setWelcomeBack] = useState(restored !== null && restored.data.status !== 'gameOver');
   const sound = useSound();
+  const rootRef = useRef<HTMLDivElement>(null);
+  const immersive = useImmersive(rootRef);
+  const rulesSections = useRulesSections();
+  // The Finish confirm is open: the ball and the clock stand still without leaving `running`.
+  const [finishOpen, setFinishOpen] = useState(false);
 
   // The frame loop and the input handlers share one authoritative copy of the
   // state, so a pause pressed between two frames is never overwritten.
@@ -77,7 +92,8 @@ export function BreakoutGame(props: ArcadeGameProps = {}) {
     setState(next);
   }, []);
 
-  const seconds = useRunTimer(state.status === 'running', runId, runId === 0 ? (restored?.seconds ?? 0) : 0);
+  const live = state.status === 'running' && !finishOpen;
+  const seconds = useRunTimer(live, runId, runId === 0 ? (restored?.seconds ?? 0) : 0);
 
   // Levels loop forever with a faster ball: a run only ends with the last life.
   const stats = useArcadeRun({
@@ -86,7 +102,7 @@ export function BreakoutGame(props: ArcadeGameProps = {}) {
     score: state.score,
     seconds,
     runKey: runId,
-    outcome: 'over',
+    outcome: () => (state.finishedEarly ? 'finished' : 'over'),
     props,
   });
 
@@ -153,6 +169,10 @@ export function BreakoutGame(props: ArcadeGameProps = {}) {
     if (x !== null) targetRef.current = x;
   }, []);
 
+  // Touch / pen: the finger drives the paddle (absolute follow); a short, still touch is a tap = launch.
+  // A mouse press launches at once, as before.
+  const touchStart = useRef<{ id: number; x: number; y: number; at: number } | null>(null);
+
   const onPointerDown = useCallback((e: ReactPointerEvent<SVGSVGElement>) => {
     const x = toLogicalX(e);
     if (x !== null) targetRef.current = x;
@@ -161,7 +181,25 @@ export function BreakoutGame(props: ArcadeGameProps = {}) {
     } catch {
       /* capture is optional (synthetic events) */
     }
-    if (stateRef.current.status === 'running') launchRef.current = true;
+    if (e.pointerType === 'mouse' || !e.pointerType) {
+      if (stateRef.current.status === 'running') launchRef.current = true;
+    } else {
+      touchStart.current = { id: e.pointerId, x: e.clientX, y: e.clientY, at: Date.now() };
+    }
+  }, []);
+
+  const onPointerUp = useCallback((e: ReactPointerEvent<SVGSVGElement>) => {
+    const start = touchStart.current;
+    if (!start || start.id !== e.pointerId) return;
+    touchStart.current = null;
+    const moved = Math.hypot(e.clientX - start.x, e.clientY - start.y);
+    if (moved <= TAP_SLOP_PX && Date.now() - start.at <= TAP_MAX_MS && stateRef.current.status === 'running') {
+      launchRef.current = true;
+    }
+  }, []);
+
+  const onPointerCancel = useCallback(() => {
+    touchStart.current = null;
   }, []);
 
   // ── simulation: fixed 120 Hz steps, accumulated over animation frames ──
@@ -182,7 +220,7 @@ export function BreakoutGame(props: ArcadeGameProps = {}) {
     },
     [commit, dirRef, playSound],
   );
-  useFrameLoop(state.status === 'running', onFrame);
+  useFrameLoop(live, onFrame);
 
   // Hidden tab → pause (and the frame clamp keeps the resume smooth).
   useEffect(() => {
@@ -193,6 +231,22 @@ export function BreakoutGame(props: ArcadeGameProps = {}) {
     };
     document.addEventListener('visibilitychange', onVisibility);
     return () => document.removeEventListener('visibilitychange', onVisibility);
+  }, [commit]);
+
+  const openRules = useCallback(
+    (open: boolean) => {
+      if (!open) return;
+      setWelcomeBack(false);
+      const s = stateRef.current;
+      if (s.status === 'running') commit({ ...s, status: 'paused' });
+    },
+    [commit],
+  );
+
+  const finishEarly = useCallback(() => {
+    setWelcomeBack(false);
+    const s = stateRef.current;
+    if (s.status === 'running' || s.status === 'paused') commit({ ...s, status: 'gameOver', finishedEarly: true });
   }, [commit]);
 
   const best = Math.max(stats.best, state.score);
@@ -231,7 +285,7 @@ export function BreakoutGame(props: ArcadeGameProps = {}) {
         };
   } else if (state.status === 'gameOver') {
     overlay = {
-      title: k('gameOver'),
+      title: state.finishedEarly ? k('finishedEarly') : k('gameOver'),
       message: t(newBest ? 'overBodyNewBest' : 'overBody', { score: num(state.score), level: num(state.level), best: num(best) }),
       actions: [{ label: t('playAgain'), onClick: startNewRun, primary: true, kbd: 'R' }],
     };
@@ -240,7 +294,7 @@ export function BreakoutGame(props: ArcadeGameProps = {}) {
   const statusLabel = state.status === 'running' && awaitingLaunch(state) ? t('launch') : undefined;
 
   return (
-    <div className={`arc-game ${styles.game}`} style={{ '--game-color': 'var(--game-breakout)' } as CSSProperties}>
+    <div ref={rootRef} className={`arc-game ${styles.game}`} style={{ '--game-color': 'var(--game-breakout)' } as CSSProperties}>
       {!embedded && (
         <header className="arc-game__head">
           <div>
@@ -263,8 +317,14 @@ export function BreakoutGame(props: ArcadeGameProps = {}) {
       />
 
       <div className={styles.layout}>
-        <div className={`arc-game__board ${styles.boardWrap}`}>
-          <Playfield state={state} onPointerMove={onPointerMove} onPointerDown={onPointerDown} />
+        <div className={`arc-game__board arc-board-touch ${styles.boardWrap}`}>
+          <Playfield
+            state={state}
+            onPointerMove={onPointerMove}
+            onPointerDown={onPointerDown}
+            onPointerUp={onPointerUp}
+            onPointerCancel={onPointerCancel}
+          />
           {overlay && <GameOverlay {...overlay} />}
         </div>
 
@@ -282,6 +342,11 @@ export function BreakoutGame(props: ArcadeGameProps = {}) {
               <button type="button" className="arc-btn" onClick={startNewRun} disabled={state.status === 'idle'}>
                 {k('restart')}
               </button>
+            </div>
+            <div className={styles.tools}>
+              <RulesButton sections={rulesSections} gameId="breakout" onOpenChange={openRules} hotkey={false} />
+              <FinishButton score={state.score} visible={inProgress} onFinish={finishEarly} onOpenChange={setFinishOpen} />
+              <FullscreenButton immersive={immersive} />
             </div>
             <p className={styles.level}>
               {t('levelLine', { level: num(state.level) })} <strong>{levelName(layout.name, t)}</strong>
@@ -307,6 +372,12 @@ export function BreakoutGame(props: ArcadeGameProps = {}) {
           <section className="arc-panel">
             <h2 className="arc-panel__title">{t('panelKeys')}</h2>
             <KeyHelp rows={keyRows(t)} />
+            <TouchHelp
+              rows={[
+                [t('touchDrag'), t('touchDragAction')],
+                [t('touchTap'), t('touchTapAction')],
+              ]}
+            />
             <p className={styles.note}>{t('pointerNote')}</p>
           </section>
         </aside>

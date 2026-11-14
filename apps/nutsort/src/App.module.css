@@ -35,6 +35,13 @@
   flex: 1;
 }
 
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
 .save {
   margin-top: 10px;
   min-height: 16px;
@@ -66,5 +73,30 @@
 @media (max-width: 900px) {
   .layout {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Touch: every play button is a comfortable 44 px target. */
+@media (pointer: coarse) {
+  .buttons > *,
+  .settings :global(.arc-segmented) button {
+    min-height: 44px;
+  }
+}
+
+/* Short landscape phones: board and panels sit side by side. */
+@media (max-width: 900px) and (orientation: landscape) and (max-height: 500px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 280px);
+    gap: 12px;
+  }
+
+  .buttons {
+    flex-wrap: wrap;
+  }
+
+  .buttons > * {
+    min-width: 0;
+    flex: 1 1 110px;
   }
 }

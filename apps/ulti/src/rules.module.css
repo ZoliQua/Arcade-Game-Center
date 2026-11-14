@@ -1,0 +1,53 @@
+/* Sized from the dialog's own width (never the viewport), so it fits portrait, landscape and full screen alike. */
+.diagram {
+  display: block;
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  margin: 4px auto 8px;
+}
+
+.bids {
+  width: 100%;
+  max-width: 420px;
+  margin: 4px 0 10px;
+  border-collapse: collapse;
+  font-size: 13px;
+  table-layout: auto;
+}
+
+.bids th,
+.bids td {
+  padding: 3px 6px;
+  border-bottom: 1px solid var(--panel-border);
+  text-align: left;
+}
+
+.bids thead th {
+  font-size: 12px;
+  color: var(--text-mute);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.bids thead th:not(:first-child) {
+  text-align: right;
+}
+
+.bids tbody th {
+  font-weight: 600;
+  color: var(--text-strong);
+  overflow-wrap: anywhere;
+}
+
+.bids td {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  width: 1%;
+}
+
+/* The dialog caps every svg at 100 % of its box, which collapses an icon in a shrink-to-fit header cell. */
+.bids .icon svg {
+  max-width: none;
+}

@@ -64,6 +64,8 @@ export type GameState = {
   /** Text shown over the field for `bannerMs` ("Level 2", "Life lost"). */
   banner: string;
   bannerMs: number;
+  /** The player ended the run with Finish; ranks the current score. */
+  finishedEarly?: boolean;
 };
 
 /** Per-step player input. */

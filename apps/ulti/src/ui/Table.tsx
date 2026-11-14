@@ -47,7 +47,7 @@ export function Table({ deal, scores, name, figure, lang, tr, dental, talon, tur
           dealer: tr('dealer'),
           declarer: tr('declarer'),
           defender: tr('defender'),
-          cards: tr('cardsCount', { n: deal.hands[p].length }),
+          cards: tr('cardsCount', { n: formatNumber(deal.hands[p].length, lang) }),
           seat: tr('seatLabel', { name: name(p), units }),
         }}
       />

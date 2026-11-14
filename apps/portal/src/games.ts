@@ -14,8 +14,7 @@ import { HoldemDemo, HoldemGame } from '@arcade/holdem';
 import { MinesweeperDemo, MinesweeperGame } from '@arcade/minesweeper';
 import { SolitaireDemo, SolitaireGame } from '@arcade/solitaire';
 import { UltiDemo, UltiGame } from '@arcade/ulti';
-// TEMPORARY: Snapszer placeholder until the real game is mirrored in (Task 24).
-import { SnapszerPlaceholderDemo, SnapszerPlaceholderGame } from './SnapszerPlaceholder';
+import { SnapszerDemo, SnapszerGame } from '@arcade/snapszer';
 
 export type GameModule = {
   Game: ComponentType<ArcadeGameProps>;
@@ -38,6 +37,5 @@ export const GAME_MODULES: Record<ArcadeGameId, GameModule> = {
   minesweeper: { Game: MinesweeperGame, Demo: MinesweeperDemo },
   solitaire: { Game: SolitaireGame, Demo: SolitaireDemo },
   ulti: { Game: UltiGame, Demo: UltiDemo },
-  // TEMPORARY — replaced by @arcade/snapszer in Task 24.
-  snapszer: { Game: SnapszerPlaceholderGame, Demo: SnapszerPlaceholderDemo },
+  snapszer: { Game: SnapszerGame, Demo: SnapszerDemo },
 };

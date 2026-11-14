@@ -1,17 +1,24 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import {
   clearSession,
+  FinishButton,
   formatClock,
+  FullscreenButton,
   formatNumber,
   gameName,
   GameOverlay,
+  hCardLabel,
   KeyHelp,
   readString,
+  RulesButton,
   SaveBadge,
   shouldIgnoreKey,
   StatPanel,
+  TouchHelp,
   useArcadeRun,
   useDental,
+  useImmersive,
+  useIsTouch,
   useKitMessages,
   useLang,
   useMessages,
@@ -27,26 +34,30 @@ import type { Action } from './bots/actions';
 import { isLevel, LEVELS, type Level } from './bots/profiles';
 import { talonOwner } from './bots/view';
 import type { HCard, HSuit } from './arcade';
-import { BASE_VALUE, canPickUp, cardKey, illegalReason, isLegalDiscard, type Bid, type BidKind, type DealState, type Player } from './engine';
+import { BASE_VALUE, canPickUp, cardKey, illegalReason, isLegalDiscard, TALON_SIZE, type Bid, type BidKind, type DealState, type Player } from './engine';
 import { sessionOutcome } from './game/scoring';
 import {
   act,
   botStep,
+  canFinishEarly,
   DEALS_PER_SESSION,
+  finishEarly,
+  MIN_FINISH_DEALS,
+  rankedScore,
   isBotTurn,
   isUltiSession,
   nextDeal,
   SESSION_SCHEMA,
-  sessionScore,
   startSession,
   type UltiSession,
 } from './game/session';
 import { botDelay, readSpeed, SPEED_FACTOR, SPEEDS, writeSpeed, type Speed } from './game/speed';
 import { MESSAGES, type MessageKey } from './i18n';
+import { useRulesSections } from './rules';
 import { ActionPanel } from './ui/ActionPanel';
 import { DentalToggle } from './ui/DentalToggle';
 import { SeatFigure } from './ui/figures/SeatFigure';
-import { bidLabel, formatUnits, KIND_INFO, KIND_NAME, REASON_KEY, suitName, type Tr } from './ui/labels';
+import { bidLabel, formatUnits, KIND_NAME, kindInfo, REASON_KEY, suitName, type Tr } from './ui/labels';
 import { LogPanel } from './ui/LogPanel';
 import { Table } from './ui/Table';
 import type { TalonView } from './ui/TrickArea';
@@ -60,7 +71,7 @@ export const BOT_NAMES = { 1: 'Bandi', 2: 'Teri' } as const;
 
 type UiPhase = 'idle' | 'live' | 'paused';
 /** A message worded at render time, so a language switch re-words it. */
-type Notice = { key: MessageKey; bid?: Bid | null; suit?: HSuit | null; led?: HSuit | null };
+type Notice = { key: MessageKey; bid?: Bid | null; suit?: HSuit | null; led?: HSuit | null; n?: number };
 
 const DIFF_LABEL: Record<Level, MessageKey> = { easy: 'diffEasy', medium: 'diffMedium', hard: 'diffHard' };
 const SPEED_LABEL: Record<Speed, MessageKey> = { slow: 'speedSlow', normal: 'speedNormal', fast: 'speedFast' };
@@ -125,20 +136,28 @@ export function UltiGame(props: ArcadeGameProps = {}) {
   const [selected, setSelected] = useState<HCard[]>([]);
   const [notice, setNotice] = useState<Notice | null>(null);
   const [peek, setPeek] = useState(false);
+  // The Finish confirm is open: the bots and the clock stand still without leaving `running`.
+  const [finishOpen, setFinishOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const immersive = useImmersive(rootRef);
+  const touch = useIsTouch();
+  const rulesSections = useRulesSections();
 
   const finished = session?.phase === 'finished';
   const status: ArcadeStatus = ui === 'idle' || !session ? 'idle' : finished ? 'gameOver' : ui === 'paused' ? 'paused' : 'running';
   const running = status === 'running';
-  const score = session ? sessionScore(session) : 0;
+  // The Score panel (and the leaderboard at the end) shows the ranked score; it differs from the session score only
+  // after an early finish with too few deals.
+  const score = session ? rankedScore(session) : 0;
 
-  const seconds = useRunTimer(running, runKey, runKey === 0 && resumable ? (restored?.seconds ?? 0) : 0);
+  const seconds = useRunTimer(running && !finishOpen, runKey, runKey === 0 && resumable ? (restored?.seconds ?? 0) : 0);
   const stats = useArcadeRun({
     gameId: 'ulti',
     status,
     score,
     seconds,
     runKey,
-    outcome: () => (session ? sessionOutcome(session.scores) : 'over'),
+    outcome: () => (session?.finishedEarly ? 'finished' : session ? sessionOutcome(session.scores) : 'over'),
     props,
   });
   const savedAt = useSessionAutosave({
@@ -165,11 +184,18 @@ export function UltiGame(props: ArcadeGameProps = {}) {
   // ── Bots: one move per turn after a visible delay (Speed setting); a pause or a turn change cancels it. ──
   const latest = useRef(session);
   latest.current = session;
-  const botKey = session && running && !confirmNew && isBotTurn(session) ? moveKey : null;
+  const botKey = session && running && !confirmNew && !finishOpen && isBotTurn(session) ? moveKey : null;
   useEffect(() => {
     if (botKey === null || !latest.current) return;
     const ms = botDelay(latest.current.deal) * SPEED_FACTOR[speed];
-    const id = window.setTimeout(() => setSession((s) => (s && isBotTurn(s) ? botStep(s) : s)), ms);
+    // The decision (a Hard bot samples deals: tens of ms, rarely more) runs once, in its own task after the
+    // visible delay — never inside a React state updater or render — so the last tap has long been painted.
+    const id = window.setTimeout(() => {
+      const base = latest.current;
+      if (!base || !isBotTurn(base)) return;
+      const next = botStep(base);
+      setSession((s) => (s === base ? next : s));
+    }, ms);
     return () => window.clearTimeout(id);
   }, [botKey, speed]);
 
@@ -212,10 +238,17 @@ export function UltiGame(props: ArcadeGameProps = {}) {
     else setConfirmNew(true);
   }, [finished, ui, toSetup]);
 
+  const finish = useCallback(() => setSession((s) => (s ? finishEarly(s) : s)), []);
+
+  // Opening the rules pauses a live session; closing them leaves it paused.
+  const onRulesOpen = useCallback((open: boolean) => {
+    if (open) setUi((p) => (p === 'live' ? 'paused' : p));
+  }, []);
+
   const goNextDeal = useCallback(() => setSession((s) => (s && s.phase === 'dealOver' ? nextDeal(s) : s)), []);
 
   // ── The player's moves (the engine rejects anything illegal) ──
-  const myTurn = running && !confirmNew && session !== null && session.phase === 'playing' && session.deal.turn === 0;
+  const myTurn = running && !confirmNew && !finishOpen && session !== null && session.phase === 'playing' && session.deal.turn === 0;
   const doAct = useCallback((a: Action) => {
     const s = latest.current;
     if (!s) return;
@@ -233,7 +266,7 @@ export function UltiGame(props: ArcadeGameProps = {}) {
         setNotice(null);
         setSelected((sel) => {
           if (sel.some((c) => cardKey(c) === cardKey(card))) return sel.filter((c) => cardKey(c) !== cardKey(card));
-          return [...sel, card].slice(-2);
+          return [...sel, card].slice(-TALON_SIZE);
         });
         return;
       }
@@ -241,16 +274,23 @@ export function UltiGame(props: ArcadeGameProps = {}) {
       if (reason) {
         const led = deal.trick?.cards[0]?.card.suit ?? null;
         setNotice({ key: REASON_KEY[reason], suit: reason === 'mustFollow' ? led : (deal.bid?.trump ?? null), led });
+        setSelected([]);
+        return;
+      }
+      // Touch: the first tap raises the card, a second tap on the same card plays it.
+      if (touch && !(selected.length === 1 && cardKey(selected[0]) === cardKey(card))) {
+        setNotice(null);
+        setSelected([card]);
         return;
       }
       doAct({ type: 'play', card });
     },
-    [deal, doAct],
+    [deal, doAct, touch, selected],
   );
 
   const onDiscard = useCallback(() => {
     if (!deal) return;
-    if (selected.length !== 2) return setNotice({ key: 'discardNeedTwo' });
+    if (selected.length !== TALON_SIZE) return setNotice({ key: 'discardNeedTwo', n: TALON_SIZE });
     if (!isLegalDiscard(deal, selected)) return setNotice({ key: 'discardNoBid', bid: deal.bid });
     doAct({ type: 'discard', cards: [selected[0], selected[1]] });
   }, [deal, selected, doAct]);
@@ -267,8 +307,10 @@ export function UltiGame(props: ArcadeGameProps = {}) {
 
   // ── Keys ────────────────────────────────────────────────────
   const dealOver = session?.phase === 'dealOver';
-  const keyState = useRef({ status, confirmNew, dealOver, start, togglePause, toSetup, goNextDeal });
-  keyState.current = { status, confirmNew, dealOver, start, togglePause, toSetup, goNextDeal };
+  // CSS full screen (iPhone) leaves on Escape; then Escape does only that, not pause / resume as well.
+  const cssImmersive = immersive.active && !immersive.native;
+  const keyState = useRef({ status, confirmNew, dealOver, start, togglePause, toSetup, goNextDeal, cssImmersive });
+  keyState.current = { status, confirmNew, dealOver, start, togglePause, toSetup, goNextDeal, cssImmersive };
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (shouldIgnoreKey(e)) return;
@@ -278,6 +320,7 @@ export function UltiGame(props: ArcadeGameProps = {}) {
         setConfirmNew(false);
         return;
       }
+      if (e.key === 'Escape' && s.cssImmersive) return;
       if (e.key === 'p' || e.key === 'P' || e.key === 'Escape') {
         e.preventDefault();
         // The give-up card stays in charge: P never pauses behind it.
@@ -308,6 +351,7 @@ export function UltiGame(props: ArcadeGameProps = {}) {
         bid: notice.bid ? bidLabel(notice.bid, tr, lang) : '—',
         suit: notice.suit ? suitName(notice.suit, tr) : '—',
         led: notice.led ? suitName(notice.led, tr) : '—',
+        n: notice.n === undefined ? '—' : fmt(notice.n),
       })
     : null;
   const keyRows = useMemo(
@@ -315,6 +359,14 @@ export function UltiGame(props: ArcadeGameProps = {}) {
       ['Enter', tr('keyConfirm')],
       ['P Esc', tr('keyPause')],
       ['Tab', tr('keyCards')],
+      ['R', k('rulesButton')],
+    ],
+    [tr, k],
+  );
+  const touchRows = useMemo(
+    (): [string, string][] => [
+      [tr('touchTap'), tr('touchTapAction')],
+      [tr('touchBar'), tr('touchBarAction')],
     ],
     [tr],
   );
@@ -382,12 +434,14 @@ export function UltiGame(props: ArcadeGameProps = {}) {
     const outcome = sessionOutcome(session.scores);
     const best = Math.max(stats.best, score);
     overlay = {
-      title: tr(outcome === 'win' ? 'wonTitle' : outcome === 'draw' ? 'drawTitle' : 'lostTitle'),
+      title: session.finishedEarly
+        ? k('finishedEarly')
+        : tr(outcome === 'win' ? 'wonTitle' : outcome === 'draw' ? 'drawTitle' : 'lostTitle'),
       message:
         (score > 0 ? tr('resultPoints', { points: fmt(score) }) : tr('resultNoPoints')) +
-        tr('resultTail', { deals: fmt(DEALS_PER_SESSION), time: formatClock(seconds), best: fmt(best) }) +
+        tr('resultTail', { deals: fmt(session.history.length), time: formatClock(seconds), best: fmt(best) }) +
         (score > 0 && score > stats.bestBeforeRun ? tr('newBestSuffix') : ''),
-      children: lastResult(session),
+      children: session.finishedEarly ? undefined : lastResult(session),
       actions: [{ label: tr('newSession'), onClick: toSetup, primary: true, kbd: 'Enter' }],
     };
   } else if (running && session?.phase === 'dealOver') {
@@ -399,11 +453,16 @@ export function UltiGame(props: ArcadeGameProps = {}) {
   }
 
   const inSession = session !== null && ui !== 'idle';
+  let finishNote = '';
+  if (inSession && session && !finished) {
+    if (!canFinishEarly(session)) finishNote = tr('finishNoteDeal');
+    else if (session.history.length < MIN_FINISH_DEALS) finishNote = tr('finishNoteMin', { min: fmt(MIN_FINISH_DEALS), zero: fmt(0) });
+  }
   const style = { '--game-color': 'var(--game-ulti)' } as CSSProperties;
   const figure = (p: Player) => <SeatFigure seat={p} dental={dental} title={tr(FIGURE_TITLE[dental ? 'dental' : 'classic'][p])} />;
 
   return (
-    <div className={`arc-game ${styles.game}`} style={style} data-testid="ulti-game">
+    <div ref={rootRef} className={`arc-game ${styles.game}`} style={style} data-testid="ulti-game">
       {!embedded && (
         <header className="arc-game__head">
           <div>
@@ -433,9 +492,25 @@ export function UltiGame(props: ArcadeGameProps = {}) {
         }
       />
 
+      <div className={styles.tools}>
+        <RulesButton sections={rulesSections} gameId="ulti" onOpenChange={onRulesOpen} />
+        <FinishButton
+          score={session ? rankedScore(finishEarly(session)) : 0}
+          visible={inSession && session !== null && canFinishEarly(session)}
+          onFinish={finish}
+          onOpenChange={setFinishOpen}
+        />
+        <FullscreenButton immersive={immersive} />
+        {finishNote && (
+          <p className={styles.finishNote} data-testid="ulti-finish-note">
+            {finishNote}
+          </p>
+        )}
+      </div>
+
       <div className={styles.layout}>
         <div className={styles.main}>
-          <div className={`arc-game__board ${styles.board}`}>
+          <div className={`arc-game__board arc-board-tap ${styles.board}`}>
             {deal && session ? (
               <Table
                 deal={deal}
@@ -448,7 +523,8 @@ export function UltiGame(props: ArcadeGameProps = {}) {
                 talon={talonView(deal, peek, tr)}
                 turn={session.phase === 'playing' ? deal.turn : null}
                 hand={{
-                  selected: deal.phase === 'discard' && myTurn ? new Set(selected.map(cardKey)) : undefined,
+                  fan: touch,
+                  selected: myTurn && (deal.phase === 'discard' || (touch && deal.phase === 'play')) ? new Set(selected.map(cardKey)) : undefined,
                   playable: deal.phase === 'play' && myTurn ? new Set(deal.hands[0].filter((c) => !illegalReason(deal, 0, c)).map(cardKey)) : null,
                   onCard: myTurn && (deal.phase === 'discard' || deal.phase === 'play') ? onCard : null,
                 }}
@@ -488,6 +564,12 @@ export function UltiGame(props: ArcadeGameProps = {}) {
               onPass={() => doAct({ type: 'pass' })}
               onKontra={() => doAct({ type: 'kontra' })}
               onSkipKontra={() => doAct({ type: 'skipKontra' })}
+              bar={touch}
+              play={
+                touch && myTurn && deal.phase === 'play' && selected.length === 1
+                  ? { label: tr('playBtn', { card: hCardLabel(selected[0], lang) }), onPlay: () => onCard(selected[0]) }
+                  : null
+              }
             />
           )}
         </div>
@@ -568,7 +650,7 @@ export function UltiGame(props: ArcadeGameProps = {}) {
                   <dt>
                     {KIND_NAME[kind]} <span className={styles.value}>{fmt(BASE_VALUE[kind])}</span>
                   </dt>
-                  <dd>{tr(KIND_INFO[kind])}</dd>
+                  <dd>{kindInfo(kind, tr, lang)}</dd>
                 </div>
               ))}
               <div>
@@ -585,6 +667,7 @@ export function UltiGame(props: ArcadeGameProps = {}) {
           <section className="arc-panel">
             <h2 className="arc-panel__title">{tr('panelKeys')}</h2>
             <KeyHelp rows={keyRows} />
+            <TouchHelp rows={touchRows} />
           </section>
         </aside>
       </div>

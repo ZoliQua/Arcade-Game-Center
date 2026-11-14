@@ -35,7 +35,7 @@ export function TrickArea({ deal, name, lang, tr, dental, talon }: TrickAreaProp
         <div className={styles.bid} data-testid="ulti-current-bid">
           <span className={styles.caption}>{tr('currentBid')}</span>
           {deal.bid && by !== null ? (
-            <span title={bidInfo(deal.bid, tr)}>
+            <span title={bidInfo(deal.bid, tr, lang)}>
               {deal.bid.trump && <SuitIcon suit={deal.bid.trump} />} <strong>{bidLabel(deal.bid, tr, lang)}</strong> · {name(by)}
               {deal.kontra && <strong className={styles.kontra}> · Kontra</strong>}
             </span>
@@ -56,7 +56,12 @@ export function TrickArea({ deal, name, lang, tr, dental, talon }: TrickAreaProp
         )}
       </div>
 
-      <div className={styles.talon} data-testid="ulti-talon" data-open={talon.mode === 'open' ? 'true' : 'false'}>
+      <div
+        className={styles.talon}
+        data-testid="ulti-talon"
+        data-open={talon.mode === 'open' ? 'true' : 'false'}
+        data-empty={talonCards.length === 0 ? 'true' : 'false'}
+      >
         <span className={styles.caption}>{talon.mode === 'open' ? talon.label : tr('talon')}</span>
         <div className={styles.talonCards}>
           {talonCards.length === 0 ? (
@@ -78,7 +83,7 @@ export function TrickArea({ deal, name, lang, tr, dental, talon }: TrickAreaProp
           <>
             <span className={styles.caption}>
               {tr('trickN', { n: shown.index + 1 })}
-              {shown.trick.winner !== null && ` · ${tr('takes', { name: name(shown.trick.winner) })}`}
+              {shown.trick.winner !== null && ` · ${shown.trick.winner === 0 ? tr('takesYou') : tr('takes', { name: name(shown.trick.winner) })}`}
             </span>
             <div className={styles.trickCards}>
               {shown.trick.cards.map((pc) => (

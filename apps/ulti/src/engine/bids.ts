@@ -51,8 +51,11 @@ export const isPiros = (bid: Bid): boolean => bid.trump === 'piros';
 /** Parti games: the card points decide (Passz, Negyvenszáz, Húszszáz). */
 export const hasParti = (bid: Bid): boolean => bid.kinds.some((k) => k === 'passz' || k === 'negyvenszaz' || k === 'huszszaz');
 
+/** Piros (hearts trump) multiplies every contract of the bid. */
+export const PIROS_FACTOR = 2;
+
 /** Value of one contract of the bid (piros doubles trump bids). */
-export const kindValue = (bid: Bid, kind: BidKind): number => BASE_VALUE[kind] * (isPiros(bid) ? 2 : 1);
+export const kindValue = (bid: Bid, kind: BidKind): number => BASE_VALUE[kind] * (isPiros(bid) ? PIROS_FACTOR : 1);
 
 /** Total bid value per opponent (combinations add). */
 export const bidValue = (bid: Bid): number => bid.kinds.reduce((sum, k) => sum + kindValue(bid, k), 0);

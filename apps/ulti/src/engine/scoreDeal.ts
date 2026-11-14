@@ -2,7 +2,14 @@ import { hasParti, kindValue } from './bids';
 import { cardPoints } from './ranks';
 import type { Bid, BidKind, DealResult, DealState, Player } from './types';
 
-const LAST_TRICK = 10;
+/** Parti points for the last trick. */
+export const LAST_TRICK_POINTS = 10;
+/** Negyvenszáz and Húszszáz: the declarer needs at least this many parti points. */
+export const PARTI_TARGET = 100;
+/** Kontra multiplies every contract of the game. */
+export const KONTRA_FACTOR = 2;
+/** A failed Ulti (bukott ulti) pays this many times its value. */
+export const FAILED_ULTI_FACTOR = 2;
 
 /**
  * Parti points per side: ász/X 10 each in won tricks, 10 for the last trick, the talon's ász/X count
@@ -12,7 +19,7 @@ export function partiPoints(state: DealState): { declarer: number; defenders: nu
   const totals = { declarer: 0, defenders: 0 };
   const side = (p: Player | null) => (p === state.declarer ? 'declarer' : 'defenders');
   state.tricks.forEach((t, i) => {
-    const pts = t.cards.reduce((s, pc) => s + cardPoints(pc.card), 0) + (i === 9 ? LAST_TRICK : 0);
+    const pts = t.cards.reduce((s, pc) => s + cardPoints(pc.card), 0) + (i === 9 ? LAST_TRICK_POINTS : 0);
     totals[side(t.winner)] += pts;
   });
   totals.defenders += state.talon.reduce((s, card) => s + cardPoints(card), 0);
@@ -29,7 +36,7 @@ function contractWon(state: DealState, kind: BidKind, parti: { declarer: number;
       return parti.declarer > parti.defenders;
     case 'negyvenszaz':
     case 'huszszaz':
-      return parti.declarer >= 100;
+      return parti.declarer >= PARTI_TARGET;
     case 'betli':
       return all && tricks.every((t) => t.winner !== declarer);
     case 'durchmars':
@@ -49,7 +56,7 @@ export function dealResult(state: DealState): DealResult {
   if (state.phase !== 'over' || state.declarer === null || !state.bid) throw new Error('Deal is not over');
   const bid = state.bid;
   const parti = partiPoints(state);
-  const mult = state.kontra ? 2 : 1;
+  const mult = state.kontra ? KONTRA_FACTOR : 1;
   const tricksWon = [0, 1, 2].map((p) => state.tricks.filter((t) => t.winner === p).length) as unknown as DealResult['tricksWon'];
   return {
     declarer: state.declarer,
@@ -58,7 +65,7 @@ export function dealResult(state: DealState): DealResult {
     contracts: bid.kinds.map((kind) => {
       const won = contractWon(state, kind, parti);
       // A failed Ulti (bukott ulti) pays double.
-      const lostUlti = kind === 'ulti' && !won ? 2 : 1;
+      const lostUlti = kind === 'ulti' && !won ? FAILED_ULTI_FACTOR : 1;
       return { kind, won, value: kindValue(bid, kind) * mult * lostUlti };
     }),
     parti: hasParti(bid) ? parti : null,

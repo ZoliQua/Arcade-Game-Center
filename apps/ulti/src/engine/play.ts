@@ -56,6 +56,9 @@ export function illegalReason(state: DealState, player: Player, card: HCard): Il
   return card.suit === trump ? 'mustOvertrump' : 'mustTrump';
 }
 
+/** Points of an announced king + over pair: in trump (40) or in another suit (20). */
+export const PAIR_POINTS = { trump: 40, other: 20 } as const;
+
 /** 20/40 announced automatically at the player's first card (parti games only). */
 function announcementsFor(state: DealState, player: Player): Announcement[] {
   const bid = state.bid as Bid;
@@ -63,12 +66,12 @@ function announcementsFor(state: DealState, player: Player): Announcement[] {
   const trump = bid.trump;
   if (trump === null) return [];
   const pairs = H_SUITS.filter((s) => hasPair(hand, s)).map(
-    (suit): Announcement => ({ player, suit, points: suit === trump ? 40 : 20 }),
+    (suit): Announcement => ({ player, suit, points: suit === trump ? PAIR_POINTS.trump : PAIR_POINTS.other }),
   );
   if (bid.kinds.includes('passz')) return pairs;
   if (player !== state.declarer) return [];
-  if (bid.kinds.includes('negyvenszaz')) return pairs.filter((a) => a.points === 40);
-  if (bid.kinds.includes('huszszaz')) return pairs.filter((a) => a.points === 20).slice(0, 1);
+  if (bid.kinds.includes('negyvenszaz')) return pairs.filter((a) => a.points === PAIR_POINTS.trump);
+  if (bid.kinds.includes('huszszaz')) return pairs.filter((a) => a.points === PAIR_POINTS.other).slice(0, 1);
   return [];
 }
 

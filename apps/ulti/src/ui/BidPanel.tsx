@@ -1,6 +1,5 @@
-import type { Lang } from '../arcade';
-import { H_SUITS } from '../arcade';
-import { BID_SHAPES, bidValue, type Bid } from '../engine';
+import { formatNumber, H_SUITS, type Lang } from '../arcade';
+import { BID_SHAPES, bidValue, PIROS_FACTOR, type Bid } from '../engine';
 import { bidId, bidInfo, bidLabel, KIND_NAME, suitName, type Tr } from './labels';
 import { SuitIcon } from './SuitIcon';
 import styles from './BidPanel.module.css';
@@ -39,21 +38,25 @@ export function BidPanel({ bids, current, lang, tr, onBid }: BidPanelProps) {
                     key={bidId(bid)}
                     type="button"
                     className={`arc-btn ${styles.bidBtn}`}
-                    title={bidInfo(bid, tr)}
-                    aria-label={`${bidLabel(bid, tr, lang)} (${bidValue(bid)})`}
+                    title={bidInfo(bid, tr, lang)}
+                    aria-label={`${bidLabel(bid, tr, lang)} (${formatNumber(bidValue(bid), lang)})`}
                     data-bid={bidId(bid)}
                     onClick={() => onBid(bid)}
                   >
                     {suit ? (
                       <>
-                        <SuitIcon suit={suit} /> {suitName(suit, tr)}
+                        <SuitIcon suit={suit} /> <span className={styles.suitName}>{suitName(suit, tr)}</span>
                       </>
                     ) : (
                       KIND_NAME[shape[0]]
                     )}
-                    <span className={styles.value}>
-                      {piros ? '×2 ' : ''}
-                      {bidValue(bid)}
+                    {piros && (
+                      <span className={styles.mult} data-mult="">
+                        ×{formatNumber(PIROS_FACTOR, lang)}
+                      </span>
+                    )}
+                    <span className={styles.value} data-value="">
+                      {formatNumber(bidValue(bid), lang)}
                     </span>
                   </button>
                 );

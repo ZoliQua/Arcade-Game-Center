@@ -45,7 +45,7 @@ export const GAMES = {
  * Registered in the kit before their repo exists: skipped with a note.
  * An id leaves PENDING as soon as its repo exists. Any other missing repo is an error.
  */
-const PENDING = new Set(['snapszer']);
+const PENDING = new Set([]);
 
 const SYNCED = ['src', 'index.html', 'public', 'vite.config.ts'];
 const IGNORED = new Set(['.DS_Store', 'node_modules', 'dist']);

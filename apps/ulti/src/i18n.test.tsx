@@ -20,8 +20,8 @@ const stat = (label: string) => screen.getByText(label).parentElement?.textConte
 
 /** Keys whose text may equal English: Hungarian game terms, names and pure templates. */
 const SAME_OK: Record<'hu' | 'de', MessageKey[]> = {
-  hu: ['kontraBtn', 'talon', 'statDealValue', 'colDeal', 'logKontra', 'logTrickOpen', 'unitsLine', 'suitPiros', 'suitTok', 'suitZold', 'suitMakk'],
-  de: ['kontraBtn', 'talon', 'statDealValue', 'colDeal', 'logKontra', 'logTrickOpen', 'unitsLine', 'speedNormal'],
+  hu: ['kontraBtn', 'talon', 'statDealValue', 'colDeal', 'logKontra', 'logTrickOpen', 'unitsLine', 'suitPiros', 'suitTok', 'suitZold', 'suitMakk', 'rulesTablePiros'],
+  de: ['kontraBtn', 'talon', 'statDealValue', 'colDeal', 'logKontra', 'logTrickOpen', 'unitsLine', 'speedNormal', 'rulesTablePiros', 'rulesDiagramColourless'],
 };
 
 describe('Ulti i18n', () => {
@@ -109,7 +109,7 @@ describe('Ulti i18n', () => {
     expect(stat('Osztás')).toBe(`${s.dealNo} / 10`);
     expect(stat('Idő')).toBe('00:42');
     expect(screen.getByTestId('ulti-log').children.length).toBe(logBefore);
-    expect(screen.getByTestId('ulti-log').textContent).toContain('viszi');
+    expect(screen.getByTestId('ulti-log').textContent).toMatch(/viszi|viszed/);
     expect(screen.getByRole('heading', { level: 2, name: /^Napló/ })).toBeTruthy();
     expect(isUltiSessionLoad()?.deal.log.length).toBe(s.deal.log.length + 1);
   });

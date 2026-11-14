@@ -1,9 +1,9 @@
 {
   "name": "@arcade/portal",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "private": true,
   "type": "module",
-  "description": "The Zoltan's Arcade portal app: landing page with live demos, all fourteen games, stats, saves, leaderboard and settings.",
+  "description": "The Zoltan's Arcade portal app: landing page with live demos, all fifteen games, stats, saves, leaderboard and settings.",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit -p . && vite build",
@@ -22,6 +22,7 @@
     "@arcade/nutsort": "*",
     "@arcade/pacman": "*",
     "@arcade/snake": "*",
+    "@arcade/snapszer": "*",
     "@arcade/solitaire": "*",
     "@arcade/tetris": "*",
     "@arcade/tictactoe": "*",

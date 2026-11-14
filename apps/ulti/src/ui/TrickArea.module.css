@@ -98,3 +98,39 @@
   grid-area: south;
   margin-top: -18px;
 }
+
+/* Phones (portrait and landscape): a slim centre — no empty talon block, the three trick cards in one row. */
+@media (orientation: landscape) and (max-height: 520px), (max-width: 520px) and (pointer: coarse) {
+  .centre {
+    min-height: 0;
+    padding: 4px 8px;
+    gap: 4px 12px;
+  }
+
+  .talon[data-empty='true'] {
+    display: none;
+  }
+
+  .centre:has(.talon[data-empty='true']) {
+    grid-template-columns: 1fr;
+    grid-template-areas: 'info' 'trick';
+  }
+
+  .talonCard {
+    width: 30px;
+  }
+
+  .trickCards {
+    grid-template-columns: repeat(3, auto);
+    grid-template-areas: 'west south east';
+    gap: 0 12px;
+  }
+
+  .south {
+    margin-top: 0;
+  }
+
+  .trickCard {
+    width: 40px;
+  }
+}

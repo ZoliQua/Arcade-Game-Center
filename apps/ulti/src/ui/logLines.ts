@@ -1,7 +1,18 @@
-import type { Lang } from '../arcade';
-import { hCardLabel, type HCard } from '../arcade';
+import { formatNumber, hCardLabel, type HCard, type Lang } from '../arcade';
 import type { LogEntry, Player } from '../engine';
+import type { MessageKey } from '../i18n';
 import { bidLabel, suitName, type Tr } from './labels';
+
+/** Lines about the player (seat 0) use their own second-person wording ("You pass", „Passzolsz”, „Du passt”). */
+const YOU: Partial<Record<MessageKey, MessageKey>> = {
+  logPickup: 'logPickupYou',
+  logDiscard: 'logDiscardYou',
+  logBid: 'logBidYou',
+  logPass: 'logPassYou',
+  logDeclarer: 'logDeclarerYou',
+  logAnnounce: 'logAnnounceYou',
+  logTrick: 'logTrickYou',
+};
 
 export type LogLine = { id: number; kind: 'bid' | 'trick' | 'info'; text: string };
 
@@ -10,23 +21,25 @@ export function logLines(log: readonly LogEntry[], name: (p: Player) => string, 
   const out: LogLine[] = [];
   let plays: { player: Player; card: HCard }[] = [];
   let trickNo = 0;
+  const say = (key: MessageKey, p: Player, vars: Record<string, string | number> = {}) =>
+    tr(p === 0 ? (YOU[key] ?? key) : key, { name: name(p), ...vars });
   const cards = () => plays.map((p) => `${name(p.player)}: ${hCardLabel(p.card, lang)}`).join(', ');
   log.forEach((e, id) => {
     switch (e.type) {
       case 'pickup':
-        out.push({ id, kind: 'bid', text: tr('logPickup', { name: name(e.player) }) });
+        out.push({ id, kind: 'bid', text: say('logPickup', e.player) });
         break;
       case 'discard':
-        out.push({ id, kind: 'bid', text: tr('logDiscard', { name: name(e.player) }) });
+        out.push({ id, kind: 'bid', text: say('logDiscard', e.player) });
         break;
       case 'bid':
-        out.push({ id, kind: 'bid', text: tr('logBid', { name: name(e.player), bid: bidLabel(e.bid, tr, lang) }) });
+        out.push({ id, kind: 'bid', text: say('logBid', e.player, { bid: bidLabel(e.bid, tr, lang) }) });
         break;
       case 'pass':
-        out.push({ id, kind: 'bid', text: tr('logPass', { name: name(e.player) }) });
+        out.push({ id, kind: 'bid', text: say('logPass', e.player) });
         break;
       case 'declarer':
-        out.push({ id, kind: 'info', text: tr('logDeclarer', { name: name(e.player), bid: bidLabel(e.bid, tr, lang) }) });
+        out.push({ id, kind: 'info', text: say('logDeclarer', e.player, { bid: bidLabel(e.bid, tr, lang) }) });
         break;
       case 'kontra':
         out.push({ id, kind: 'bid', text: tr('logKontra', { name: name(e.player) }) });
@@ -35,14 +48,14 @@ export function logLines(log: readonly LogEntry[], name: (p: Player) => string, 
         out.push({ id, kind: 'bid', text: tr('logNoKontra', { name: name(e.player) }) });
         break;
       case 'announce':
-        out.push({ id, kind: 'info', text: tr('logAnnounce', { name: name(e.player), points: e.points, suit: suitName(e.suit, tr) }) });
+        out.push({ id, kind: 'info', text: say('logAnnounce', e.player, { points: formatNumber(e.points, lang), suit: suitName(e.suit, tr) }) });
         break;
       case 'play':
         plays.push({ player: e.player, card: e.card });
         break;
       case 'trick':
         trickNo = e.index + 1;
-        out.push({ id, kind: 'trick', text: tr('logTrick', { n: trickNo, cards: cards(), name: name(e.winner) }) });
+        out.push({ id, kind: 'trick', text: say('logTrick', e.winner, { n: formatNumber(trickNo, lang), cards: cards() }) });
         plays = [];
         break;
       case 'over':

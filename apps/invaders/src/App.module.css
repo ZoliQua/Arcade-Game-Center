@@ -34,6 +34,13 @@
   flex: 1;
 }
 
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
 .save {
   margin-top: 10px;
   min-height: 16px;
@@ -92,5 +99,12 @@
 
   .boardCol {
     width: min(100%, 520px);
+  }
+}
+
+/* Short landscape phones: size the board so it and the Fire button fit under the sticky header. */
+@media (max-height: 480px) and (orientation: landscape) {
+  .boardCol {
+    width: min(100%, calc((100vh - 130px) * 224 / 240));
   }
 }

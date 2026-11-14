@@ -32,13 +32,16 @@
   cursor: default;
 }
 
-.cardBtn:not(:disabled):hover,
-.cardBtn:focus-visible {
-  transform: translateY(-8px);
-  z-index: 1;
+@media (hover: hover) {
+  .cardBtn:not(:disabled):hover {
+    transform: translateY(-8px);
+    z-index: 1;
+  }
 }
 
 .cardBtn:focus-visible {
+  transform: translateY(-8px);
+  z-index: 1;
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
@@ -69,4 +72,77 @@
   transform: translateX(-50%);
   font-size: 12px;
   color: var(--text-strong);
+}
+
+/*
+ * Touch fan. The hand is its own size container: the card width and the step between cards come from the hand's
+ * width (never the viewport), so twelve cards fit wherever the table is (portal, standalone, full screen, landscape).
+ * Each step is at least the corner index wide, so every card's rank + suit stays in view.
+ */
+.fan {
+  container-type: inline-size;
+  --card-w: clamp(44px, 16cqw, 70px);
+  --step: min(calc(var(--card-w) * 0.74), calc((100cqw - var(--card-w)) / (var(--n) - 1)));
+  min-height: 0;
+  padding: 24px 8px 6px;
+  touch-action: manipulation;
+}
+
+.fan .slot {
+  margin-left: calc(var(--step) - var(--card-w));
+  min-height: calc(var(--card-w) * 1.6);
+  transform: translateY(var(--drop, 0)) rotate(var(--rot, 0deg));
+  transform-origin: 50% 100%;
+}
+
+.fan .slot:first-child {
+  margin-left: 0;
+}
+
+/* Never lift a card above its right-hand neighbour: that would cover the neighbour's corner. */
+.fan .cardBtn:focus-visible {
+  z-index: auto;
+}
+
+.fan .mark {
+  top: -22px;
+}
+
+.corner {
+  position: absolute;
+  top: 3px;
+  left: 1px;
+  width: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 2px 0 3px;
+  border-radius: 4px;
+  background: rgba(250, 243, 223, 0.94);
+  box-shadow: 0 0 0 1px rgba(46, 29, 18, 0.35);
+  color: #2e1d12;
+  font: 700 9.5px/1 Georgia, 'Times New Roman', serif;
+  letter-spacing: -0.03em;
+  pointer-events: none;
+  transition: transform calc(160ms * var(--anim, 1)) ease-out;
+}
+
+/* The kit raises a selected card by 14 % of its height; the index rides along. */
+.cardBtn[aria-pressed='true'] .corner {
+  transform: translateY(calc(var(--card-w) * -1.6 * 0.14));
+}
+
+.fan .dim .corner {
+  opacity: 0.7;
+}
+
+/* Landscape phones: the fan's size also follows the free height. */
+@media (orientation: landscape) and (max-height: 520px) {
+  .fan {
+    --card-w: min(clamp(40px, 16cqw, 70px), 13vh);
+    --card-w: min(clamp(40px, 16cqw, 70px), 13dvh);
+    padding-top: 18px;
+    padding-bottom: 2px;
+  }
 }

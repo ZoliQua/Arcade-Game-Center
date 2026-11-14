@@ -14,4 +14,6 @@ export type GameState = {
   gridSize: number;
   wrapWalls: boolean;
   speed: number;
+  /** The player ended the run with Finish; ranks the current score. */
+  finishedEarly?: boolean;
 };

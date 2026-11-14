@@ -51,6 +51,7 @@ return [
         'minesweeper' => 12000, // classic max 6000 (Expert on par, 300 s); time attack 150 per board, capped at 12000
         'solitaire'   => 4000,  // Spider four suits won on par without undo
         'ulti'        => 30000, // ten-deal session: net units × 50 × difficulty factor, capped
+        'snapszer'    => 5000,  // match: (unit lead × 100 + 500 for the win) × difficulty factor, capped
         // Duel games score one round with duelRoundScore(): max 2 × 500.
         'gomoku'    => 1000,
         'tictactoe' => 1000,

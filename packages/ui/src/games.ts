@@ -47,5 +47,5 @@ export const GAMES: PortalGame[] = ARCADE_GAMES.map((g) => ({
   color: `var(${g.colorVar})`,
 }));
 
-export const APP_VERSION = '3.1';
+export const APP_VERSION = '3.2';
 

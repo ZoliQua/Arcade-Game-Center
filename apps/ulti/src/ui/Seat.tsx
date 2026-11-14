@@ -49,6 +49,11 @@ export function Seat({ seat, name, units, isTurn, isDealer, role, backs, dental,
           {isDealer && <span className={styles.badge}>{labels.dealer}</span>}
           {role && <span className={styles.badge}>{role === 'declarer' ? `★ ${labels.declarer}` : labels.defender}</span>}
         </span>
+        {backs !== undefined && (
+          <span className={styles.count} aria-hidden="true">
+            {labels.cards}
+          </span>
+        )}
       </div>
       {backs !== undefined && (
         <div className={styles.backs} aria-label={labels.cards} role="img" data-testid={`seat-backs-${seat}`}>

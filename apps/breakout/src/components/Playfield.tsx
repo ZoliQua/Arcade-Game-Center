@@ -113,9 +113,11 @@ type Props = {
   variant?: 'full' | 'mini';
   onPointerMove?: (e: ReactPointerEvent<SVGSVGElement>) => void;
   onPointerDown?: (e: ReactPointerEvent<SVGSVGElement>) => void;
+  onPointerUp?: (e: ReactPointerEvent<SVGSVGElement>) => void;
+  onPointerCancel?: (e: ReactPointerEvent<SVGSVGElement>) => void;
 };
 
-export function Playfield({ state, variant = 'full', onPointerMove, onPointerDown }: Props) {
+export function Playfield({ state, variant = 'full', onPointerMove, onPointerDown, onPointerUp, onPointerCancel }: Props) {
   const t = useMessages(MESSAGES);
   const [lang] = useLang();
   const [dental] = useDental();
@@ -135,6 +137,8 @@ export function Playfield({ state, variant = 'full', onPointerMove, onPointerDow
       aria-hidden={mini ? true : undefined}
       onPointerMove={onPointerMove}
       onPointerDown={onPointerDown}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerCancel}
       data-dental={dental ? 'true' : 'false'}
     >
       <rect x={0} y={0} width={FIELD_W} height={FIELD_H} className={styles.bg} />

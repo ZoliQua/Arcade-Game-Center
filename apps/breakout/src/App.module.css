@@ -32,6 +32,13 @@
   flex: 1;
 }
 
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
 .level {
   margin: 10px 0 0;
   font-size: 13px;
@@ -62,5 +69,9 @@
 @media (max-width: 820px) {
   .layout {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .boardWrap {
+    width: min(100%, 720px, calc(62dvh * 4 / 3));
   }
 }

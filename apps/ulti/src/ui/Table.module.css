@@ -25,3 +25,14 @@
 .bottom > section {
   align-self: center;
 }
+
+@media (orientation: landscape) and (max-height: 520px), (max-width: 520px) and (pointer: coarse) {
+  .table {
+    gap: 6px;
+    padding: 6px 8px;
+  }
+
+  .top {
+    gap: 6px;
+  }
+}

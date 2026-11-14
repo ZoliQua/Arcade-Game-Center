@@ -64,3 +64,83 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Touch: thumb-sized bid buttons; the list scrolls inside the bottom bar instead of pushing the table away. */
+@media (pointer: coarse) {
+  .rows {
+    max-height: 28vh;
+    max-height: 28dvh;
+    overscroll-behavior: contain;
+  }
+
+  .bidBtn {
+    min-height: 44px;
+    font-size: 13px;
+  }
+}
+
+/* Narrow touch screens: the suit sign (a shape) names the suit; the word stays in the button's accessible name. */
+@media (pointer: coarse) and (max-width: 520px) {
+  .suitName {
+    display: none;
+  }
+
+  .hint {
+    display: none;
+  }
+
+  /* One line per contract (name, then the four suit buttons) and a shorter list: the hand stays in view. */
+  .row {
+    grid-template-columns: 84px minmax(0, 1fr);
+  }
+
+  .kind {
+    font-size: 12px;
+    line-height: 1.15;
+  }
+
+  .rows {
+    max-height: 22vh;
+    max-height: 22dvh;
+  }
+
+  .bidBtn {
+    gap: 6px;
+  }
+}
+
+/* Piros: the ×2 is its own framed badge (shape, not colour) in the button's corner, apart from the value. */
+.bidBtn {
+  position: relative;
+}
+
+.mult {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  padding: 0 3px;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  font-size: 9px;
+  line-height: 1.25;
+  font-weight: 700;
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+/* Landscape phones: the list sits in the side column next to the table, so it may be taller. */
+@media (orientation: landscape) and (max-height: 520px) {
+  .row {
+    grid-template-columns: 1fr;
+  }
+
+  .rows {
+    max-height: 46vh;
+    max-height: 46dvh;
+  }
+
+  .hint,
+  .suitName {
+    display: none;
+  }
+}

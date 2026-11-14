@@ -10,6 +10,21 @@
   justify-content: center;
 }
 
+.boardCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
 .boardWrap {
   justify-self: center;
 }

@@ -56,7 +56,7 @@ describe('UltiGame', () => {
       const bid = actions.querySelector('[data-bid]');
       const pass = within(actions).queryByRole('button', { name: en.passBtn });
       const noKontra = within(actions).queryByRole('button', { name: en.noKontra });
-      const discardBtn = within(actions).queryByRole('button', { name: en.discardBtn });
+      const discardBtn = within(actions).queryByRole('button', { name: en.discardBtn.replace('{n}', '2') });
       const playable = document.querySelector('[data-playable="true"]');
       if (bid) click(bid);
       else if (pass) click(pass);
@@ -68,8 +68,8 @@ describe('UltiGame', () => {
           for (let j = i + 1; j < n; j += 1) {
             click(handButtons()[i]);
             click(handButtons()[j]);
-            click(within(actions).getByRole('button', { name: en.discardBtn }));
-            if (!within(screen.getByTestId('ulti-actions')).queryByRole('button', { name: en.discardBtn })) break outer;
+            click(within(actions).getByRole('button', { name: en.discardBtn.replace('{n}', '2') }));
+            if (!within(screen.getByTestId('ulti-actions')).queryByRole('button', { name: en.discardBtn.replace('{n}', '2') })) break outer;
             handButtons().filter((b) => b.getAttribute('aria-pressed') === 'true').forEach((b) => click(b));
           }
       } else if (playable) click(playable);
