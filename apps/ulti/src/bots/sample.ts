@@ -1,4 +1,4 @@
-import { HUNGARIAN_DECK, type HCard, type HSuit } from '../deck/cards';
+import { HUNGARIAN_DECK, type HCard, type HSuit } from '../arcade/hungarian/cards';
 import { cardKey, trickWinner, type DealState, type Hands, type PlayedCard, type Player } from '../engine';
 import type { BotView } from './view';
 

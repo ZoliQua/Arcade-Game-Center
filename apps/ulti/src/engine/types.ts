@@ -1,4 +1,4 @@
-import type { HCard, HSuit } from '../deck/cards';
+import type { HCard, HSuit } from '../arcade/hungarian/cards';
 
 /** Seats: 0 is the human, 1 and 2 the bots. */
 export type Player = 0 | 1 | 2;

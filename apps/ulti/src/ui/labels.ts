@@ -1,5 +1,5 @@
 import type { Lang, MessageVars } from '../arcade';
-import type { HSuit } from '../deck/cards';
+import type { HSuit } from '../arcade';
 import { bidValue, type Bid, type BidKind, type IllegalReason } from '../engine';
 import type { MessageKey } from '../i18n';
 

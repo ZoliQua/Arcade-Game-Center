@@ -1,4 +1,4 @@
-import { H_SUITS, type HCard } from '../deck/cards';
+import { H_SUITS, type HCard } from '../arcade/hungarian/cards';
 import { hasPair } from './bids';
 import { nextPlayer, setHand } from './deal';
 import { beats, currentBest, sameCard, trickWinner } from './ranks';

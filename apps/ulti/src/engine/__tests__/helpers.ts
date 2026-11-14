@@ -1,5 +1,5 @@
 /** Test helpers: hand-built deal states (not part of the public engine API). */
-import type { HCard, HRank, HSuit } from '../../deck/cards';
+import type { HCard, HRank, HSuit } from '../../arcade/hungarian/cards';
 import type { Bid, DealState, Player, Trick } from '../types';
 
 export const c = (suit: HSuit, rank: HRank): HCard => ({ suit, rank });

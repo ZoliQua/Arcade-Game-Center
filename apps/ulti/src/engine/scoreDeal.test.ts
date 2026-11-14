@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { HCard } from '../deck/cards';
+import type { HCard } from '../arcade/hungarian/cards';
 import { makeBid } from './bids';
 import { applyBid, applyKontra, dealCards, discard, legalBids, mulberry32, pass, skipKontra } from './deal';
 import { legalPlays, playCard } from './play';

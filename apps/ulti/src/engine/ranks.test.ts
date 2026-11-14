@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { HUNGARIAN_DECK, type HRank } from '../deck/cards';
+import { HUNGARIAN_DECK, type HRank } from '../arcade/hungarian/cards';
 import { COLOURLESS_ORDER, TRUMP_ORDER, cardPoints, rankStrength, trickWinner } from './ranks';
 import { c } from './__tests__/helpers';
 

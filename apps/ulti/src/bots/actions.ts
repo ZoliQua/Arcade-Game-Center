@@ -1,4 +1,4 @@
-import type { HCard } from '../deck/cards';
+import type { HCard } from '../arcade/hungarian/cards';
 import { applyBid, applyKontra, discard, pass, pickUp, playCard, skipKontra, type Bid, type DealState } from '../engine';
 
 /** One decision of the player whose turn it is (human or bot). */

@@ -1,4 +1,4 @@
-import { H_SUITS, HUNGARIAN_DECK, type HCard, type HRank, type HSuit } from '../deck/cards';
+import { H_SUITS, HUNGARIAN_DECK, type HCard, type HRank, type HSuit } from '../arcade/hungarian/cards';
 import {
   ALL_BIDS, bidFeasible, bidValue, cardKey, cardPoints, hasParti, isHigherBid, kindValue, rankStrength, sameCard, type Bid, type BidKind,
   type DealState, type Player,

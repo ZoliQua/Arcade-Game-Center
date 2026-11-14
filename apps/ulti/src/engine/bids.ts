@@ -1,4 +1,4 @@
-import { H_SUITS, type HCard, type HSuit } from '../deck/cards';
+import { H_SUITS, type HCard, type HSuit } from '../arcade/hungarian/cards';
 import type { Bid, BidKind } from './types';
 
 /** Base value per opponent (Hungarian Wikipedia value table). */

@@ -1,7 +1,11 @@
-import { useDental, useLang } from '../arcade';
-import { H_SUITS, HUNGARIAN_DECK, hCardBackLabel, hCardLabel } from './cards';
-import { HungarianCard } from './HungarianCard';
+import { H_SUITS, HUNGARIAN_DECK, HungarianCard, hCardBackLabel, hCardLabel, hFigureName, useDental, useLang, type HCard, type Lang } from '../arcade';
 import styles from './Gallery.module.css';
+
+/** Caption: the card's name plus who or what it shows (Tell figure, mounted king or season). */
+function caption(c: HCard, lang: Lang): string {
+  const figure = hFigureName(c, lang);
+  return figure ? `${hCardLabel(c, lang)} · ${figure}` : hCardLabel(c, lang);
+}
 
 /** Dev-only review page (`?gallery=1`): the whole deck plus both backs. Not part of the game. */
 export function Gallery() {
@@ -14,7 +18,7 @@ export function Gallery() {
           {HUNGARIAN_DECK.filter((c) => c.suit === suit).map((c) => (
             <figure key={`${c.suit}-${c.rank}`} className={styles.cell}>
               <HungarianCard card={c} size={128} lang={lang} />
-              <figcaption>{hCardLabel(c, lang)}</figcaption>
+              <figcaption>{caption(c, lang)}</figcaption>
             </figure>
           ))}
         </div>

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   applyBid, cardKey, dealCards, discard, isLegalDiscard, makeBid, nextPlayer, pickUp, sameCard, type DealState, type Player,
 } from '../engine';
-import type { HCard } from '../deck/cards';
+import type { HCard } from '../arcade/hungarian/cards';
 import { driveDeal } from './testkit';
 import { toBotView } from './view';
 

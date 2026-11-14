@@ -1,4 +1,4 @@
-import { HUNGARIAN_DECK, H_RANKS, H_SUITS, type HCard } from '../deck/cards';
+import { HUNGARIAN_DECK, H_RANKS, H_SUITS, type HCard } from '../arcade/hungarian/cards';
 import { applyAction, type Action } from '../bots/actions';
 import { decide } from '../bots/decide';
 import { isLevel, type Level } from '../bots/profiles';

@@ -1,6 +1,6 @@
 import type { Lang } from '../arcade';
-import type { HCard } from '../deck/cards';
-import { HungarianCard } from '../deck/HungarianCard';
+import type { HCard } from '../arcade';
+import { HungarianCard } from '../arcade';
 import type { DealState, Player } from '../engine';
 import { bidInfo, bidLabel, suitName, type Tr } from './labels';
 import { SuitIcon } from './SuitIcon';

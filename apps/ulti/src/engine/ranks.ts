@@ -1,4 +1,4 @@
-import type { HCard, HRank, HSuit } from '../deck/cards';
+import type { HCard, HRank, HSuit } from '../arcade/hungarian/cards';
 import type { PlayedCard, Player } from './types';
 
 /** Trump games (Passz, 40-100, 20-100, Ulti, Durchmars), low → high: the X ranks right below the ace. */

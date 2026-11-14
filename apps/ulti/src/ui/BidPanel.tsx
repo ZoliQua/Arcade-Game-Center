@@ -1,5 +1,5 @@
 import type { Lang } from '../arcade';
-import { H_SUITS } from '../deck/cards';
+import { H_SUITS } from '../arcade';
 import { BID_SHAPES, bidValue, type Bid } from '../engine';
 import { bidId, bidInfo, bidLabel, KIND_NAME, suitName, type Tr } from './labels';
 import { SuitIcon } from './SuitIcon';

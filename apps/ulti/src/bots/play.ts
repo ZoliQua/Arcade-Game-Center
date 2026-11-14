@@ -1,4 +1,4 @@
-import type { HCard, HSuit } from '../deck/cards';
+import type { HCard, HSuit } from '../arcade/hungarian/cards';
 import {
   cardKey, cardPoints, dealResult, legalPlays, playCard, rankStrength, sameCard, scoreDeal, trickWinner, type Bid, type DealState,
   type Player, type Trick,

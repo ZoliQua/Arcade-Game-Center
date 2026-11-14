@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { HCard } from '../deck/cards';
+import type { HCard } from '../arcade/hungarian/cards';
 import { bidFeasible, bidValue, isHigherBid, makeBid } from '../engine';
 import { c } from '../engine/__tests__/helpers';
 import { bestBids, chooseBid, chooseDiscard, partiChance, wantsPickUp } from './bid';

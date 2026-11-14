@@ -1,4 +1,4 @@
-import { P } from '../../deck/art/parts';
+import { H_PALETTE as P } from '../../arcade';
 import { Tooth } from '../../arcade';
 import { Cameo, Features, HeadBase, Shoulders, WhiteCoat } from './parts';
 import { O, WHITE, WHITE_SHADE } from './palette';

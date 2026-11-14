@@ -1,4 +1,4 @@
-import { HUNGARIAN_DECK, type HCard } from '../deck/cards';
+import { HUNGARIAN_DECK, type HCard } from '../arcade/hungarian/cards';
 import { ALL_BIDS, bidFeasible, bidsEqual, isHigherBid } from './bids';
 import { cardKey, sameCard } from './ranks';
 import type { Bid, DealState, Hands, LogEntry, Player } from './types';

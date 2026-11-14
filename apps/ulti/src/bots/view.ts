@@ -1,4 +1,4 @@
-import type { HCard } from '../deck/cards';
+import type { HCard } from '../arcade/hungarian/cards';
 import {
   legalBids, legalPlays, type Announcement, type Bid, type DealState, type LogEntry, type Phase, type Player, type Trick,
 } from '../engine';

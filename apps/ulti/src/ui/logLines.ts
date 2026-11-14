@@ -1,5 +1,5 @@
 import type { Lang } from '../arcade';
-import { hCardLabel, type HCard } from '../deck/cards';
+import { hCardLabel, type HCard } from '../arcade';
 import type { LogEntry, Player } from '../engine';
 import { bidLabel, suitName, type Tr } from './labels';
 

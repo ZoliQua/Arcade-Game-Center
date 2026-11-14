@@ -1,5 +1,5 @@
-import type { HSuit } from '../deck/cards';
-import { SuitSign } from '../deck/art/SuitSign';
+import type { HSuit } from '../arcade';
+import { HSuitSign as SuitSign } from '../arcade';
 
 /** A suit sign of the deck as an inline icon (shape tells the suit, never colour alone). */
 export function SuitIcon({ suit, size = 16, title }: { suit: HSuit; size?: number; title?: string }) {

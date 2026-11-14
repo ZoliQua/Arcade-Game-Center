@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import type { Lang } from '../arcade';
-import { HungarianCard } from '../deck/HungarianCard';
+import { HungarianCard } from '../arcade';
 import styles from './Seat.module.css';
 
 export type SeatProps = {

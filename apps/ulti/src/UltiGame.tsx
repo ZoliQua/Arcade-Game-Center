@@ -26,7 +26,7 @@ import {
 import type { Action } from './bots/actions';
 import { isLevel, LEVELS, type Level } from './bots/profiles';
 import { talonOwner } from './bots/view';
-import type { HCard, HSuit } from './deck/cards';
+import type { HCard, HSuit } from './arcade';
 import { BASE_VALUE, canPickUp, cardKey, illegalReason, isLegalDiscard, type Bid, type BidKind, type DealState, type Player } from './engine';
 import { sessionOutcome } from './game/scoring';
 import {

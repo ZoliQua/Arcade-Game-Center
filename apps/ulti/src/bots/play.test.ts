@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { HUNGARIAN_DECK } from '../deck/cards';
+import { HUNGARIAN_DECK } from '../arcade/hungarian/cards';
 import { cardKey, makeBid, mulberry32, type Player } from '../engine';
 import { c, playState, trickOf } from '../engine/__tests__/helpers';
 import { heuristicPlay } from './play';

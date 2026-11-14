@@ -1,7 +1,7 @@
 import { useId, type ReactNode } from 'react';
-import { P } from '../../deck/art/parts';
+import { H_PALETTE as P } from '../../arcade';
 import { O, WHITE, WHITE_SHADE } from './palette';
-import { svgId } from '../../deck/art/svgId';
+import { hSvgId as svgId } from '../../arcade';
 
 /**
  * Seat portraits in the deck's woodcut look: a cream cameo, flat period colours, dark-brown outlines.

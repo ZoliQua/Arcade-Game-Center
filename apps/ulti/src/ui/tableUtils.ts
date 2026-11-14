@@ -1,4 +1,4 @@
-import { H_SUITS, type HCard } from '../deck/cards';
+import { H_SUITS, type HCard } from '../arcade';
 import { rankStrength, type Bid, type DealState, type Trick } from '../engine';
 
 /** Suits in deck order, then high to low in the order of the current game (trump order unless colourless). */
