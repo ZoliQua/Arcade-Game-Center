@@ -3,6 +3,25 @@
 All notable changes to Arcade-Game-Center. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 versioning: [SemVer](https://semver.org/).
 
+## [3.1.0] — 2026-11-14
+
+### Added
+- **Minesweeper**, **Solitaire** and **Ulti** join the arcade (fourteen games), each from its own standalone repo
+  ([Minesweeper-Game](https://github.com/ZoliQua/Minesweeper-Game), [Solitaire-Game](https://github.com/ZoliQua/Solitaire-Game),
+  [Ulti-Game](https://github.com/ZoliQua/Ulti-Game)) mirrored into `apps/minesweeper`, `apps/solitaire` and `apps/ulti`:
+  - Minesweeper („Aknakereső”): classic, hexagonal and time-attack boards, a safe first click, numbers drawn as digits (colour only a bonus).
+  - Solitaire („Pasziánsz”, „Solitär”): Klondike (draw 1 / 3), Spider (1 / 2 / 4 suits) and FreeCell with hints, undo,
+    safe auto-moves and auto-complete.
+  - Ulti: the Hungarian three-player card game against two bots, with bidding, the talon, the classic contracts, Kontra
+    and Hungarian scoring, on our own vector redraw of the 1835 Schneider Tell deck.
+- Kit registry entries, `--game-*` accent tokens and a shared playing-card component; sidebar / card icons.
+- `arcade-api`: `max_score` caps for `minesweeper` (6,000), `solitaire` (4,000) and `ulti` (30,000).
+
+### Changed
+- Landing headline „Fourteen classics, one home.” (hu / de alike); package and page descriptions list all fourteen games.
+- The monorepo test setup polyfills `PointerEvent` for jsdom, as the Solitaire repo does, so drag tests run here too.
+- `scripts/sync-games.mjs`: the three new ids are no longer pending; every registered game needs its sibling repo.
+
 ## [3.0.0] — 2026-11-09
 
 ### Added

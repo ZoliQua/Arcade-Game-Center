@@ -25,6 +25,18 @@ server rewrites.
 
 The first request creates the table automatically.
 
+### Upgrading to v3.1 (fourteen games)
+
+Add Minesweeper, Solitaire and Ulti to the live `_config.php` `max_score` map, otherwise their scores are rejected with
+`unknown_game` (Minesweeper: Expert cleared on par; Solitaire: Spider four suits won on par without undo; Ulti: the
+ten-deal session cap):
+
+```php
+'minesweeper' => 6000,
+'solitaire'   => 4000,
+'ulti'        => 30000,
+```
+
 ### Upgrading an existing server to v2.3 (eleven games)
 
 Add Texas Hold'em to the live `_config.php` `max_score` map (hard-table base 5,000 × first-place share 1.0):

@@ -1,7 +1,7 @@
 # 🕹️ Zoltan's Arcade — Arcade-Game-Center
 
-One portal for eleven browser games — **Tetris, Snake, 2048, Pac-Man, Gomoku, Tic-Tac-Toe, Breakout, Space Invaders,
-Connect Four, Nut Sort and Texas Hold'em** — with one design
+One portal for fourteen browser games — **Tetris, Snake, 2048, Pac-Man, Gomoku, Tic-Tac-Toe, Breakout, Space Invaders,
+Connect Four, Nut Sort, Texas Hold'em, Minesweeper, Solitaire and Ulti** — with one design
 system, one scoring model, autosave & resume, live attract-mode demos on the home page and a global leaderboard.
 Every game is also its **own repository** that builds and runs standalone.
 
@@ -46,6 +46,9 @@ Live: **https://dulzoltan.hu/arcade/**
 | 🔴 Connect Four | [Connect-Four-Game](https://github.com/ZoliQua/Connect-Four-Game) | Duel — 7×6, bitboard negamax AI | `apps/connect4` |
 | 🔩 Nut Sort | [Nut-Sort-Game](https://github.com/ZoliQua/Nut-Sort-Game) | Sorting — 20 fixed levels with proven par, colour-blind shape coding | `apps/nutsort` |
 | 🃏 Texas Hold'em | [Texas-Holdem-Game](https://github.com/ZoliQua/Texas-Holdem-Game) | Cards — no-limit sit & go vs. 15 characters with styles and tells | `apps/holdem` |
+| 💣 Minesweeper | [Minesweeper-Game](https://github.com/ZoliQua/Minesweeper-Game) | Logic — classic, hexagonal and time-attack boards, safe first click | `apps/minesweeper` |
+| ♠️ Solitaire | [Solitaire-Game](https://github.com/ZoliQua/Solitaire-Game) | Cards — Klondike, Spider and FreeCell with hints, undo and auto-complete | `apps/solitaire` |
+| 🎴 Ulti | [Ulti-Game](https://github.com/ZoliQua/Ulti-Game) | Cards — the Hungarian three-player classic vs. two bots, Tell deck redrawn after 1835 | `apps/ulti` |
 
 ## ✨ Features
 
@@ -54,7 +57,7 @@ Live: **https://dulzoltan.hu/arcade/**
 - 🏆 **One scoring model** — every finished run is recorded once with the same rules (best, plays, wins, total score, play time); duel games share one round-score formula
 - 🧭 **Hash routing** — `#/play/snake`, `#/leaderboard`, `#/settings`: reloads, bookmarks and the back button just work
 - 🌍 **Three languages** — English, Hungarian and German in every game and the portal, from the top bar or settings; `?lang=en|hu|de` hands the language over from a link, and numbers follow the locale's grouping
-- 🦷 **Dental mode** — a „Fogas mód” / "Dental mode" / „Zahnmodus” toggle, off by default (or `?dental=1`), shared by the portal and all eleven games, each re-skinned with teeth, toothbrushes and toothpaste; presentation only
+- 🦷 **Dental mode** — a „Fogas mód” / "Dental mode" / „Zahnmodus” toggle, off by default (or `?dental=1`), shared by the portal and all fourteen games, each re-skinned with teeth, toothbrushes and toothpaste; presentation only
 - 🌗 **One design system** — tokens and `arc-*` components shared by the portal and every game, dark & light theme (**T**), synced across tabs
 - 📊 **Live header** — status, score and run time come straight from the mounted game
 - 🌍 **Global leaderboard** — small PHP + MySQL API with rate limiting and sanity caps
@@ -77,6 +80,7 @@ npm run dev:game @arcade/gomoku   # any game on its own, straight from apps/
 apps/
   portal/        @arcade/portal    the user-facing Vite app (landing, play, leaderboard, settings)
   tetris/ snake/ 2048/ pacman/ gomoku/ tictactoe/ breakout/ invaders/ connect4/ nutsort/ holdem/
+  minesweeper/ solitaire/ ulti/
                  @arcade/<id>      mirror of each standalone repo: src/, index.html, public/, vite.config.ts
 packages/
   kit/           @arcade/kit       shared runtime: stats, sessions, theme, hooks, StatPanel, GameOverlay, ArcadeShell, arcade.css
