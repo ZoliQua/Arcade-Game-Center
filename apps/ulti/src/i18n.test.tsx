@@ -55,6 +55,16 @@ describe('Ulti i18n', () => {
     expect(MESSAGES.hu.pickUp).toBe('Felveszem a talont');
   });
 
+  it('uses natural Hungarian and German wording for the log, the pass button and deal titles', () => {
+    expect(MESSAGES.hu.logAnnounce).toBe('{name} bemondja: {points} ({suit})');
+    expect(MESSAGES.de.takes).toBe('{name} macht den Stich');
+    expect(MESSAGES.de.logTrick).toBe('{n}. {cards} — {name} macht den Stich');
+    expect(MESSAGES.de.passBtn).toBe('Passen');
+    for (const v of Object.values(MESSAGES.hu)) expect(v).not.toMatch(/a\(z\)/i);
+    expect(MESSAGES.hu.dealOverTitle).toMatch(/^\{n\}\. osztás/);
+    expect(MESSAGES.hu.welcomeBody).toMatch(/^\{deal\}\. osztás/);
+  });
+
   it('renders the German UI after applyLang("de")', () => {
     applyLang('de');
     render(<UltiGame />);

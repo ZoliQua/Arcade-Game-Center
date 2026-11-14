@@ -280,6 +280,8 @@ export function UltiGame(props: ArcadeGameProps = {}) {
       }
       if (e.key === 'p' || e.key === 'P' || e.key === 'Escape') {
         e.preventDefault();
+        // The give-up card stays in charge: P never pauses behind it.
+        if (s.confirmNew) return;
         s.togglePause();
         return;
       }

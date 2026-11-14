@@ -15,7 +15,7 @@ versioning: [SemVer](https://semver.org/).
   - Ulti: the Hungarian three-player card game against two bots, with bidding, the talon, the classic contracts, Kontra
     and Hungarian scoring, on our own vector redraw of the 1835 Schneider Tell deck.
 - Kit registry entries, `--game-*` accent tokens and a shared playing-card component; sidebar / card icons.
-- `arcade-api`: `max_score` caps for `minesweeper` (6,000), `solitaire` (4,000) and `ulti` (30,000).
+- `arcade-api`: `max_score` caps for `minesweeper` (12,000: classic tops out at 6,000, time attack is capped at 12,000), `solitaire` (4,000) and `ulti` (30,000).
 
 ### Changed
 - Landing headline „Fourteen classics, one home.” (hu / de alike); package and page descriptions list all fourteen games.

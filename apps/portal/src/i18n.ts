@@ -32,6 +32,7 @@ export type PortalMessageKey =
   | 'tagArcade'
   | 'tagReflex'
   | 'tagPuzzle'
+  | 'tagLogic'
   | 'tagMaze'
   | 'tagStrategy'
   | 'tagDuel'
@@ -126,6 +127,7 @@ export const PORTAL_MESSAGES: Messages<PortalMessageKey> = {
     tagArcade: 'Arcade',
     tagReflex: 'Reflex',
     tagPuzzle: 'Puzzle',
+    tagLogic: 'Logic',
     tagMaze: 'Maze',
     tagStrategy: 'Strategy',
     tagDuel: 'Duel',
@@ -219,6 +221,7 @@ export const PORTAL_MESSAGES: Messages<PortalMessageKey> = {
     tagArcade: 'Arcade',
     tagReflex: 'Reflex',
     tagPuzzle: 'Logikai',
+    tagLogic: 'Gondolkodós',
     tagMaze: 'Labirintus',
     tagStrategy: 'Stratégia',
     tagDuel: 'Párbaj',
@@ -312,6 +315,7 @@ export const PORTAL_MESSAGES: Messages<PortalMessageKey> = {
     tagArcade: 'Arcade',
     tagReflex: 'Reaktion',
     tagPuzzle: 'Puzzle',
+    tagLogic: 'Logik',
     tagMaze: 'Labyrinth',
     tagStrategy: 'Strategie',
     tagDuel: 'Duell',
@@ -390,6 +394,7 @@ const TAG_KEYS: Record<string, PortalMessageKey> = {
   Arcade: 'tagArcade',
   Reflex: 'tagReflex',
   Puzzle: 'tagPuzzle',
+  Logic: 'tagLogic',
   Maze: 'tagMaze',
   Strategy: 'tagStrategy',
   Duel: 'tagDuel',

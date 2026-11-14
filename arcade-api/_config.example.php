@@ -48,7 +48,7 @@ return [
         'invaders' => 999999, // endless waves; the 1978 cabinet rolled over at 9,999
         'nutsort'  => 10800,  // 20 fixed levels, 100 × nut types each, solved at par
         'holdem'   => 5000,   // tournament: base by difficulty (max 5000) × finishing-place share
-        'minesweeper' => 6000,  // Expert cleared on par (300 s); time attack 150 per board
+        'minesweeper' => 12000, // classic max 6000 (Expert on par, 300 s); time attack 150 per board, capped at 12000
         'solitaire'   => 4000,  // Spider four suits won on par without undo
         'ulti'        => 30000, // ten-deal session: net units × 50 × difficulty factor, capped
         // Duel games score one round with duelRoundScore(): max 2 × 500.

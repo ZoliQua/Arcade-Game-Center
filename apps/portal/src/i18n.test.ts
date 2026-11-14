@@ -23,6 +23,9 @@ describe('portal messages', () => {
   it('localize genre tags and pass unknown ones through', () => {
     expect(tagLabel('Duel', 'de')).toBe('Duell');
     expect(tagLabel('Puzzle', 'hu')).toBe('Logikai');
+    expect(tagLabel('Logic', 'en')).toBe('Logic');
+    expect(tagLabel('Logic', 'hu')).toBe('Gondolkodós');
+    expect(tagLabel('Logic', 'de')).toBe('Logik');
     expect(tagLabel('Racing', 'hu')).toBe('Racing');
   });
 });

@@ -202,6 +202,22 @@ describe('UltiGame', () => {
     expect(handButtons()).toHaveLength(s.deal.hands[0].length);
   });
 
+  it('P does not pause behind the open give-up card; Keep playing returns to the running game', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.37);
+    const onStatusChange = vi.fn();
+    render(<UltiGame onStatusChange={onStatusChange} />);
+    click(screen.getByRole('button', { name: /Deal the cards/ }));
+    click(screen.getByRole('button', { name: en.newSession }));
+    expect(screen.getByRole('dialog', { name: en.abandonTitle })).toBeTruthy();
+    key('p');
+    key('P');
+    key('p');
+    expect(screen.getByRole('dialog', { name: en.abandonTitle })).toBeTruthy();
+    click(screen.getByRole('button', { name: new RegExp(en.keepPlaying) }));
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(onStatusChange).toHaveBeenLastCalledWith(expect.objectContaining({ status: 'running' }));
+  });
+
   it('marks the seat on turn with a text badge, not colour alone, and shows balances', () => {
     const s = findSession((x) => humanTurn(x, 'play') && x.history.length > 0);
     resume(s);

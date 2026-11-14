@@ -28,11 +28,11 @@ The first request creates the table automatically.
 ### Upgrading to v3.1 (fourteen games)
 
 Add Minesweeper, Solitaire and Ulti to the live `_config.php` `max_score` map, otherwise their scores are rejected with
-`unknown_game` (Minesweeper: Expert cleared on par; Solitaire: Spider four suits won on par without undo; Ulti: the
+`unknown_game` (Minesweeper: classic max 6000 for Expert cleared on par, time attack capped at 12000; Solitaire: Spider four suits won on par without undo; Ulti: the
 ten-deal session cap):
 
 ```php
-'minesweeper' => 6000,
+'minesweeper' => 12000,
 'solitaire'   => 4000,
 'ulti'        => 30000,
 ```
@@ -127,5 +127,5 @@ credentials stay the same once `api/` (with `_config.php`) is copied server-side
    browsers. Leave the old `api/` in place; removing it is a manual decision.
 5. Browser data (local stats, autosaves, nickname, settings) is **not** migrated — it is stored per origin, so
    players start fresh on the new domain. The server-side leaderboard is kept (same database, same credentials).
-6. Verify live: the landing page lists all eleven games and the demos animate, a game plays, a leaderboard GET
+6. Verify live: the landing page lists all fourteen games and the demos animate, a game plays, a leaderboard GET
    answers for every game id, `api/_config.php` returns 403, Google Tag Manager loads, no console errors.
